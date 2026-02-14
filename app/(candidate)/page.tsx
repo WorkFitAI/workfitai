@@ -1,12 +1,15 @@
+import { HomeHeroSection } from "@/components/home/home-hero-section"
+import { HomeJobCategories } from "@/components/home/home-job-categories"
+import { HomeHowItWorks } from "@/components/home/home-how-it-works"
+import { HomeCtaBanner } from "@/components/home/home-cta-banner"
+
 export default function HomePage() {
   return (
-    <div className="container mx-auto px-4 py-16">
-      <h1 className="text-4xl font-bold tracking-tight text-foreground">
-        Welcome to WorkfitAI
-      </h1>
-      <p className="mt-4 text-lg text-muted-foreground">
-        AI-powered workforce management and job portal platform.
-      </p>
-    </div>
+    <>
+      <HomeHeroSection />
+      <HomeJobCategories />
+      <HomeHowItWorks />
+      <HomeCtaBanner />
+    </>
   )
 }
