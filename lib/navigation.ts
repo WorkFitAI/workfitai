@@ -11,6 +11,12 @@ export const candidateNavItems: NavItem[] = [
   { title: "Jobs", href: "/jobs", icon: Briefcase },
 ]
 
+export const authNavItems = {
+  login: '/login',
+  register: '/register',
+  forgotPassword: '/forgot-password',
+} as const
+
 export const controlNavItems: NavItem[] = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { title: "Candidates", href: "/candidates", icon: Users },

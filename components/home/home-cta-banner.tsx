@@ -18,7 +18,7 @@ export function HomeCtaBanner() {
             asChild
             className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
           >
-            <Link href="#">Browse Jobs</Link>
+            <Link href="/jobs">Browse Jobs</Link>
           </Button>
           <Button
             asChild

@@ -4,9 +4,9 @@
 **Framework**: Next.js 16.1.6 (App Router with React Server Components)
 **Language**: TypeScript 5.x
 **UI Framework**: TailwindCSS v4 (CSS-first) + shadcn/ui v3.8.4
-**Last Updated**: 2026-02-14
-**Version**: 0.2.0
-**Status**: Base Setup Complete (Route Groups, Layout Components, Form Infrastructure)
+**Last Updated**: 2026-02-15
+**Version**: 0.3.0
+**Status**: Base Setup + Authentication Complete (Route Groups, Layout Components, Auth System, Form Infrastructure)
 
 ## Project Overview
 
@@ -15,10 +15,15 @@ WorkfitAI is a dual-portal Next.js platform supporting both public job seekers a
 **Key Features:**
 - Candidate Portal: Job search and applications (public)
 - Control/Admin Portal: Workforce management dashboard (protected)
+- Full authentication flow with opaque token handling
+- Role-based route protection (CANDIDATE, HR, HR_MANAGER, ADMIN)
 - Reusable layout components for each portal
 - Form infrastructure: react-hook-form + Zod validation
 - 27 shadcn/ui components installed and ready
 - Centralized navigation configuration
+- Multi-tab logout synchronization
+- OTP verification for registration and password reset
+- OAuth callback support
 
 ## Directory Structure
 
@@ -34,26 +39,54 @@ workfitai/
 │   ├── (control)/                         # ADMIN: Control panel route group
 │   │   ├── layout.tsx                    # Sidebar + header layout
 │   │   └── dashboard/page.tsx            # Dashboard /dashboard
+│   ├── (auth)/                            # AUTH: Authentication route group
+│   │   ├── layout.tsx                    # Centered card layout
+│   │   ├── login/page.tsx                # Login page
+│   │   ├── register/page.tsx             # Register with role tabs
+│   │   ├── register/verify-otp/page.tsx  # OTP verification
+│   │   ├── forgot-password/page.tsx      # Forgot password flow
+│   │   ├── forgot-password/verify/page.tsx
+│   │   ├── forgot-password/reset/page.tsx
+│   │   └── oauth/callback/page.tsx       # OAuth exchange
 │   └── api/                               # API routes (placeholder)
 │
+├── middleware.ts                          # Route protection & auth checks
 ├── components/
 │   ├── ui/                                # shadcn/ui (27 components, auto-managed)
+│   ├── auth/                              # Auth components
+│   │   ├── login-form.tsx                # Login form with validation
+│   │   ├── password-input.tsx            # Password field with show/hide
+│   │   ├── otp-input.tsx                 # OTP input with auto-advance
+│   │   ├── register-form-candidate.tsx   # Candidate registration
+│   │   ├── register-form-hr.tsx          # HR staff registration
+│   │   └── register-form-hr-manager.tsx  # HR manager + company info
 │   ├── layout/
 │   │   ├── candidate/
-│   │   │   ├── candidate-header.tsx      # Sticky header + mobile Sheet nav
+│   │   │   ├── candidate-header.tsx      # Sticky header + auth integration
 │   │   │   └── candidate-footer.tsx      # Simple footer
 │   │   └── control/
 │   │       ├── control-sidebar.tsx       # Collapsible sidebar with nav icons
-│   │       ├── control-header.tsx        # Breadcrumb + avatar
+│   │       ├── control-header.tsx        # Breadcrumb + avatar + logout
 │   │       └── control-layout-wrapper.tsx# Sidebar state management
 │   └── shared/                            # Cross-feature components (empty, ready)
 │
+├── contexts/
+│   └── auth-context.tsx                   # Auth state + actions provider
 ├── hooks/                                 # Custom React hooks (directory ready)
 ├── lib/
 │   ├── utils.ts                           # cn() utility for class merging
-│   └── navigation.ts                      # Centralized nav config + types
+│   ├── navigation.ts                      # Centralized nav config + types
+│   ├── api-client.ts                      # Fetch wrapper with 401 refresh
+│   ├── schemas/
+│   │   └── auth-schemas.ts               # Zod schemas for all auth forms
+│   └── auth/
+│       ├── token-store.ts                # In-memory token cache + sessionStorage
+│       ├── device-fingerprint.ts         # Device ID generation + persistence
+│       ├── session-cookie.ts             # auth_session cookie helpers
+│       └── auth-service.ts               # All auth API endpoints
 ├── types/
-│   └── index.ts                           # Type exports (NavItem)
+│   ├── index.ts                           # Type exports (NavItem)
+│   └── auth.ts                            # Auth types (LoginRequest, UserSession, etc)
 │
 ├── docs/                                  # Project documentation
 │   ├── codebase-summary.md               # This file
@@ -107,6 +140,18 @@ workfitai/
 | @hookform/resolvers | ^5.2.2 | Zod integration for RHF |
 | zod | ^4.3.6 | TypeScript-first schema validation |
 | cmdk | ^1.1.1 | Command menu component |
+
+### Authentication
+
+| Component | Purpose |
+|-----------|---------|
+| `lib/auth/token-store.ts` | Opaque token caching (memory + sessionStorage) |
+| `lib/auth/device-fingerprint.ts` | Device ID for token rotation tracking |
+| `lib/auth/session-cookie.ts` | Non-HttpOnly cookie for middleware auth checks |
+| `lib/auth/auth-service.ts` | API endpoints: login, register, OTP verify, reset password, oauth |
+| `lib/api-client.ts` | Fetch wrapper with 401 refresh interceptor |
+| `contexts/auth-context.tsx` | Global auth state + token refresh scheduling |
+| `middleware.ts` | Route protection based on session cookie + roles |
 
 ### Notifications
 
@@ -497,17 +542,27 @@ npm run lint
 - ✅ Centralized navigation config
 - ✅ TailwindCSS v4 CSS-first theming
 
-### Phase 1: Core Features (Next)
+### Phase 1: ✅ Layout & Homepage Design Complete
+- ✅ Candidate portal homepage with hero, job categories, how-it-works, CTA
+- ✅ Blue oklch color tokens
+- ✅ Responsive header + footer
+- ✅ Mobile-first design
+
+### Phase 2: ✅ Authentication & User Profile Complete
+- ✅ Token management with opaque token handling
+- ✅ API client with 401 refresh interceptor
+- ✅ Auth context provider with token refresh scheduling
+- ✅ Next.js middleware route protection
+- ✅ Auth UI: password input, OTP input, forms for all roles
+- ✅ Auth pages: login, register, OTP verify, forgot password, OAuth callback
+- ✅ Multi-tab logout synchronization
+- ✅ Integration: headers with real auth state
+
+### Phase 3: Job Listings & Search (Next)
 - Candidate portal: Job search, filtering, application forms
 - Admin portal: Job posting, candidate management
-- Authentication & authorization
-- API endpoints for job/candidate data
-
-### Phase 2: Advanced
-- Search optimization
-- Notifications & messaging
-- Email integration
-- Analytics dashboard
+- Job detail pages
+- Application tracking
 
 ## Common Tasks
 
@@ -547,6 +602,7 @@ cd components/ui/[name].tsx  # Do not edit
 
 ---
 
-**Last Updated**: 2026-02-14
-**Status**: Base Setup Complete (v0.2.0)
-**LOC**: 380
+**Last Updated**: 2026-02-15
+**Status**: Base Setup + Authentication Complete (v0.3.0)
+**Auth Files**: 14 new/modified
+**LOC**: ~2100 (including all auth components and pages)
