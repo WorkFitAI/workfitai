@@ -1,8 +1,8 @@
 "use client"
 
-// Password input with show/hide toggle
+// Password input with Lock icon (left) + show/hide eye toggle (right)
 import { forwardRef, useId, useState } from 'react'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Lock } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
@@ -23,12 +23,13 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
       <div className="space-y-1">
         {label && <Label htmlFor={inputId}>{label}</Label>}
         <div className="relative">
+          <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             {...props}
             id={inputId}
             ref={ref}
             type={showPassword ? 'text' : 'password'}
-            className={cn('pr-10', className)}
+            className={cn('h-12 rounded-lg pl-10 pr-10', className)}
           />
           <Button
             type="button"

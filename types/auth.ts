@@ -7,7 +7,7 @@ export interface LoginRequest {
 export interface RegisterRequest {
   email: string
   password: string
-  role: 'CANDIDATE' | 'HR' | 'HR_MANAGER'
+  role: 'CANDIDATE' | 'HR' | 'HR_MANAGER' | 'EMPLOYER'
   fullName: string
   phoneNumber: string
   hrProfile?: {

@@ -1,30 +1,56 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+"use client"
 
-/** CTA banner — full-width blue section prompting sign-up */
+import { useState } from "react"
+import { Mail } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
+
+/** Newsletter CTA banner — full-width blue with email subscribe input */
 export function HomeCtaBanner() {
+  const [email, setEmail] = useState("")
+
+  function handleSubscribe() {
+    if (!email.includes("@")) {
+      toast.error("Please enter a valid email address")
+      return
+    }
+    toast.success("Thanks for subscribing!")
+    setEmail("")
+  }
+
   return (
-    <section className="bg-primary py-16 md:py-24">
-      <div className="container mx-auto px-4 text-center">
-        <h2 className="text-3xl font-bold tracking-tight text-primary-foreground md:text-4xl">
-          Ready to find your dream job?
+    <section className="relative overflow-hidden bg-primary py-16">
+      {/* Decorative corner blocks */}
+      <div className="absolute left-4 top-4 hidden grid-cols-1 gap-2 opacity-70 lg:grid">
+        <div className="h-20 w-24 rounded-lg bg-white/20" />
+        <div className="h-20 w-24 rounded-lg bg-white/20" />
+      </div>
+      <div className="absolute right-4 top-4 hidden grid-cols-1 gap-2 opacity-70 lg:grid">
+        <div className="h-20 w-24 rounded-lg bg-white/20" />
+        <div className="h-20 w-24 rounded-lg bg-white/20" />
+      </div>
+
+      {/* Content */}
+      <div className="relative mx-auto max-w-xl px-4 text-center">
+        <h2 className="text-2xl font-bold text-white md:text-3xl">
+          New Things Will Always Update Regularly
         </h2>
-        <p className="mt-3 text-primary-foreground/80">
-          Join thousands of candidates already matched by WorkfitAI.
-        </p>
-        <div className="mt-8 flex flex-wrap justify-center gap-4">
+        <div className="mt-6 flex overflow-hidden rounded-lg bg-white shadow-md">
+          <div className="flex flex-1 items-center gap-2 px-4">
+            <Mail className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <input
+              type="email"
+              placeholder="Enter Your Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="flex-1 py-3 text-sm text-foreground outline-none placeholder:text-muted-foreground"
+            />
+          </div>
           <Button
-            variant="outline"
-            asChild
-            className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
+            onClick={handleSubscribe}
+            className="rounded-none rounded-r-lg bg-primary px-6 text-white hover:bg-primary/90"
           >
-            <Link href="/jobs">Browse Jobs</Link>
-          </Button>
-          <Button
-            asChild
-            className="bg-primary-foreground text-primary hover:bg-primary-foreground/90"
-          >
-            <Link href="/sign-up">Sign Up Free</Link>
+            Subscribe
           </Button>
         </div>
       </div>

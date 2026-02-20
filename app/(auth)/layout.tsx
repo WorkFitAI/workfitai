@@ -1,10 +1,13 @@
-// Auth route group layout — centered card, no candidate header/footer
+// Auth route group layout — includes site header with decorative illustration support
+import { CandidateHeader } from "@/components/layout/candidate/candidate-header"
+
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-white">
+      <CandidateHeader />
+      <main className="relative overflow-hidden">
         {children}
-      </div>
+      </main>
     </div>
   )
 }
