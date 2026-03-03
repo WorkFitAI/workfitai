@@ -46,14 +46,17 @@ async function attemptRefresh(): Promise<boolean> {
         return false
       }
       const json = await response.json()
-      const { accessToken, expiryInMinutes, username, roles } = json.data
-      setAccessToken(accessToken, expiryInMinutes)
+      const { accessToken, expiryInMs, username, roles } = json.data
+      setAccessToken(accessToken, expiryInMs)
       // Keep auth_session cookie in sync so middleware reflects the refreshed session
       if (username && roles) {
+        const normalizedRoles = (roles as string[]).map((r) =>
+          r.startsWith('ROLE_') ? r : `ROLE_${r}`
+        ) as UserSession['roles']
         const session: UserSession = {
           username,
-          roles: roles as UserSession['roles'],
-          expiresAt: Date.now() + expiryInMinutes * 60 * 1000,
+          roles: normalizedRoles,
+          expiresAt: Date.now() + expiryInMs,
         }
         setSessionCookie(session)
       }

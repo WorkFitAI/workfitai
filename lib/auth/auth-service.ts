@@ -29,16 +29,24 @@ function broadcastLogout(): void {
   }
 }
 
+/** Normalize backend roles to ROLE_<NAME> format expected by middleware */
+function normalizeRoles(roles: string[]): UserSession['roles'] {
+  return roles.map((r) =>
+    r.startsWith('ROLE_') ? r : (`ROLE_${r}` as UserSession['roles'][number])
+  ) as UserSession['roles']
+}
+
 export const authService = {
   async login(data: LoginRequest): Promise<LoginResponse> {
     const response = await apiClient.post<LoginResponse>('/auth/login', data)
-    if (response.success) {
-      const { accessToken, expiryInMinutes, username, roles } = response.data
-      setAccessToken(accessToken, expiryInMinutes)
+    if (response.data?.accessToken) {
+      console.log('Login success')
+      const { accessToken, expiryInMs, username, roles } = response.data
+      setAccessToken(accessToken, expiryInMs)
       const session: UserSession = {
         username,
-        roles: roles as UserSession['roles'],
-        expiresAt: Date.now() + expiryInMinutes * 60 * 1000,
+        roles: normalizeRoles(roles),
+        expiresAt: Date.now() + expiryInMs,
       }
       setSessionCookie(session)
     }
@@ -59,13 +67,13 @@ export const authService = {
 
   async refresh(): Promise<LoginResponse> {
     const response = await apiClient.post<LoginResponse>('/auth/refresh')
-    if (response.success) {
-      const { accessToken, expiryInMinutes, username, roles } = response.data
-      setAccessToken(accessToken, expiryInMinutes)
+    if (response.data?.accessToken) {
+      const { accessToken, expiryInMs, username, roles } = response.data
+      setAccessToken(accessToken, expiryInMs)
       const session: UserSession = {
         username,
-        roles: roles as UserSession['roles'],
-        expiresAt: Date.now() + expiryInMinutes * 60 * 1000,
+        roles: normalizeRoles(roles),
+        expiresAt: Date.now() + expiryInMs,
       }
       setSessionCookie(session)
     }

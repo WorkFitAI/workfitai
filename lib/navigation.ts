@@ -8,7 +8,9 @@ export interface NavItem {
 
 export const candidateNavItems: NavItem[] = [
   { title: "Home", href: "/", icon: Home },
-  { title: "Jobs", href: "/jobs", icon: Briefcase },
+  { title: "Jobs List", href: "/jobs", icon: Briefcase },
+  { title: "My Applications", href: "/applied-jobs", icon: FileText },
+  { title: "My CVs", href: "/my-cvs", icon: FileText },
 ]
 
 export const authNavItems = {

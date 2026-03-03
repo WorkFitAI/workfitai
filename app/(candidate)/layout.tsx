@@ -5,7 +5,7 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex min-h-screen flex-col">
       <CandidateHeader />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 pt-16">{children}</main>
       <CandidateFooter />
     </div>
   )

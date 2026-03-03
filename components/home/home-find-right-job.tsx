@@ -1,31 +1,66 @@
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 
-/** Two-column section: visual placeholder left + copy + CTAs right */
+const BASE = "/imgs/page/homepage1"
+
+/** Two-column section: visual left with real chart + team photo, copy + CTAs right */
 export function HomeFindRightJob() {
   return (
     <section className="py-16 md:py-24">
       <div className="container mx-auto grid grid-cols-1 items-center gap-12 px-4 lg:grid-cols-2">
-        {/* Left: stats/chart visual */}
-        <div className="relative rounded-2xl bg-white p-6 shadow-lg">
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Opportunities
-          </p>
-          {/* Wave chart placeholder */}
-          <div className="my-4 flex h-24 items-end justify-around rounded-lg bg-primary/5 px-4">
-            {[40, 65, 45, 80, 55, 90, 70].map((h, i) => (
-              <div
-                key={i}
-                className="w-6 rounded-t-sm bg-primary/60"
-                style={{ height: `${h}%` }}
+        {/* Left: real chart + team photo + floating card */}
+        <div className="relative">
+          {/* Outer white card */}
+          <div className="relative rounded-2xl bg-white p-6 shadow-lg">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Opportunities
+            </p>
+
+            {/* Real chart image */}
+            <div className="relative my-4 h-36 w-full overflow-hidden rounded-xl">
+              <Image
+                src={`${BASE}/img-chart.png`}
+                alt="Job opportunities chart"
+                fill
+                className="object-cover"
               />
-            ))}
+            </div>
+
+            <p className="text-sm text-muted-foreground">
+              Millions of jobs matched to the right talent every day
+            </p>
+
+            {/* Real team photo */}
+            <div className="relative mt-4 h-44 w-full overflow-hidden rounded-xl">
+              <Image
+                src={`${BASE}/img1.png`}
+                alt="Professional team"
+                fill
+                className="object-cover object-top"
+              />
+            </div>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Millions of jobs matched to the right talent every day
-          </p>
-          {/* Team photo placeholder */}
-          <div className="mt-4 flex h-32 w-full items-center justify-center rounded-xl bg-gradient-to-br from-blue-100 to-primary/10 text-5xl">
-            👥
+
+          {/* Floating control card overlay */}
+          <div className="absolute -bottom-4 -right-4 z-10 w-36 overflow-hidden rounded-xl shadow-xl">
+            <Image
+              src={`${BASE}/controlcard.png`}
+              alt="Control dashboard"
+              width={144}
+              height={144}
+              className="w-full object-contain"
+            />
+          </div>
+
+          {/* Key numbers badge */}
+          <div className="absolute -left-4 top-6 z-10 w-20">
+            <Image
+              src={`${BASE}/key-numbers.svg`}
+              alt="Key stats"
+              width={80}
+              height={80}
+              className="object-contain drop-shadow-md"
+            />
           </div>
         </div>
 

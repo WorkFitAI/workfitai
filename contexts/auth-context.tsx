@@ -12,6 +12,9 @@ const BROADCAST_CHANNEL = 'wfa-auth-channel'
 // Schedule next refresh 60s before token expiry
 const REFRESH_BUFFER_MS = 60 * 1000
 
+// Roles that can access the control (HR/Admin) dashboard
+const CONTROL_ROLES = ['ROLE_HR', 'ROLE_HR_MANAGER', 'ROLE_ADMIN']
+
 interface AuthContextValue {
   user: UserSession | null
   isAuthenticated: boolean
@@ -49,10 +52,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const response = await authService.refresh()
         if (isLoggedOutRef.current) return // logout completed during async refresh
 
-        if (response.success) {
-          const { username, roles, expiryInMinutes } = response.data
-          const newExpiresAt = Date.now() + expiryInMinutes * 60 * 1000
-          setUser({ username, roles: roles as UserSession['roles'], expiresAt: newExpiresAt })
+        if (response.data?.accessToken) {
+          const { username, roles, expiryInMs } = response.data
+          const newExpiresAt = Date.now() + expiryInMs
+          const normalizedRoles = (roles as string[]).map((r) =>
+            r.startsWith('ROLE_') ? r : `ROLE_${r}`
+          ) as UserSession['roles']
+          setUser({ username, roles: normalizedRoles, expiresAt: newExpiresAt })
           scheduleRefresh(newExpiresAt)
         } else {
           setUser(null)
@@ -81,10 +87,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Attempt silent refresh when stored token has expired
         try {
           const response = await authService.refresh()
-          if (response.success) {
-            const { username, roles, expiryInMinutes } = response.data
-            const expiresAt = Date.now() + expiryInMinutes * 60 * 1000
-            setUser({ username, roles: roles as UserSession['roles'], expiresAt })
+          if (response.data?.accessToken) {
+            const { username, roles, expiryInMs } = response.data
+            const expiresAt = Date.now() + expiryInMs
+            const normalizedRoles = (roles as string[]).map((r) =>
+              r.startsWith('ROLE_') ? r : `ROLE_${r}`
+            ) as UserSession['roles']
+            setUser({ username, roles: normalizedRoles, expiresAt })
             scheduleRefresh(expiresAt)
           }
         } catch {
@@ -101,10 +110,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Call refresh to get user identity and a fresh session cookie
           try {
             const response = await authService.refresh()
-            if (response.success) {
-              const { username, roles, expiryInMinutes } = response.data
-              const expiresAt = Date.now() + expiryInMinutes * 60 * 1000
-              setUser({ username, roles: roles as UserSession['roles'], expiresAt })
+            if (response.data?.accessToken) {
+              const { username, roles, expiryInMs } = response.data
+              const expiresAt = Date.now() + expiryInMs
+              const normalizedRoles = (roles as string[]).map((r) =>
+                r.startsWith('ROLE_') ? r : `ROLE_${r}`
+              ) as UserSession['roles']
+              setUser({ username, roles: normalizedRoles, expiresAt })
               scheduleRefresh(expiresAt)
             }
           } catch {
@@ -145,12 +157,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(async (data: LoginRequest) => {
     const response = await authService.login(data)
-    if (response.success) {
+    if (response.data?.accessToken) {
       isLoggedOutRef.current = false // reset in case of re-login after logout
-      const { username, roles, expiryInMinutes } = response.data
-      const expiresAt = Date.now() + expiryInMinutes * 60 * 1000
-      setUser({ username, roles: roles as UserSession['roles'], expiresAt })
+      const { username, roles, expiryInMs } = response.data
+      const expiresAt = Date.now() + expiryInMs
+      const normalizedRoles = (roles as string[]).map((r) =>
+        r.startsWith('ROLE_') ? r : `ROLE_${r}`
+      ) as UserSession['roles']
+      setUser({ username, roles: normalizedRoles, expiresAt })
       scheduleRefresh(expiresAt)
+
+      // Role-based redirect: ADMIN / HR → /dashboard, candidates → /
+      const isControlUser = normalizedRoles.some((r) => CONTROL_ROLES.includes(r))
+      routerRef.current.push(isControlUser ? '/dashboard' : '/')
     }
   }, [scheduleRefresh])
 

@@ -43,14 +43,18 @@ export interface ResetPasswordRequest {
 
 // API response types
 export interface LoginResponse {
-  success: boolean
+  status: number
   message: string
   data: {
     accessToken: string
-    expiryInMinutes: number
+    expiryInMs: number
     username: string
     roles: string[]
+    companyId?: string | null
   }
+  timestamp?: string
+  source?: string
+  tokenType?: string
 }
 
 export interface ApiResponse<T = unknown> {

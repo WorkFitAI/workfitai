@@ -1,13 +1,17 @@
+import Image from "next/image"
+
+const BASE = "/imgs/page/homepage1"
+
 const locations = [
-  { city: "Paris", country: "France", companies: 5, jobs: 347, gradient: "from-pink-400/80 to-rose-500/80" },
-  { city: "London", country: "England", companies: 8, jobs: 5264, gradient: "from-blue-500/80 to-indigo-600/80" },
-  { city: "New York", country: "USA", companies: 3, jobs: 4356, gradient: "from-orange-400/80 to-amber-500/80" },
-  { city: "Amsterdam", country: "Holland", companies: 6, jobs: 892, gradient: "from-teal-400/80 to-cyan-500/80" },
-  { city: "Copenhagen", country: "Denmark", companies: 4, jobs: 1240, gradient: "from-purple-500/80 to-violet-600/80" },
-  { city: "Berlin", country: "Germany", companies: 7, jobs: 2180, gradient: "from-slate-500/80 to-gray-600/80" },
+  { city: "Paris",      country: "France",  companies: 5, jobs: 347,  img: `${BASE}/location1.png` },
+  { city: "London",     country: "England", companies: 8, jobs: 5264, img: `${BASE}/location2.png` },
+  { city: "New York",   country: "USA",     companies: 3, jobs: 4356, img: `${BASE}/location3.png` },
+  { city: "Amsterdam",  country: "Holland", companies: 6, jobs: 892,  img: `${BASE}/location4.png` },
+  { city: "Copenhagen", country: "Denmark", companies: 4, jobs: 1240, img: `${BASE}/location5.png` },
+  { city: "Berlin",     country: "Germany", companies: 7, jobs: 2180, img: `${BASE}/location6.png` },
 ]
 
-/** Jobs by location — grid of city cards with gradient overlay */
+/** Jobs by location — grid of city cards with real photography + gradient text overlay */
 export function HomeJobsByLocation() {
   return (
     <section className="py-16 md:py-20">
@@ -23,15 +27,20 @@ export function HomeJobsByLocation() {
           {locations.map((loc) => (
             <div
               key={`${loc.city}-${loc.country}`}
-              className="relative h-48 cursor-pointer overflow-hidden rounded-xl"
+              className="group relative h-52 cursor-pointer overflow-hidden rounded-xl"
             >
-              {/* Colored background (replaces photo) */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${loc.gradient}`} />
-              {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              {/* Content */}
-              <div className="absolute bottom-3 left-3 text-white">
-                <p className="font-semibold">
+              {/* Real city photo */}
+              <Image
+                src={loc.img}
+                alt={`${loc.city}, ${loc.country}`}
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              {/* Dark gradient overlay for text legibility */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              {/* City info */}
+              <div className="absolute bottom-3 left-4 text-white">
+                <p className="font-semibold drop-shadow">
                   {loc.city}, {loc.country}
                 </p>
                 <p className="text-xs opacity-80">

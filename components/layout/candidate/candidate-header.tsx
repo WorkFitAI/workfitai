@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useEffect, useState } from "react"
 import { Box, ChevronDown, Menu, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
@@ -18,27 +19,28 @@ import { candidateNavItems } from "@/lib/navigation"
 import { useAuth } from "@/contexts/auth-context"
 
 /** Guest auth buttons — Register text link + filled Sign In button */
-function GuestButtons() {
+function GuestButtons({ scrolled }: { scrolled: boolean }) {
   return (
     <div className="flex items-center gap-3">
       <Link
         href="/register"
-        className="flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary"
+        className={cn(
+          "flex items-center gap-1 text-sm font-medium transition-colors hover:text-primary",
+          scrolled ? "text-foreground" : "text-foreground/80"
+        )}
       >
-        <User className="h-4 w-4" />
         Register
       </Link>
       <Button asChild size="sm" className="gap-1 bg-primary text-white hover:bg-primary/90">
         <Link href="/login">
-          <User className="h-4 w-4" />
-          Sign In
+          Sign in
         </Link>
       </Button>
     </div>
   )
 }
 
-/** Logged-in avatar dropdown — avatar + name + chevron */
+/** Logged-in avatar dropdown */
 function UserDropdown() {
   const { user, logout } = useAuth()
   const initials = user?.username?.charAt(0).toUpperCase() ?? "U"
@@ -77,40 +79,68 @@ function UserDropdown() {
 export function CandidateHeader() {
   const pathname = usePathname()
   const { isAuthenticated } = useAuth()
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 20)
+    }
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
+  const isHome = pathname === "/"
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-white shadow-sm">
+    <header
+      className={cn(
+        "fixed top-0 z-50 w-full transition-all duration-300",
+        // At top on homepage: fully transparent, no border
+        // Scrolled or not on homepage: solid white with shadow
+        scrolled || !isHome
+          ? "border-b border-border bg-white shadow-sm"
+          : "border-b border-transparent bg-transparent"
+      )}
+    >
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
             <Box className="h-5 w-5 text-white" />
           </div>
-          <span className="text-xl font-bold text-foreground">WorkfitAI</span>
+          <span
+            className={cn(
+              "text-xl font-bold transition-colors",
+              scrolled || !isHome ? "text-foreground" : "text-foreground"
+            )}
+          >
+            WorkfitAI
+          </span>
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-4 md:flex">
-          {candidateNavItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-0.5 text-sm font-medium transition-colors",
-                pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
-                  ? "font-semibold text-primary"
-                  : "text-foreground/80 hover:text-primary"
-              )}
-            >
-              {item.title}
-              <ChevronDown className="ml-0.5 inline h-3 w-3" />
-            </Link>
-          ))}
+        <nav className="hidden items-center gap-6 md:flex">
+          {candidateNavItems.map((item) => {
+            const isActive =
+              pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-primary",
+                  isActive ? "font-semibold text-primary" : "text-foreground/80"
+                )}
+              >
+                {item.title}
+              </Link>
+            )
+          })}
         </nav>
 
         {/* Desktop account section */}
         <div className="hidden md:flex">
-          {isAuthenticated ? <UserDropdown /> : <GuestButtons />}
+          {isAuthenticated ? <UserDropdown /> : <GuestButtons scrolled={scrolled} />}
         </div>
 
         {/* Mobile hamburger */}
@@ -139,8 +169,6 @@ export function CandidateHeader() {
                 </SheetClose>
               ))}
             </nav>
-
-            {/* Mobile auth section at bottom */}
             <div className="mt-auto border-t border-border pt-4">
               {isAuthenticated ? (
                 <UserDropdown />
@@ -149,7 +177,7 @@ export function CandidateHeader() {
                   <Link href="/register" className="text-sm font-medium text-foreground hover:text-primary">
                     Register
                   </Link>
-                  <Button asChild size="sm" className="gap-1 bg-primary text-white">
+                  <Button asChild size="sm" className="bg-primary text-white">
                     <Link href="/login">
                       <User className="h-4 w-4" />
                       Sign In

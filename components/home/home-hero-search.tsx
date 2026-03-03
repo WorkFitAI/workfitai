@@ -32,10 +32,10 @@ export function HomeHeroSearch() {
       <div className="h-8 w-px bg-border" />
       {/* Keyword */}
       <div className="flex flex-1 items-center gap-2 px-4 py-3">
-        <User className="h-4 w-4 shrink-0 text-muted-foreground" />
+        <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
         <input
           type="text"
-          placeholder="You"
+          placeholder="Keyword"
           aria-label="Search keyword"
           className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
         />

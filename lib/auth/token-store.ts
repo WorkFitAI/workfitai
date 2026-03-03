@@ -22,8 +22,8 @@ export function getAccessToken(): string | null {
 }
 
 /** Stores the access token in memory + sessionStorage with computed expiry */
-export function setAccessToken(token: string, expiryInMinutes: number): void {
-  const expiresAt = Date.now() + expiryInMinutes * 60 * 1000
+export function setAccessToken(token: string, expiryInMs: number): void {
+  const expiresAt = Date.now() + expiryInMs
   cachedToken = token
   cachedExpiry = expiresAt
 
