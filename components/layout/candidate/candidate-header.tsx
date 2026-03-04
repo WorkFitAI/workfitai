@@ -1,16 +1,17 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu } from "lucide-react"
+import { useEffect, useState } from "react"
+import { ChevronDown, Menu, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -18,43 +19,58 @@ import { cn } from "@/lib/utils"
 import { candidateNavItems } from "@/lib/navigation"
 import { useAuth } from "@/contexts/auth-context"
 
-/** Guest auth buttons — shown when user is not signed in */
-function GuestButtons() {
+/** Guest auth buttons — Register text link + filled Sign In button */
+function GuestButtons({ scrolled }: { scrolled: boolean }) {
   return (
-    <div className="flex items-center gap-2">
-      <Button variant="ghost" asChild className="text-sm">
-        <Link href="/login">Sign In</Link>
-      </Button>
-      <Button asChild className="text-sm">
-        <Link href="/register">Sign Up</Link>
+    <div className="flex items-center gap-3">
+      <Link
+        href="/register"
+        className={cn(
+          "flex items-center gap-1 text-sm font-medium transition-colors hover:text-primary",
+          scrolled ? "text-foreground" : "text-foreground/80"
+        )}
+      >
+        Register
+      </Link>
+      <Button asChild size="sm" className="gap-1 bg-primary text-white hover:bg-primary/90">
+        <Link href="/login">
+          Sign in
+        </Link>
       </Button>
     </div>
   )
 }
 
-/** Logged-in avatar dropdown — shown when user is authenticated */
+/** Logged-in avatar dropdown */
 function UserDropdown() {
   const { user, logout } = useAuth()
   const initials = user?.username?.charAt(0).toUpperCase() ?? "U"
+  const firstName = user?.username?.split(" ")[0] ?? "User"
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+        <button className="flex items-center gap-2 rounded-full outline-none">
           <Avatar className="h-8 w-8">
-            <AvatarFallback>{initials}</AvatarFallback>
+            <AvatarFallback className="bg-primary text-white">{initials}</AvatarFallback>
           </Avatar>
-        </Button>
+          <span className="hidden text-sm font-medium md:block">{firstName}</span>
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuLabel>{user?.username}</DropdownMenuLabel>
-        <DropdownMenuSeparator />
+      <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-lg">
         <DropdownMenuItem asChild>
-          <Link href="/profile">Profile</Link>
+          <Link href="/saved-jobs">Saved Jobs</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/applied-jobs">Applied Jobs</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/account-settings">Account Settings</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-destructive" onClick={logout}>
-          Sign Out
+          Logout
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -64,37 +80,66 @@ function UserDropdown() {
 export function CandidateHeader() {
   const pathname = usePathname()
   const { isAuthenticated } = useAuth()
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 20)
+    }
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
+  const isHome = pathname === "/"
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header
+      className={cn(
+        "fixed top-0 z-50 w-full transition-all duration-300",
+        // At top on homepage: fully transparent, no border
+        // Scrolled or not on homepage: solid white with shadow
+        scrolled || !isHome
+          ? "border-b border-border bg-white shadow-sm"
+          : "border-b border-transparent bg-transparent"
+      )}
+    >
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
-        <Link href="/" className="text-xl font-bold text-primary">
-          WorkfitAI
+        <Link href="/" className="flex items-center gap-2">
+          <Image
+            src="/imgs/template/workfitai.png"
+            alt="WorkfitAI logo"
+            width={36}
+            height={36}
+            className="h-9 w-9 object-contain"
+            priority
+          />
+          <span className="text-xl font-bold text-[#1a2140]">WorkfitAI</span>
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-1 md:flex">
-          {candidateNavItems.map((item) => (
-            <Button
-              key={item.href}
-              asChild
-              variant="ghost"
-              className={cn(
-                "text-sm font-medium",
-                (pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href)))
-                  ? "bg-accent text-accent-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <Link href={item.href}>{item.title}</Link>
-            </Button>
-          ))}
+        <nav className="hidden items-center gap-6 md:flex">
+          {candidateNavItems.map((item) => {
+            const isActive =
+              pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-primary",
+                  isActive ? "font-semibold text-primary" : "text-foreground/80"
+                )}
+              >
+                {item.title}
+              </Link>
+            )
+          })}
         </nav>
 
         {/* Desktop account section */}
         <div className="hidden md:flex">
-          {isAuthenticated ? <UserDropdown /> : <GuestButtons />}
+          {isAuthenticated ? <UserDropdown /> : <GuestButtons scrolled={scrolled} />}
         </div>
 
         {/* Mobile hamburger */}
@@ -109,33 +154,33 @@ export function CandidateHeader() {
             <nav className="mt-8 flex flex-col gap-2">
               {candidateNavItems.map((item) => (
                 <SheetClose asChild key={item.href}>
-                  <Button
-                    asChild
-                    variant="ghost"
+                  <Link
+                    href={item.href}
                     className={cn(
-                      "justify-start text-sm font-medium",
-                      (pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href)))
-                        ? "bg-accent text-accent-foreground"
-                        : "text-muted-foreground hover:text-foreground"
+                      "text-sm font-medium transition-colors",
+                      pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
+                        ? "font-semibold text-primary"
+                        : "text-foreground/80 hover:text-primary"
                     )}
                   >
-                    <Link href={item.href}>{item.title}</Link>
-                  </Button>
+                    {item.title}
+                  </Link>
                 </SheetClose>
               ))}
             </nav>
-
-            {/* Mobile auth section at bottom */}
             <div className="mt-auto border-t border-border pt-4">
               {isAuthenticated ? (
                 <UserDropdown />
               ) : (
                 <div className="flex flex-col gap-2">
-                  <Button variant="ghost" asChild className="justify-start">
-                    <Link href="/login">Sign In</Link>
-                  </Button>
-                  <Button asChild className="justify-start">
-                    <Link href="/register">Sign Up</Link>
+                  <Link href="/register" className="text-sm font-medium text-foreground hover:text-primary">
+                    Register
+                  </Link>
+                  <Button asChild size="sm" className="bg-primary text-white">
+                    <Link href="/login">
+                      <User className="h-4 w-4" />
+                      Sign In
+                    </Link>
                   </Button>
                 </div>
               )}

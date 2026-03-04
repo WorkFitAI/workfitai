@@ -2,7 +2,7 @@
 
 // Step 2 of forgot-password flow — verify OTP sent to email
 // Reset token is stored in sessionStorage (never exposed in URL)
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
@@ -15,7 +15,8 @@ const RESEND_COOLDOWN_SECONDS = 60
 // sessionStorage key for the reset token — avoids exposing it in the URL
 export const RESET_TOKEN_SESSION_KEY = 'wfa_reset_token'
 
-export default function ForgotPasswordVerifyPage() {
+/** Inner component — must be inside <Suspense> because it calls useSearchParams() */
+function ForgotPasswordVerifyContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const email = searchParams.get('email') ?? ''
@@ -87,5 +88,14 @@ export default function ForgotPasswordVerifyPage() {
         </Button>
       </CardContent>
     </Card>
+  )
+}
+
+/** Page export — wraps content in Suspense (required by Next.js for useSearchParams) */
+export default function ForgotPasswordVerifyPage() {
+  return (
+    <Suspense>
+      <ForgotPasswordVerifyContent />
+    </Suspense>
   )
 }

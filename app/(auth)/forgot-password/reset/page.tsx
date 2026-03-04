@@ -2,7 +2,7 @@
 
 // Step 3 of forgot-password flow — set new password
 // Reset token read from sessionStorage (set by verify page), cleared after use
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -15,7 +15,8 @@ import { authService } from '@/lib/auth/auth-service'
 import { resetPasswordSchema, type ResetPasswordFormValues } from '@/lib/schemas/auth-schemas'
 import { RESET_TOKEN_SESSION_KEY } from '@/app/(auth)/forgot-password/verify/page'
 
-export default function ResetPasswordPage() {
+/** Inner component — must be inside <Suspense> because it calls useSearchParams() */
+function ResetPasswordForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const email = searchParams.get('email') ?? ''
@@ -93,5 +94,14 @@ export default function ResetPasswordPage() {
         </form>
       </CardContent>
     </Card>
+  )
+}
+
+/** Page export — wraps form in Suspense (required by Next.js for useSearchParams) */
+export default function ResetPasswordPage() {
+  return (
+    <Suspense>
+      <ResetPasswordForm />
+    </Suspense>
   )
 }
