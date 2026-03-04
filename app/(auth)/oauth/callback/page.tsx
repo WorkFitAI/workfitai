@@ -32,13 +32,13 @@ export default function OAuthCallbackPage() {
         const response = await apiClient.get<LoginResponse>(
           `/auth/oauth/exchange?session=${encodeURIComponent(sessionId)}`,
         )
-        if (response.success) {
-          const { accessToken, expiryInMinutes, username, roles } = response.data
-          setAccessToken(accessToken, expiryInMinutes)
+        if (response.data?.accessToken) {
+          const { accessToken, expiryInMs, username, roles } = response.data
+          setAccessToken(accessToken, expiryInMs)
           const session: UserSession = {
             username,
             roles: roles as UserSession['roles'],
-            expiresAt: Date.now() + expiryInMinutes * 60 * 1000,
+            expiresAt: Date.now() + expiryInMs,
           }
           setSessionCookie(session)
           const isControlUser = roles.some((r) => CONTROL_ROLES.includes(r))

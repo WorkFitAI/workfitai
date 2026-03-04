@@ -1,11 +1,14 @@
 "use client"
 
-// Auth context — provides user session state and auth actions to all components
+// Auth context — provides user session state and auth actions to all components.
+// Redux store is kept in sync at every setUser() call via dispatch.
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { authService } from '@/lib/auth/auth-service'
 import { getAccessToken, isTokenExpired } from '@/lib/auth/token-store'
 import { getSessionCookie } from '@/lib/auth/session-cookie'
+import { useAppDispatch } from '@/store/hooks'
+import { setCredentials, clearCredentials } from '@/store/auth-slice'
 import type { LoginRequest, UserSession } from '@/types/auth'
 
 const BROADCAST_CHANNEL = 'wfa-auth-channel'
@@ -27,6 +30,7 @@ const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
+  const dispatch = useAppDispatch()
   const [user, setUser] = useState<UserSession | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -36,6 +40,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Keep a stable ref to the router so timer callbacks don't stale-close over it
   const routerRef = useRef(router)
   useEffect(() => { routerRef.current = router }, [router])
+
+  /** Set user in React state AND sync to Redux store */
+  const applyUser = useCallback((session: UserSession | null) => {
+    setUser(session)
+    if (session) {
+      dispatch(setCredentials(session))
+    } else {
+      dispatch(clearCredentials())
+    }
+  }, [dispatch])
 
   /** Schedule the next silent refresh 1 min before token expiry */
   const scheduleRefresh = useCallback((expiresAt: number) => {
@@ -58,20 +72,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const normalizedRoles = (roles as string[]).map((r) =>
             r.startsWith('ROLE_') ? r : `ROLE_${r}`
           ) as UserSession['roles']
-          setUser({ username, roles: normalizedRoles, expiresAt: newExpiresAt })
+          applyUser({ username, roles: normalizedRoles, expiresAt: newExpiresAt })
           scheduleRefresh(newExpiresAt)
         } else {
-          setUser(null)
+          applyUser(null)
           routerRef.current.push('/login')
         }
       } catch {
         if (!isLoggedOutRef.current) {
-          setUser(null)
+          applyUser(null)
           routerRef.current.push('/login')
         }
       }
     }, delay)
-  }, []) // stable — uses refs for mutable values
+  }, [applyUser]) // stable — uses refs for mutable values
 
   /** Restore user state from a successful refresh response */
   const restoreFromRefresh = useCallback(async (): Promise<boolean> => {
@@ -83,7 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const normalizedRoles = (roles as string[]).map((r) =>
           r.startsWith('ROLE_') ? r : `ROLE_${r}`
         ) as UserSession['roles']
-        setUser({ username, roles: normalizedRoles, expiresAt })
+        applyUser({ username, roles: normalizedRoles, expiresAt })
         scheduleRefresh(expiresAt)
         return true
       }
@@ -91,10 +105,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Refresh failed — no valid session
     }
     return false
-  }, [scheduleRefresh])
+  }, [applyUser, scheduleRefresh])
 
   // On mount: restore session from token store, session cookie, or backend refresh token
-  // Handles: same-tab refresh, new tab, browser restart
   useEffect(() => {
     const restore = async () => {
       const token = getAccessToken()
@@ -103,15 +116,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Fast path: valid token in sessionStorage — restore from cookie or refresh
         const session = getSessionCookie()
         if (session && session.expiresAt > Date.now()) {
-          setUser(session)
+          applyUser(session)
           scheduleRefresh(session.expiresAt)
         } else {
-          // Cookie missing or expired — re-sync via refresh (backend validates via HttpOnly refresh token)
           await restoreFromRefresh()
         }
       } else {
-        // No valid token in sessionStorage (new tab, browser restart, or expired)
-        // Always attempt refresh — backend HttpOnly refresh token cookie is the source of truth
+        // No valid token — try backend HttpOnly refresh token cookie
         await restoreFromRefresh()
       }
 
@@ -119,7 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     restore()
-  }, [scheduleRefresh, restoreFromRefresh])
+  }, [applyUser, scheduleRefresh, restoreFromRefresh])
 
   // Cross-tab logout sync via BroadcastChannel
   useEffect(() => {
@@ -131,7 +142,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       channel.onmessage = (event) => {
         if (event.data?.type === 'logout') {
           isLoggedOutRef.current = true
-          setUser(null)
+          applyUser(null)
           routerRef.current.push('/login')
         }
       }
@@ -143,7 +154,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       channel?.close()
       if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current)
     }
-  }, [])
+  }, [applyUser])
 
   const login = useCallback(async (data: LoginRequest) => {
     const response = await authService.login(data)
@@ -154,22 +165,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const normalizedRoles = (roles as string[]).map((r) =>
         r.startsWith('ROLE_') ? r : `ROLE_${r}`
       ) as UserSession['roles']
-      setUser({ username, roles: normalizedRoles, expiresAt })
+      applyUser({ username, roles: normalizedRoles, expiresAt })
       scheduleRefresh(expiresAt)
 
       // Role-based redirect: ADMIN / HR → /dashboard, candidates → /
       const isControlUser = normalizedRoles.some((r) => CONTROL_ROLES.includes(r))
       routerRef.current.push(isControlUser ? '/dashboard' : '/')
     }
-  }, [scheduleRefresh])
+  }, [applyUser, scheduleRefresh])
 
   const logout = useCallback(async () => {
     isLoggedOutRef.current = true
     if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current)
     await authService.logout()
-    setUser(null)
+    applyUser(null)
     router.push('/login')
-  }, [router])
+  }, [applyUser, router])
 
   return (
     <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout }}>
