@@ -1,9 +1,10 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
-import { Box, ChevronDown, Menu, User } from "lucide-react"
+import { ChevronDown, Menu, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -53,7 +54,7 @@ function UserDropdown() {
           <Avatar className="h-8 w-8">
             <AvatarFallback className="bg-primary text-white">{initials}</AvatarFallback>
           </Avatar>
-          <span className="hidden text-sm font-medium md:block">Hi, {firstName}...</span>
+          <span className="hidden text-sm font-medium md:block">{firstName}</span>
           <ChevronDown className="h-4 w-4 text-muted-foreground" />
         </button>
       </DropdownMenuTrigger>
@@ -105,17 +106,15 @@ export function CandidateHeader() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-            <Box className="h-5 w-5 text-white" />
-          </div>
-          <span
-            className={cn(
-              "text-xl font-bold transition-colors",
-              scrolled || !isHome ? "text-foreground" : "text-foreground"
-            )}
-          >
-            WorkfitAI
-          </span>
+          <Image
+            src="/imgs/template/workfitai.png"
+            alt="WorkfitAI logo"
+            width={36}
+            height={36}
+            className="h-9 w-9 object-contain"
+            priority
+          />
+          <span className="text-xl font-bold text-[#1a2140]">WorkfitAI</span>
         </Link>
 
         {/* Desktop nav */}

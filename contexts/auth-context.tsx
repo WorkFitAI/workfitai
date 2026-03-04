@@ -73,63 +73,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, delay)
   }, []) // stable — uses refs for mutable values
 
-  // On mount: restore session from token store + session cookie
+  /** Restore user state from a successful refresh response */
+  const restoreFromRefresh = useCallback(async (): Promise<boolean> => {
+    try {
+      const response = await authService.refresh()
+      if (response.data?.accessToken) {
+        const { username, roles, expiryInMs } = response.data
+        const expiresAt = Date.now() + expiryInMs
+        const normalizedRoles = (roles as string[]).map((r) =>
+          r.startsWith('ROLE_') ? r : `ROLE_${r}`
+        ) as UserSession['roles']
+        setUser({ username, roles: normalizedRoles, expiresAt })
+        scheduleRefresh(expiresAt)
+        return true
+      }
+    } catch {
+      // Refresh failed — no valid session
+    }
+    return false
+  }, [scheduleRefresh])
+
+  // On mount: restore session from token store, session cookie, or backend refresh token
+  // Handles: same-tab refresh, new tab, browser restart
   useEffect(() => {
     const restore = async () => {
       const token = getAccessToken()
 
-      if (!token) {
-        setIsLoading(false)
-        return
-      }
-
-      if (isTokenExpired()) {
-        // Attempt silent refresh when stored token has expired
-        try {
-          const response = await authService.refresh()
-          if (response.data?.accessToken) {
-            const { username, roles, expiryInMs } = response.data
-            const expiresAt = Date.now() + expiryInMs
-            const normalizedRoles = (roles as string[]).map((r) =>
-              r.startsWith('ROLE_') ? r : `ROLE_${r}`
-            ) as UserSession['roles']
-            setUser({ username, roles: normalizedRoles, expiresAt })
-            scheduleRefresh(expiresAt)
-          }
-        } catch {
-          // Refresh failed — stay unauthenticated
-        }
-      } else {
-        // Token valid — try to restore from cookie first
+      if (token && !isTokenExpired()) {
+        // Fast path: valid token in sessionStorage — restore from cookie or refresh
         const session = getSessionCookie()
-        if (session) {
+        if (session && session.expiresAt > Date.now()) {
           setUser(session)
           scheduleRefresh(session.expiresAt)
         } else {
-          // Cookie missing (cleared by another tab, browser restart, etc.)
-          // Call refresh to get user identity and a fresh session cookie
-          try {
-            const response = await authService.refresh()
-            if (response.data?.accessToken) {
-              const { username, roles, expiryInMs } = response.data
-              const expiresAt = Date.now() + expiryInMs
-              const normalizedRoles = (roles as string[]).map((r) =>
-                r.startsWith('ROLE_') ? r : `ROLE_${r}`
-              ) as UserSession['roles']
-              setUser({ username, roles: normalizedRoles, expiresAt })
-              scheduleRefresh(expiresAt)
-            }
-          } catch {
-            // Refresh failed — stay unauthenticated
-          }
+          // Cookie missing or expired — re-sync via refresh (backend validates via HttpOnly refresh token)
+          await restoreFromRefresh()
         }
+      } else {
+        // No valid token in sessionStorage (new tab, browser restart, or expired)
+        // Always attempt refresh — backend HttpOnly refresh token cookie is the source of truth
+        await restoreFromRefresh()
       }
 
       setIsLoading(false)
     }
 
     restore()
-  }, [scheduleRefresh])
+  }, [scheduleRefresh, restoreFromRefresh])
 
   // Cross-tab logout sync via BroadcastChannel
   useEffect(() => {
