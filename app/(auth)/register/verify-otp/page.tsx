@@ -1,7 +1,7 @@
 "use client"
 
 // OTP verification page after registration
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
@@ -12,7 +12,8 @@ import { authService } from '@/lib/auth/auth-service'
 
 const RESEND_COOLDOWN_SECONDS = 60
 
-export default function VerifyOtpPage() {
+/** Inner component — must be inside <Suspense> because it calls useSearchParams() */
+function VerifyOtpContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const email = searchParams.get('email') ?? ''
@@ -89,5 +90,14 @@ export default function VerifyOtpPage() {
         </Button>
       </CardContent>
     </Card>
+  )
+}
+
+/** Page export — wraps content in Suspense (required by Next.js for useSearchParams) */
+export default function VerifyOtpPage() {
+  return (
+    <Suspense>
+      <VerifyOtpContent />
+    </Suspense>
   )
 }

@@ -1,7 +1,7 @@
 "use client"
 
 // OAuth callback handler — exchanges session ID for access token and redirects
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
@@ -14,7 +14,8 @@ import type { LoginResponse, UserSession } from '@/types/auth'
 
 const CONTROL_ROLES = ['ROLE_HR', 'ROLE_HR_MANAGER', 'ROLE_ADMIN']
 
-export default function OAuthCallbackPage() {
+/** Inner component — must be inside <Suspense> because it calls useSearchParams() */
+function OAuthCallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session') ?? ''
@@ -74,5 +75,14 @@ export default function OAuthCallbackPage() {
         )}
       </CardContent>
     </Card>
+  )
+}
+
+/** Page export — wraps content in Suspense (required by Next.js for useSearchParams) */
+export default function OAuthCallbackPage() {
+  return (
+    <Suspense>
+      <OAuthCallbackContent />
+    </Suspense>
   )
 }
