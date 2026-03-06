@@ -12,7 +12,6 @@ const candidateBaseSchema = z.object({
   password: z
     .string()
     .min(8, 'At least 8 characters')
-    .regex(/[A-Z]/, 'Must contain an uppercase letter')
     .regex(/\d/, 'Must contain a digit'),
   confirmPassword: z.string(),
   fullName: z.string().min(3, 'At least 3 characters'),

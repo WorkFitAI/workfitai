@@ -16,6 +16,8 @@ export default defineConfig({
       "__tests__/integration/forgot-password.test.tsx",
       // Toast behavior tests — vi.mock sonner + auth-context, renders LoginForm
       "__tests__/integration/toast.test.tsx",
+      // Kafka OTP tests — requires live backend + Kafka (self-skips when unavailable)
+      "__tests__/integration/kafka-otp.test.ts",
     ],
     coverage: {
       provider: "v8",
