@@ -1,50 +1,54 @@
-"use client"
+"use client";
 
 // Login form — email with Mail icon + check, password with Lock icon + eye, remember me checkbox
-import { useState } from 'react'
-import Link from 'next/link'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { toast } from 'sonner'
-import { Check, Loader2, Mail } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox'
-import { PasswordInput } from '@/components/auth/password-input'
-import { useAuth } from '@/contexts/auth-context'
-import { loginSchema, type LoginFormValues } from '@/lib/schemas/auth-schemas'
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { Check, Loader2, Mail } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { PasswordInput } from "@/components/auth/password-input";
+import { useAuth } from "@/contexts/auth-context";
+import { loginSchema, type LoginFormValues } from "@/lib/schemas/auth-schemas";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:9085'
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:9085";
 
 export function LoginForm() {
-  const { login } = useAuth()
-  const [isLoading, setIsLoading] = useState(false)
-  const [rememberMe, setRememberMe] = useState(false)
+  const router = useRouter();
+  const { login } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) })
+  } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) });
 
-  const emailValue = watch('usernameOrEmail', '')
-  const isEmailValid = emailValue.includes('@') && emailValue.includes('.')
+  const emailValue = watch("usernameOrEmail", "");
+  const isEmailValid = emailValue.includes("@") && emailValue.includes(".");
 
   async function onSubmit(data: LoginFormValues) {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      await login(data)
+      await login(data);
       if (rememberMe) {
-        localStorage.setItem('rememberedEmail', data.usernameOrEmail)
+        localStorage.setItem("rememberedEmail", data.usernameOrEmail);
       }
-      toast.success('Signed in successfully')
+      toast.success("Signed in successfully");
+      router.push("/");
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Sign in failed'
-      toast.error(message)
+      const message = err instanceof Error ? err.message : "Sign in failed";
+      toast.error(message);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -60,14 +64,16 @@ export function LoginForm() {
             placeholder="Email address"
             autoComplete="username"
             className="h-12 rounded-lg border-border pl-10 pr-10 focus-visible:ring-primary"
-            {...register('usernameOrEmail')}
+            {...register("usernameOrEmail")}
           />
           {isEmailValid && (
             <Check className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-green-500" />
           )}
         </div>
         {errors.usernameOrEmail && (
-          <p className="text-sm text-destructive">{errors.usernameOrEmail.message}</p>
+          <p className="text-sm text-destructive">
+            {errors.usernameOrEmail.message}
+          </p>
         )}
       </div>
 
@@ -79,7 +85,7 @@ export function LoginForm() {
           autoComplete="current-password"
           error={errors.password?.message}
           placeholder="Password"
-          {...register('password')}
+          {...register("password")}
         />
       </div>
 
@@ -93,7 +99,10 @@ export function LoginForm() {
           />
           Remember me
         </label>
-        <Link href="/forgot-password" className="text-sm text-foreground underline">
+        <Link
+          href="/forgot-password"
+          className="text-sm text-foreground underline"
+        >
           Forgot password?
         </Link>
       </div>
@@ -114,7 +123,9 @@ export function LoginForm() {
           type="button"
           variant="outline"
           className="w-full"
-          onClick={() => { window.location.href = `${API_BASE}/auth/oauth2/google` }}
+          onClick={() => {
+            window.location.href = `${API_BASE}/auth/oauth2/google`;
+          }}
         >
           Continue with Google
         </Button>
@@ -122,11 +133,13 @@ export function LoginForm() {
           type="button"
           variant="outline"
           className="w-full"
-          onClick={() => { window.location.href = `${API_BASE}/auth/oauth2/github` }}
+          onClick={() => {
+            window.location.href = `${API_BASE}/auth/oauth2/github`;
+          }}
         >
           Continue with GitHub
         </Button>
       </div>
     </form>
-  )
+  );
 }

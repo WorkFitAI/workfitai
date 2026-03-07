@@ -1,66 +1,75 @@
-"use client"
+"use client";
 
 // OTP verification page after registration
-import { Suspense, useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { OtpInput } from '@/components/auth/otp-input'
-import { authService } from '@/lib/auth/auth-service'
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { OtpInput } from "@/components/auth/otp-input";
+import { authService } from "@/lib/auth/auth-service";
 
-const RESEND_COOLDOWN_SECONDS = 60
+const RESEND_COOLDOWN_SECONDS = 60;
 
 /** Inner component — must be inside <Suspense> because it calls useSearchParams() */
 function VerifyOtpContent() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const email = searchParams.get('email') ?? ''
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const email = searchParams.get("email") ?? "";
+  const role = searchParams.get("role") ?? "CANDIDATE";
 
-  const [otp, setOtp] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [cooldown, setCooldown] = useState(0)
+  const [otp, setOtp] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
 
   // Guard: redirect back if email param is missing
   useEffect(() => {
-    if (!email) router.replace('/register')
-  }, [email, router])
+    if (!email) router.replace("/register");
+  }, [email, router]);
 
   // Tick down resend cooldown
   useEffect(() => {
-    if (cooldown <= 0) return
-    const timer = setTimeout(() => setCooldown((c) => c - 1), 1000)
-    return () => clearTimeout(timer)
-  }, [cooldown])
+    if (cooldown <= 0) return;
+    const timer = setTimeout(() => setCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [cooldown]);
 
-  if (!email) return null
+  if (!email) return null;
 
   async function handleSubmit() {
-    if (otp.length < 6) return toast.error('Enter the 6-digit OTP')
-    setIsSubmitting(true)
+    if (otp.length < 6) return toast.error("Enter the 6-digit OTP");
+    setIsSubmitting(true);
     try {
-      const response = await authService.verifyOtp({ email, otp })
-      if (response.success) {
-        toast.success('Email verified! You can now sign in.')
-        router.push('/login')
+      await authService.verifyOtp({ email, otp });
+      // apiClient throws ApiError on non-2xx — reaching here means success
+      if (role === "HR" || role === "HR_MANAGER") {
+        toast.success("Email verified! Your account is pending approval.");
+        router.push(`/pending-approval?role=${role}`);
       } else {
-        toast.error(response.message || 'Invalid OTP')
+        toast.success("Email verified! Welcome to WorkfitAI.");
+        router.push("/login");
       }
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Verification failed')
+      toast.error(err instanceof Error ? err.message : "Verification failed");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
   async function handleResend() {
     try {
-      await authService.resendOtp(email)
-      toast.success('OTP resent to your email')
-      setCooldown(RESEND_COOLDOWN_SECONDS)
+      await authService.resendOtp(email);
+      toast.success("OTP resent to your email");
+      setCooldown(RESEND_COOLDOWN_SECONDS);
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Failed to resend OTP')
+      toast.error(err instanceof Error ? err.message : "Failed to resend OTP");
     }
   }
 
@@ -69,13 +78,18 @@ function VerifyOtpContent() {
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">Verify Your Email</CardTitle>
         <CardDescription>
-          Enter the 6-digit code sent to <span className="font-medium text-foreground">{email}</span>
+          Enter the 6-digit code sent to{" "}
+          <span className="font-medium text-foreground">{email}</span>
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center gap-6">
         <OtpInput value={otp} onChange={setOtp} disabled={isSubmitting} />
 
-        <Button className="w-full" onClick={handleSubmit} disabled={isSubmitting || otp.length < 6}>
+        <Button
+          className="w-full"
+          onClick={handleSubmit}
+          disabled={isSubmitting || otp.length < 6}
+        >
           {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Verify
         </Button>
@@ -86,11 +100,11 @@ function VerifyOtpContent() {
           onClick={handleResend}
           disabled={cooldown > 0}
         >
-          {cooldown > 0 ? `Resend OTP in ${cooldown}s` : 'Resend OTP'}
+          {cooldown > 0 ? `Resend OTP in ${cooldown}s` : "Resend OTP"}
         </Button>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 /** Page export — wraps content in Suspense (required by Next.js for useSearchParams) */
@@ -99,5 +113,5 @@ export default function VerifyOtpPage() {
     <Suspense>
       <VerifyOtpContent />
     </Suspense>
-  )
+  );
 }

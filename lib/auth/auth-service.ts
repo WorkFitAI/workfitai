@@ -1,7 +1,10 @@
 // Auth API service — all authentication-related API calls
-import { apiClient } from '@/lib/api-client'
-import { setAccessToken, clearAccessToken } from '@/lib/auth/token-store'
-import { setSessionCookie, clearSessionCookie } from '@/lib/auth/session-cookie'
+import { apiClient } from "@/lib/api-client";
+import { setAccessToken, clearAccessToken } from "@/lib/auth/token-store";
+import {
+  setSessionCookie,
+  clearSessionCookie,
+} from "@/lib/auth/session-cookie";
 import type {
   LoginRequest,
   LoginResponse,
@@ -13,96 +16,105 @@ import type {
   ResetPasswordRequest,
   UserInfo,
   UserSession,
-} from '@/types/auth'
+} from "@/types/auth";
 
-const BROADCAST_CHANNEL = 'wfa-auth-channel'
+const BROADCAST_CHANNEL = "wfa-auth-channel";
 
 /** Broadcasts a logout event to all tabs */
 function broadcastLogout(): void {
-  if (typeof window === 'undefined') return
+  if (typeof window === "undefined") return;
   try {
-    const channel = new BroadcastChannel(BROADCAST_CHANNEL)
-    channel.postMessage({ type: 'logout' })
-    channel.close()
+    const channel = new BroadcastChannel(BROADCAST_CHANNEL);
+    channel.postMessage({ type: "logout" });
+    channel.close();
   } catch {
     // BroadcastChannel not supported in some environments
   }
 }
 
 /** Normalize backend roles to ROLE_<NAME> format expected by middleware */
-function normalizeRoles(roles: string[]): UserSession['roles'] {
+function normalizeRoles(roles: string[]): UserSession["roles"] {
   return roles.map((r) =>
-    r.startsWith('ROLE_') ? r : (`ROLE_${r}` as UserSession['roles'][number])
-  ) as UserSession['roles']
+    r.startsWith("ROLE_") ? r : (`ROLE_${r}` as UserSession["roles"][number]),
+  ) as UserSession["roles"];
 }
 
 export const authService = {
   async login(data: LoginRequest): Promise<LoginResponse> {
-    const response = await apiClient.post<LoginResponse>('/auth/login', data)
+    const response = await apiClient.post<LoginResponse>("/auth/login", data);
     if (response.data?.accessToken) {
-      console.log('Login success')
-      const { accessToken, expiryInMs, username, roles } = response.data
-      setAccessToken(accessToken, expiryInMs)
+      console.log("Login success");
+      const { accessToken, expiryInMs, username, roles, companyId } =
+        response.data;
+      setAccessToken(accessToken, expiryInMs);
       const session: UserSession = {
         username,
         roles: normalizeRoles(roles),
+        companyId: companyId ?? null,
         expiresAt: Date.now() + expiryInMs,
-      }
-      setSessionCookie(session)
+      };
+      setSessionCookie(session);
     }
-    return response
+    return response;
   },
 
   async register(data: RegisterRequest): Promise<ApiResponse> {
-    return apiClient.post<ApiResponse>('/auth/register', data)
+    return apiClient.post<ApiResponse>("/auth/register", data);
   },
 
   async verifyOtp(data: VerifyOtpRequest): Promise<ApiResponse> {
-    return apiClient.post<ApiResponse>('/auth/verify-otp', data)
+    return apiClient.post<ApiResponse>("/auth/verify-otp", data);
   },
 
   async resendOtp(email: string): Promise<ApiResponse> {
-    return apiClient.post<ApiResponse>('/auth/resend-otp', { email })
+    return apiClient.post<ApiResponse>("/auth/resend-otp", { email });
   },
 
   async refresh(): Promise<LoginResponse> {
-    const response = await apiClient.post<LoginResponse>('/auth/refresh')
+    const response = await apiClient.post<LoginResponse>("/auth/refresh");
     if (response.data?.accessToken) {
-      const { accessToken, expiryInMs, username, roles } = response.data
-      setAccessToken(accessToken, expiryInMs)
+      const { accessToken, expiryInMs, username, roles, companyId } =
+        response.data;
+      setAccessToken(accessToken, expiryInMs);
       const session: UserSession = {
         username,
         roles: normalizeRoles(roles),
+        companyId: companyId ?? null,
         expiresAt: Date.now() + expiryInMs,
-      }
-      setSessionCookie(session)
+      };
+      setSessionCookie(session);
     }
-    return response
+    return response;
   },
 
   async logout(): Promise<void> {
     try {
-      await apiClient.post<ApiResponse>('/auth/logout')
+      await apiClient.post<ApiResponse>("/auth/logout");
     } finally {
-      clearAccessToken()
-      clearSessionCookie()
-      broadcastLogout()
+      clearAccessToken();
+      clearSessionCookie();
+      broadcastLogout();
     }
   },
 
   async forgotPassword(data: ForgotPasswordRequest): Promise<ApiResponse> {
-    return apiClient.post<ApiResponse>('/auth/forgot-password', data)
+    return apiClient.post<ApiResponse>("/auth/forgot-password", data);
   },
 
-  async verifyResetOtp(data: VerifyOtpRequest): Promise<ApiResponse<VerifyResetOtpResponse>> {
-    return apiClient.post<ApiResponse<VerifyResetOtpResponse>>('/auth/verify-reset-otp', data)
+  async verifyResetOtp(
+    data: VerifyOtpRequest,
+  ): Promise<ApiResponse<VerifyResetOtpResponse>> {
+    return apiClient.post<ApiResponse<VerifyResetOtpResponse>>(
+      "/auth/verify-reset-otp",
+      data,
+    );
   },
 
   async resetPassword(data: ResetPasswordRequest): Promise<ApiResponse> {
-    return apiClient.post<ApiResponse>('/auth/reset-password', data)
+    return apiClient.post<ApiResponse>("/auth/reset-password", data);
   },
 
   async getCurrentUser(): Promise<ApiResponse<UserInfo>> {
-    return apiClient.get<ApiResponse<UserInfo>>('/auth/me')
+    return apiClient.get<ApiResponse<UserInfo>>("/auth/me");
   },
-}
+};

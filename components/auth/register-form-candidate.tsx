@@ -1,29 +1,48 @@
-"use client"
+"use client";
 
 // Candidate registration form — firstName, lastName, email, phone, password, confirm, accountType, terms
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { toast } from 'sonner'
-import { Building2, Loader2, Mail, User } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox'
-import { PasswordInput } from '@/components/auth/password-input'
-import { authService } from '@/lib/auth/auth-service'
-import { candidateRegisterSchema, type CandidateRegisterFormValues } from '@/lib/schemas/auth-schemas'
-import { cn } from '@/lib/utils'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { Building2, Loader2, Mail, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { PasswordInput } from "@/components/auth/password-input";
+import { authService } from "@/lib/auth/auth-service";
+import {
+  candidateRegisterSchema,
+  type CandidateRegisterFormValues,
+} from "@/lib/schemas/auth-schemas";
+import { cn } from "@/lib/utils";
 
-type AccountType = 'job_seeker' | 'employer'
+type AccountType = "job_seeker" | "employer";
 
 const accountTypes = [
-  { id: 'job_seeker' as const, icon: User, title: 'Job Seeker', desc: 'Looking for job opportunities' },
-  { id: 'employer' as const, icon: Building2, title: 'Employer', desc: 'Hiring talented professionals' },
-]
+  {
+    id: "job_seeker" as const,
+    icon: User,
+    title: "Job Seeker",
+    desc: "Looking for job opportunities",
+  },
+  {
+    id: "employer" as const,
+    icon: Building2,
+    title: "Employer",
+    desc: "Hiring talented professionals",
+  },
+];
 
-function AccountTypeSelector({ value, onChange }: { value: AccountType; onChange: (v: AccountType) => void }) {
+function AccountTypeSelector({
+  value,
+  onChange,
+}: {
+  value: AccountType;
+  onChange: (v: AccountType) => void;
+}) {
   return (
     <div className="grid grid-cols-2 gap-3">
       {accountTypes.map(({ id, icon: Icon, title, desc }) => (
@@ -32,10 +51,10 @@ function AccountTypeSelector({ value, onChange }: { value: AccountType; onChange
           type="button"
           onClick={() => onChange(id)}
           className={cn(
-            'flex flex-col items-center gap-2 rounded-lg border-2 p-4 text-center transition-colors',
+            "flex flex-col items-center gap-2 rounded-lg border-2 p-4 text-center transition-colors",
             value === id
-              ? 'border-primary bg-primary/5 text-primary'
-              : 'border-border text-muted-foreground hover:border-primary/40'
+              ? "border-primary bg-primary/5 text-primary"
+              : "border-border text-muted-foreground hover:border-primary/40",
           )}
         >
           <Icon className="h-8 w-8" />
@@ -44,46 +63,48 @@ function AccountTypeSelector({ value, onChange }: { value: AccountType; onChange
         </button>
       ))}
     </div>
-  )
+  );
 }
 
 export function RegisterFormCandidate() {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const [accountType, setAccountType] = useState<AccountType>('job_seeker')
-  const [agreeTerms, setAgreeTerms] = useState(false)
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [accountType, setAccountType] = useState<AccountType>("job_seeker");
+  const [agreeTerms, setAgreeTerms] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<CandidateRegisterFormValues>({ resolver: zodResolver(candidateRegisterSchema) })
+  } = useForm<CandidateRegisterFormValues>({
+    resolver: zodResolver(candidateRegisterSchema),
+  });
 
   async function onSubmit(data: CandidateRegisterFormValues) {
     if (!agreeTerms) {
-      toast.error('Please agree to the terms and policy')
-      return
+      toast.error("Please agree to the terms and policy");
+      return;
     }
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const response = await authService.register({
+      await authService.register({
         email: data.email,
         password: data.password,
         fullName: data.fullName,
         phoneNumber: data.phoneNumber,
-        role: accountType === 'employer' ? 'EMPLOYER' : 'CANDIDATE',
-      })
-      if (response.success) {
-        toast.success('Account created! Check your email for the OTP.')
-        router.push(`/register/verify-otp?email=${encodeURIComponent(data.email)}`)
-      } else {
-        toast.error(response.message || 'Registration failed')
-      }
+        role: accountType === "employer" ? "EMPLOYER" : "CANDIDATE",
+      });
+      // apiClient throws ApiError on non-2xx — reaching here means success
+      toast.success("Account created! Check your email for the OTP.");
+      router.push(
+        `/register/verify-otp?email=${encodeURIComponent(data.email)}`,
+      );
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Registration failed'
-      toast.error(message)
+      const message =
+        err instanceof Error ? err.message : "Registration failed";
+      toast.error(message);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -98,10 +119,12 @@ export function RegisterFormCandidate() {
             id="c-fullName"
             placeholder="Full name"
             className="h-12 rounded-lg pl-10"
-            {...register('fullName')}
+            {...register("fullName")}
           />
         </div>
-        {errors.fullName && <p className="text-sm text-destructive">{errors.fullName.message}</p>}
+        {errors.fullName && (
+          <p className="text-sm text-destructive">{errors.fullName.message}</p>
+        )}
       </div>
 
       {/* Email */}
@@ -114,30 +137,34 @@ export function RegisterFormCandidate() {
             type="email"
             placeholder="Email address"
             className="h-12 rounded-lg pl-10"
-            {...register('email')}
+            {...register("email")}
           />
         </div>
-        {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+        {errors.email && (
+          <p className="text-sm text-destructive">{errors.email.message}</p>
+        )}
       </div>
 
       {/* Phone */}
       <div className="space-y-1">
-        <Label htmlFor="c-phone">Phone (optional)</Label>
+        <Label htmlFor="c-phone">Phone</Label>
         <div className="flex gap-2">
           <select className="h-12 rounded-lg border border-border bg-white px-2 text-sm">
             <option>🇻🇳 +84</option>
-            <option>🇺🇸 +1</option>
-            <option>🇬🇧 +44</option>
           </select>
           <Input
             id="c-phone"
             type="tel"
             placeholder="Phone number"
             className="h-12 flex-1 rounded-lg"
-            {...register('phoneNumber')}
+            {...register("phoneNumber")}
           />
         </div>
-        {errors.phoneNumber && <p className="text-sm text-destructive">{errors.phoneNumber.message}</p>}
+        {errors.phoneNumber && (
+          <p className="text-sm text-destructive">
+            {errors.phoneNumber.message}
+          </p>
+        )}
       </div>
 
       {/* Password */}
@@ -146,7 +173,7 @@ export function RegisterFormCandidate() {
         label="Password"
         placeholder="Password"
         error={errors.password?.message}
-        {...register('password')}
+        {...register("password")}
       />
 
       {/* Confirm Password */}
@@ -155,14 +182,8 @@ export function RegisterFormCandidate() {
         label="Password confirmation"
         placeholder="Password confirmation"
         error={errors.confirmPassword?.message}
-        {...register('confirmPassword')}
+        {...register("confirmPassword")}
       />
-
-      {/* Account Type */}
-      <div className="space-y-2">
-        <Label>Account Type</Label>
-        <AccountTypeSelector value={accountType} onChange={setAccountType} />
-      </div>
 
       {/* Terms */}
       <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
@@ -184,5 +205,5 @@ export function RegisterFormCandidate() {
         Register →
       </Button>
     </form>
-  )
+  );
 }
