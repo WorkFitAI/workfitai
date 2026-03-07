@@ -24,7 +24,14 @@ jobs:
         run: npm ci
 
       - name: Run tests with coverage
-        run: npm run test:coverage
+        run: |
+          npx vitest run \
+            --exclude '__tests__/integration/auth-service.test.ts' \
+            --exclude '__tests__/integration/kafka-otp.test.ts' \
+            --coverage
+        env:
+          # Signal that we are in CI — some tests self-skip when this is set
+          CI: true
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
@@ -55,3 +62,25 @@ jobs:
         env:
           # Suppress telemetry in CI
           NEXT_TELEMETRY_DISABLED: 1
+
+  # ── Job 3: Backend-dependent integration tests ───────────────────────────
+  # TODO: Uncomment once the backend server is deployed and BACKEND_URL is set
+  # as a GitHub Actions secret.
+  #
+  # integration-tests:
+  #   name: Integration Tests (backend required)
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 20
+  #         cache: npm
+  #     - run: npm ci
+  #     - name: Run backend-dependent tests
+  #       run: |
+  #         npx vitest run \
+  #           __tests__/integration/auth-service.test.ts \
+  #           __tests__/integration/kafka-otp.test.ts
+  #       env:
+  #         BACKEND_URL: ${{ secrets.BACKEND_URL }}
