@@ -185,12 +185,6 @@ export function RegisterFormCandidate() {
         {...register("confirmPassword")}
       />
 
-      {/* Account Type */}
-      <div className="space-y-2">
-        <Label>Account Type</Label>
-        <AccountTypeSelector value={accountType} onChange={setAccountType} />
-      </div>
-
       {/* Terms */}
       <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
         <Checkbox

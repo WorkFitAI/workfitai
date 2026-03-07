@@ -12,7 +12,7 @@ export interface RegisterRequest {
   phoneNumber: string;
   hrProfile?: {
     department: string;
-    hrManagerEmail: string;
+    hrManagerEmail?: string; // required for HR role, omitted for HR_MANAGER
     address: string;
   };
   company?: {
@@ -22,6 +22,7 @@ export interface RegisterRequest {
     description?: string;
     address: string;
     size?: string;
+    companyNo?: string; // company registration / tax number
   };
 }
 

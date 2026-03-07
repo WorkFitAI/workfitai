@@ -14,6 +14,12 @@ export default defineConfig({
       // Integration tests — service layer (vi.mock'd api-client, no real fetch/render)
       "__tests__/integration/auth-service.test.ts",
       "__tests__/integration/forgot-password.test.tsx",
+      // Registration flow integration tests (MSW + RTL)
+      "__tests__/integration/register-candidate.test.tsx",
+      "__tests__/integration/register-hr.test.tsx",
+      "__tests__/integration/register-hr-manager.test.tsx",
+      // OTP verification page integration tests
+      "__tests__/integration/verify-otp.test.tsx",
       // Toast behavior tests — vi.mock sonner + auth-context, renders LoginForm
       "__tests__/integration/toast.test.tsx",
       // Kafka OTP tests — requires live backend + Kafka (self-skips when unavailable)
