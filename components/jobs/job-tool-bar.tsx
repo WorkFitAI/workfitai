@@ -1,33 +1,42 @@
+import { useRouter } from "next/navigation";
+
 import { TextAlignJustify, LayoutGrid } from "lucide-react";
 
 const JobToolbar = ({
   page,
   totalPages,
   pageSize,
+  total,
 }: {
   page: number;
   totalPages: number;
   pageSize: number;
+  total: number;
 }) => {
+  const router = useRouter();
+
   return (
     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-2 bg-white">
       {/* Left */}
       <p className="text-gray-600 text-sm">
         Showing{" "}
         <span className="font-medium">
-          {(page - 1) * pageSize + 1}–
-          {Math.min(page * pageSize, totalPages * pageSize)}
+          {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, total)}
         </span>{" "}
-        of <span className="font-medium">{totalPages * pageSize}</span> jobs
+        of <span className="font-medium">{total}</span> jobs
       </p>
 
       {/* Right */}
       <div className="flex items-center gap-3 flex-wrap">
         {/* Show */}
-        <select className="border rounded-sm px-3 py-1 text-sm bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500">
-          <option>Show: 10</option>
-          <option>Show: 12</option>
-          <option>Show: 20</option>
+        <select
+          className="border rounded-sm px-3 py-1 text-sm bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          value={pageSize}
+          onChange={(e) => router.push(`?page=${page}&size=${e.target.value}`)}
+        >
+          <option value={10}>Show: 10</option>
+          <option value={12}>Show: 12</option>
+          <option value={20}>Show: 20</option>
         </select>
 
         {/* Sort */}

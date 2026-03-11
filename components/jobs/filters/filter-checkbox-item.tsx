@@ -1,13 +1,28 @@
 type Props = {
   label: string;
   count: number;
+  value: string;
+  checked: boolean;
+  onChange: (value: string, checked: boolean) => void;
 };
 
-const FilterCheckboxItem = ({ label, count }: Props) => {
+const FilterCheckboxItem = ({
+  label,
+  count,
+  value,
+  checked,
+  onChange,
+}: Props) => {
   return (
     <label className="flex items-center justify-between py-2 cursor-pointer">
       <div className="flex items-center gap-2">
-        <input type="checkbox" className="w-4 h-4" />
+        <input
+          type="checkbox"
+          className="w-4 h-4"
+          checked={checked}
+          onChange={(e) => onChange(value, e.target.checked)}
+        />
+
         <span className="text-sm text-gray-600">{label}</span>
       </div>
 
