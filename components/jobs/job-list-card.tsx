@@ -1,16 +1,20 @@
 import Image from "next/image";
-
 import { Briefcase, MapPin, Clock } from "lucide-react";
+import { Job } from "@/types/job";
 
-const JobListCard = () => {
+interface Props {
+  job: Job;
+}
+
+const JobListCard = ({ job }: Props) => {
   return (
-    <div className="bg-white border rounded-xl p-6 flex flex-col gap-4 shadow-sm hover:shadow-md transition">
+    <div className="bg-white border rounded-xl p-6 flex flex-col gap-3 shadow-sm hover:shadow-md transition">
       {/* Top */}
       <div className="flex justify-between items-start">
         <div className="flex gap-3 items-center">
           {/* Logo */}
           <Image
-            src="/imgs/brands/brand-3.png"
+            src={job.company.logoUrl}
             alt="company logo"
             width={48}
             height={48}
@@ -18,47 +22,50 @@ const JobListCard = () => {
           />
 
           <div>
-            <p className="font-bold text-gray-800">Dailymotion</p>
+            <p className="font-bold text-gray-800">{job.company.name}</p>
+
             <p className="flex items-center text-xs text-gray-500 gap-1">
               <MapPin className="w-3 h-3 text-gray-400" />
-              New York, US
+              {job.company.address}
             </p>
           </div>
         </div>
 
         <div className="flex gap-2">
-          <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-            Adobe XD
-          </span>
-          <span className="text-xs bg-gray-100 px-2 py-1 rounded">Figma</span>
+          {job.skillNames.map((skill, index) => (
+            <span key={index} className="text-xs bg-gray-100 px-2 py-1 rounded">
+              {skill}
+            </span>
+          ))}
         </div>
       </div>
 
       {/* Title */}
-      <h2 className="text-xl font-bold text-gray-800">Full Stack Engineer</h2>
+      <h2 className="text-2xl font-bold text-gray-800">{job.title}</h2>
 
       {/* Job info */}
-      <div className="flex gap-2 text-xs text-gray-500">
+      <div className="flex gap-3 text-xs text-gray-500">
         <span className="flex items-center gap-1">
           <Briefcase className="w-3 h-3 text-gray-400" />
-          Full time
+          {job.employmentType}
         </span>
+
         <span className="flex items-center gap-1">
-          <Clock className="w-3 h-3 text-gray-400" />3 mins ago
+          <Clock className="w-3 h-3 text-gray-400" />
+          {new Date(job.createdDate).toLocaleDateString("vn-VN")}
         </span>
       </div>
 
       {/* Description */}
       <p className="text-gray-600 text-sm leading-relaxed">
-        The Tech Studio Design team has a vision to establish a trusted platform
-        that enables productive and healthy enterprises in a world of digital
-        and remote everything.
+        {job.shortDescription}
       </p>
 
       {/* Bottom */}
       <div className="flex justify-between items-center mt-1">
         <p className="text-blue-600 font-semibold text-md">
-          $500 <span className="text-gray-400 text-sm">/Hour</span>
+          ${job.salaryMin.toLocaleString("en-US")} - $
+          {job.salaryMax.toLocaleString("en-US")}
         </p>
 
         <button className="bg-blue-100 text-blue-600 px-4 py-2 rounded-md text-sm hover:bg-blue-200">

@@ -1,21 +1,33 @@
 import { TextAlignJustify, LayoutGrid } from "lucide-react";
 
-const JobToolbar = () => {
+const JobToolbar = ({
+  page,
+  totalPages,
+  pageSize,
+}: {
+  page: number;
+  totalPages: number;
+  pageSize: number;
+}) => {
   return (
     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-2 bg-white">
       {/* Left */}
       <p className="text-gray-600 text-sm">
-        Showing <span className="font-medium">41–60</span> of{" "}
-        <span className="font-medium">944</span> jobs
+        Showing{" "}
+        <span className="font-medium">
+          {(page - 1) * pageSize + 1}–
+          {Math.min(page * pageSize, totalPages * pageSize)}
+        </span>{" "}
+        of <span className="font-medium">{totalPages * pageSize}</span> jobs
       </p>
 
       {/* Right */}
       <div className="flex items-center gap-3 flex-wrap">
         {/* Show */}
         <select className="border rounded-sm px-3 py-1 text-sm bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500">
+          <option>Show: 10</option>
           <option>Show: 12</option>
-          <option>Show: 24</option>
-          <option>Show: 36</option>
+          <option>Show: 20</option>
         </select>
 
         {/* Sort */}
