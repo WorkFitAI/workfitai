@@ -31,7 +31,7 @@ const JobNavbar = () => {
       />
 
       {/* Salary filter */}
-      <FilterSalaryRange />
+      <FilterSalaryRange title="Salary Range" queryKey="salaryMin" />
 
       {/* Employment type filter */}
       <FilterCheckboxGroup

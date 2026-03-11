@@ -11,7 +11,7 @@ type Item = {
 type Props = {
   title: string;
   items: Item[];
-  queryKey: string; // vd: skill, location
+  queryKey: string;
 };
 
 const FilterCheckboxGroup = ({ title, items, queryKey }: Props) => {

@@ -3,11 +3,14 @@
 import { useEffect, useState } from "react";
 import { getJobs } from "@/app/api/job-api";
 import { Job } from "@/types/job";
+import { fi } from "zod/locales";
 
 type Filters = {
   experienceLevel?: string[];
   employmentType?: string[];
   keyword?: string;
+  salaryMin?: number;
+  salaryMax?: number;
 };
 
 export const useJobs = (
@@ -39,6 +42,14 @@ export const useJobs = (
 
     if (filters?.keyword) {
       conditions.push(`title~'${filters.keyword}'`);
+    }
+
+    if (filters?.salaryMin) {
+      conditions.push(`salaryMin >: ${filters.salaryMin}`);
+    }
+
+    if (filters?.salaryMax) {
+      conditions.push(`salaryMax :< ${filters.salaryMax}`);
     }
 
     return conditions.join(" and ");
@@ -73,7 +84,9 @@ export const useJobs = (
     pageSize,
     filters?.experienceLevel?.join(","),
     filters?.employmentType?.join(","),
-    filters?.keyword
+    filters?.keyword,
+    filters?.salaryMin,
+    filters?.salaryMax,
   ]);
 
   return {

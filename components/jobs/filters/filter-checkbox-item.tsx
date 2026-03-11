@@ -18,7 +18,7 @@ const FilterCheckboxItem = ({
       <div className="flex items-center gap-2">
         <input
           type="checkbox"
-          className="w-4 h-4"
+          className="w-4 h-4 cursor-pointer"
           checked={checked}
           onChange={(e) => onChange(value, e.target.checked)}
         />
