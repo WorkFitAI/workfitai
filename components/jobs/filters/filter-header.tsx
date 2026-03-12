@@ -19,8 +19,7 @@ const FilterHeader = ({ title, action }: Props) => {
     params.delete("keyword");
     params.delete("salaryMin");
     params.delete("salaryMax");
-
-    params.set("page", "1");
+    params.delete("skillNames");
 
     router.push(`?${params.toString()}`);
   };

@@ -35,6 +35,11 @@ export default function JobsPage() {
   const salaryMax = searchParams.get("salaryMax")
     ? Number(searchParams.get("salaryMax"))
     : undefined;
+
+  const skillNames = searchParams.get("skillNames")
+    ? searchParams.get("skillNames")!.split(",")
+    : [];
+
   const buildUrl = (newPage: number, newSize?: number) => {
     const params = new URLSearchParams(searchParams.toString());
 
@@ -52,8 +57,9 @@ export default function JobsPage() {
       employmentType,
       salaryMin,
       salaryMax,
+      skillNames,
     };
-  }, [experienceLevel, employmentType, salaryMin, salaryMax]);
+  }, [experienceLevel, employmentType, salaryMin, salaryMax, skillNames]);
 
   const { jobs, totalPages, total, loading } = useJobs(page, pageSize, filters);
   return (

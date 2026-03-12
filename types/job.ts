@@ -24,9 +24,3 @@ export interface JobData {
   meta: JobMeta;
   result: Job[];
 }
-
-export interface JobResponse {
-  status: number;
-  message: string;
-  data: JobData;
-}

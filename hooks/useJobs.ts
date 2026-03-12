@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import { getJobs } from "@/app/api/job-api";
 import { Job } from "@/types/job";
-import { fi } from "zod/locales";
 
 type Filters = {
   experienceLevel?: string[];
   employmentType?: string[];
+  skillNames?: string[];
   keyword?: string;
   salaryMin?: number;
   salaryMax?: number;
@@ -29,7 +29,13 @@ export const useJobs = (
     const buildCondition = (key: string, values?: string[]) => {
       if (!values || values.length === 0) return;
 
-      if (values.length === 1) {
+      if (key === "skillNames") {
+        const list = values.map((v) => `'${v}'`).join(",");
+        conditions.push(`${key} in [${list}]`);
+        return;
+      }
+
+      if (values.length === 1 && key !== "skillNames") {
         conditions.push(`${key}:'${values[0]}'`);
       } else {
         const list = values.map((v) => `'${v}'`).join(",");
@@ -39,6 +45,7 @@ export const useJobs = (
 
     buildCondition("experienceLevel", filters?.experienceLevel);
     buildCondition("employmentType", filters?.employmentType);
+    buildCondition("skills.name", filters?.skillNames);
 
     if (filters?.keyword) {
       conditions.push(`title~'${filters.keyword}'`);
@@ -84,6 +91,7 @@ export const useJobs = (
     pageSize,
     filters?.experienceLevel?.join(","),
     filters?.employmentType?.join(","),
+    filters?.skillNames?.join(","),
     filters?.keyword,
     filters?.salaryMin,
     filters?.salaryMax,

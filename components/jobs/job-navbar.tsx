@@ -1,6 +1,7 @@
 import FilterHeader from "@/components/jobs/filters/filter-header";
 import FilterCheckboxGroup from "@/components/jobs/filters/filter-checkbox-group";
 import FilterSalaryRange from "@/components/jobs/filters/filter-salary-range";
+import FilterSkills from "@/components/jobs/filters/filter-skills";
 
 const experienceLevel = [
   { label: "FRESHER", count: 9 },
@@ -39,6 +40,8 @@ const JobNavbar = () => {
         items={employmentTypes}
         queryKey="employmentType"
       />
+
+      <FilterSkills />
     </div>
   );
 };
