@@ -1,4 +1,4 @@
-import { JobData } from "@/types/job";
+import { JobData, JobDetail } from "@/types/job";
 import { ApiResponse } from "@/types/response";
 import { SkillResponse } from "@/types/skill";
 
@@ -45,3 +45,11 @@ export const getAllSkills = async (): Promise<ApiResponse<SkillResponse>> => {
   }
   return res.json();
 }
+
+export const getJobById = async (id: string): Promise<ApiResponse<JobDetail>> => {
+  const res = await fetch(`${API_BASE}/job/public/jobs/${id}`);
+  if (!res.ok) {
+    throw new Error("Failed to fetch job details");
+  }
+  return res.json();
+};
