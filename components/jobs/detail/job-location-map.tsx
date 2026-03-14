@@ -1,11 +1,44 @@
-const JobLocationMap = () => {
-  return (
-    <div className="border rounded-xl p-6 mb-6">
-      <h3 className="font-semibold mb-4">Job Location</h3>
+"use client";
 
-      <div className="w-full h-[200px] bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
-        Map here
-      </div>
+import { useEffect, useState } from "react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import { getCoordinates } from "@/lib/utils";
+
+const JobLocationMap = ({ address }: { address: string }) => {
+  const [position, setPosition] = useState<[number, number] | null>(null);
+
+  useEffect(() => {
+    const fetchLocation = async () => {
+      const coords = await getCoordinates(address);
+
+      if (coords) {
+        setPosition([coords.lat, coords.lng]);
+      }
+    };
+
+    fetchLocation();
+  }, [address]);
+
+  if (!position) return <p>Loading map...</p>;
+
+  return (
+    <div className="mt-5 rounded-lg overflow-hidden">
+      <MapContainer
+        center={position as [number, number]}
+        zoom={13}
+        style={{ height: "300px", width: "100%" }}
+        className="z-0"
+      >
+        <TileLayer
+          attribution="© OpenStreetMap"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+
+        <Marker position={position as [number, number]}>
+          <Popup>Company location</Popup>
+        </Marker>
+      </MapContainer>
     </div>
   );
 };

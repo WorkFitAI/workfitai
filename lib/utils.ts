@@ -27,3 +27,20 @@ export const formatPostedTime = (createdDate: string): string => {
   // >= 1 ngày → hiển thị ngày đăng
   return `${posted.toLocaleDateString("vi-VN")}`;
 };
+
+export const getCoordinates = async (address: string) => {
+  const res = await fetch(
+    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+      address
+    )}&format=json`
+  );
+
+  const data = await res.json();
+
+  if (data.length === 0) return null;
+
+  return {
+    lat: parseFloat(data[0].lat),
+    lng: parseFloat(data[0].lon),
+  };
+};

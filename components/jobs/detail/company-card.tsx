@@ -1,5 +1,9 @@
-import { Company } from "@/types/company";
 import Image from "next/image";
+import { Globe, Pin, UserRoundPlus, Users } from "lucide-react";
+
+import { Company } from "@/types/company";
+
+import JobLocationMap from "@/components/jobs/detail/job-location-map";
 
 interface CompanyCardProps {
   company: Company;
@@ -30,14 +34,34 @@ const CompanyCard = ({
       </div>
 
       <div className="text-sm text-gray-600 space-y-2">
-        <p>📍 {company.address}</p>
-        <p>👥 {company.size} employees</p>
-        <p>🌐 {company.websiteUrl}</p>
+        <div className="flex items-center gap-2">
+          <Pin size={13} />
+          <span>{company.address}</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Users size={13} />
+          <span>{company.size} employees</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Globe size={13} />
+          <span>{company.websiteUrl}</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <UserRoundPlus size={13} />
+          <span>
+            {totalApplications} / {quantity} applications
+          </span>
+        </div>
       </div>
 
       <button className="mt-4 w-full border rounded-lg py-2 hover:bg-gray-50">
         View Company
       </button>
+
+      <JobLocationMap address={company?.address || ""} />
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import { JobDetail } from "@/types/job";
+import { CheckCircle } from "lucide-react";
 
 type JobContentProps = Pick<
   JobDetail,
@@ -57,6 +58,17 @@ const JobDetailContent = ({
         <h2 className="text-lg font-semibold mb-4">Benefits</h2>
 
         <p className="text-gray-600 leading-relaxed">{benefits}</p>
+      </div>
+
+      <div className="flex justify-start mt-10 mx-auto gap-2">
+        <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium transition">
+          <CheckCircle className="w-4 h-4 inline-block mr-2" />
+          Apply Now
+        </button>
+
+        <button className="text-gray-500 px-6 py-3 border border-gray-500 rounded-md hover:bg-gray-100 font-medium transition">
+          Save Job
+        </button>
       </div>
     </div>
   );
