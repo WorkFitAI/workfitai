@@ -61,3 +61,11 @@ export const getSimilarJobs = async (id: string): Promise<ApiResponse<Job[]>> =>
   }
   return res.json();
 };
+
+export const getFeaturedJobs = async (pageNumber: number, size: number): Promise<ApiResponse<JobData>> => {
+  const res = await fetch(`${API_BASE}/job/public/jobs/featured?page=${pageNumber - 1}&size=${size}`);
+  if (!res.ok) {
+    throw new Error("Failed to fetch featured jobs");
+  }
+  return res.json();
+};

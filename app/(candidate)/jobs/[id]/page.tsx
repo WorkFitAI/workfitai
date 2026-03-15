@@ -5,8 +5,8 @@ import JobDetailContent from "@/components/jobs/detail/job-detail-content";
 import CompanyCard from "@/components/jobs/detail/company-card";
 
 import { getJobById } from "@/app/api/job-api";
-import { CheckCircle } from "lucide-react";
 import SimilarJobs from "@/components/jobs/detail/similar-jobs";
+import FeaturedJobs from "@/components/jobs/featured-jobs";
 
 type Props = {
   params: Promise<{
@@ -35,7 +35,7 @@ export default async function JobDetail({ params }: Props) {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="min-h-screen">
       <div className="max-w-[1320px] mx-auto px-4 pb-10">
         <JobDetailThumb bannerUrl={job.bannerUrl || null} />
 
@@ -82,6 +82,7 @@ export default async function JobDetail({ params }: Props) {
             <SimilarJobs jobId={id} />
           </div>
         </div>
+        <FeaturedJobs />
       </div>
     </div>
   );
