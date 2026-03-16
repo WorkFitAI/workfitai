@@ -17,6 +17,7 @@ vi.mock("@/components/jobs/detail/similar-jobs-card", () => ({
 describe("<SimilarJobs />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
   it("should display loading state initially", () => {

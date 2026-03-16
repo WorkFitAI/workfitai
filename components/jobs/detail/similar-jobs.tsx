@@ -16,7 +16,6 @@ export default function SimilarJobs({ jobId }: Props) {
     const fetchSimilarJobs = async () => {
       try {
         const res = await getSimilarJobs(jobId);
-        console.log("Similar jobs response:", res);
         setJobs(res?.data);
       } catch (error) {
         console.error("Failed to fetch similar jobs", error);
