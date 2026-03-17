@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+
 import { Briefcase, MapPin, Clock } from "lucide-react";
 import { Job } from "@/types/job";
 
@@ -7,10 +9,12 @@ interface Props {
 }
 
 const JobListCard = ({ job }: Props) => {
+  const router = useRouter();
+
   return (
-    <div className="bg-white border rounded-xl p-6 flex flex-col gap-3 shadow-sm hover:shadow-md transition">
+    <div className="bg-white border rounded-xl p-6 flex flex-col gap-3 shadow-sm hover:shadow-md transition cursor-pointer" onClick={() => router.push(`/jobs/${job.postId}`)}>
       {/* Top */}
-      <div className="flex justify-between items-start">
+      <div className="flex justify-between items-start ">
         <div className="flex gap-3 items-center">
           {/* Logo */}
           <Image

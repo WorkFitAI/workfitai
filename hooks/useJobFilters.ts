@@ -9,27 +9,19 @@ export const useJobFilters = () => {
   const page = Number(searchParams.get("page")) || 1;
   const pageSize = Number(searchParams.get("size")) || 12;
 
-  const experienceLevel = searchParams.get("experienceLevel")
-    ? searchParams.get("experienceLevel")!.split(",")
-    : [];
-
-  const employmentType = searchParams.get("employmentType")
-    ? searchParams.get("employmentType")!.split(",")
-    : [];
-
-  const skillNames = searchParams.get("skillNames")
-    ? searchParams.get("skillNames")!.split(",")
-    : [];
-
-  const salaryMin = searchParams.get("salaryMin")
-    ? Number(searchParams.get("salaryMin"))
-    : undefined;
-
-  const salaryMax = searchParams.get("salaryMax")
-    ? Number(searchParams.get("salaryMax"))
-    : undefined;
-
   const filters = useMemo(() => {
+    const experienceLevel = searchParams.get("experienceLevel")?.split(",") ?? [];
+    const employmentType = searchParams.get("employmentType")?.split(",") ?? [];
+    const skillNames = searchParams.get("skillNames")?.split(",") ?? [];
+
+    const salaryMin = searchParams.get("salaryMin")
+      ? Number(searchParams.get("salaryMin"))
+      : undefined;
+
+    const salaryMax = searchParams.get("salaryMax")
+      ? Number(searchParams.get("salaryMax"))
+      : undefined;
+
     return {
       experienceLevel,
       employmentType,
@@ -37,7 +29,7 @@ export const useJobFilters = () => {
       salaryMin,
       salaryMax,
     };
-  }, [experienceLevel, employmentType, skillNames, salaryMin, salaryMax]);
+  }, [searchParams]);
 
   const buildUrl = (newPage: number, newSize?: number) => {
     const params = new URLSearchParams(searchParams.toString());

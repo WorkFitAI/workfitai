@@ -1,4 +1,4 @@
-import { JobData } from "@/types/job";
+import { Job, JobData, JobDetail } from "@/types/job";
 import { ApiResponse } from "@/types/response";
 import { SkillResponse } from "@/types/skill";
 
@@ -45,3 +45,27 @@ export const getAllSkills = async (): Promise<ApiResponse<SkillResponse>> => {
   }
   return res.json();
 }
+
+export const getJobById = async (id: string): Promise<ApiResponse<JobDetail>> => {
+  const res = await fetch(`${API_BASE}/job/public/jobs/${id}`);
+  if (!res.ok) {
+    throw new Error("Failed to fetch job details");
+  }
+  return res.json();
+};
+
+export const getSimilarJobs = async (id: string): Promise<ApiResponse<Job[]>> => {
+  const res = await fetch(`${API_BASE}/job/public/jobs/similar/${id}`);
+  if (!res.ok) {
+    throw new Error("Failed to fetch similar jobs");
+  }
+  return res.json();
+};
+
+export const getFeaturedJobs = async (pageNumber: number, size: number): Promise<ApiResponse<JobData>> => {
+  const res = await fetch(`${API_BASE}/job/public/jobs/featured?page=${pageNumber - 1}&size=${size}`);
+  if (!res.ok) {
+    throw new Error("Failed to fetch featured jobs");
+  }
+  return res.json();
+};
