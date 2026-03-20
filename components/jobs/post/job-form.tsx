@@ -44,6 +44,12 @@ type Props = {
 export function JobForm({ initialData, onSubmit }: Props) {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [query, setQuery] = useState("");
+  const [isPublished, setIsPublished] = useState(initialData?.status === "PUBLISHED"); 
+
+  const toggleStatus = async () => {
+    setIsPublished(!isPublished);
+    await jobService.toggleJobStatus(initialData?.postId || "", !isPublished ? "PUBLISHED" : "DRAFT");
+  };
 
   const form = useForm<JobFormValues>({
     resolver: zodResolver(jobSchema) as Resolver<JobFormValues>,
@@ -62,8 +68,11 @@ export function JobForm({ initialData, onSubmit }: Props) {
       responsibilities: "",
       benefits: "",
       educationLevel: "",
+      requiredExperience: "",
+      companyNo: "",
       skillNames: [],
       expiresAt: new Date(),
+      status: isPublished as unknown as string,
       ...initialData,
     },
   });
@@ -100,9 +109,22 @@ export function JobForm({ initialData, onSubmit }: Props) {
             
             {/* PHẦN 1 */}
             <div className="p-6 border rounded-xl bg-white shadow-sm space-y-4">
-              <h2 className="font-semibold text-blue-600">
-                1. Basic Information
-              </h2>
+              <div className="flex items-center justify-between">
+                <h2 className="font-semibold text-blue-600">1. Basic Information</h2>
+
+                <div
+                  onClick={toggleStatus}
+                  className={`relative w-16 h-6 rounded-full cursor-pointer transition-colors duration-300 ${
+                    isPublished ? "bg-green-500" : "bg-gray-300"
+                  }`}
+                >
+                  <div
+                    className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                      isPublished ? "translate-x-10" : "translate-x-0"
+                    }`}
+                  />
+                </div>
+              </div>
 
               <FormField
                 control={form.control}
@@ -324,6 +346,17 @@ export function JobForm({ initialData, onSubmit }: Props) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel htmlFor={field.name}>Education Level</FormLabel>
+                    <Textarea id={field.name} rows={3} {...field} />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="requiredExperience"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor={field.name}>Required Experience</FormLabel>
                     <Textarea id={field.name} rows={3} {...field} />
                   </FormItem>
                 )}

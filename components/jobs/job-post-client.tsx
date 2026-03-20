@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useJobs } from "@/hooks/useJobs";
 import { useJobFilters } from "@/hooks/useJobFilters";
 
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { JobDialog } from "@/components/jobs/post/job-dialog";
 import { toast } from "sonner";
-import { Job, JobDetail } from "@/types/job";
+import { Job } from "@/types/job";
 import { JobFormValues } from "@/lib/schemas/job-schemas";
 
 import {
@@ -20,24 +20,9 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-
-// MOCK API (bạn thay bằng service thật)
-const getJobById = async (id: string | number): Promise<JobDetail> => {
-  // TODO: gọi API thật
-  return {} as JobDetail;
-};
-
-const createJob = async (data: JobFormValues) => {
-  // TODO: gọi API thật
-};
-
-const updateJob = async (id: string | number, data: JobFormValues) => {
-  // TODO: gọi API thật
-};
-
-const deleteJob = async (id: string | number) => {
-  // TODO: gọi API thật
-};
+import { Skill } from "@/types/skill";
+import { jobService } from "@/lib/job/job-service";
+import { Briefcase, MapPin, Clock } from "lucide-react";
 
 export default function JobAdminPage() {
   const { page, pageSize, filters, buildUrl } = useJobFilters();
@@ -56,7 +41,21 @@ export default function JobAdminPage() {
     editingJob: null,
   });
 
-  // ADD
+  const [skills, setSkills] = useState<Skill[]>([]);
+
+  useEffect(() => {
+    const fetchSkills = async () => {
+      try {
+        const res = await jobService.getAllSkills();
+        setSkills(res.data.result); 
+      } catch (err) {
+        console.error("Lỗi load skills", err);
+      }
+    };
+
+    fetchSkills();
+  }, []);
+
   const handleOpenAdd = () => {
     setDialogState({
       isOpen: true,
@@ -64,24 +63,30 @@ export default function JobAdminPage() {
     });
   };
 
-  // EDIT (CALL API getById)
   const handleOpenEdit = async (job: Job) => {
     try {
-      const detail = await getJobById(job.postId);
-
-    const normalizedData: JobFormValues = {
-        ...detail,
-        companyNo: "1",
-
-        salaryMin: detail.salaryMin ?? 0,
-        salaryMax: detail.salaryMax ?? 0,
-        quantity: detail.quantity ?? 1,
-
-        skillNames: detail.skillNames ?? [],
-
-        expiresAt: detail.expiresAt
-          ? new Date(detail.expiresAt)
-          : new Date(),
+      const detail = await jobService.getJobByIdFromHr(job.postId);
+      const normalizedData: JobFormValues = {
+        postId: detail.data.postId,
+        title: detail.data.title,
+        shortDescription: detail.data.shortDescription,
+        description: detail.data.description,
+        employmentType: detail.data.employmentType,
+        experienceLevel: detail.data.experienceLevel,
+        salaryMin: detail.data.salaryMin,
+        salaryMax: detail.data.salaryMax,
+        currency: detail.data.currency,
+        location: detail.data.location,
+        quantity: detail.data.quantity,
+        expiresAt: new Date(detail.data.expiresAt),
+        educationLevel: detail.data.educationLevel,
+        benefits: detail.data.benefits,
+        requirements: detail.data.requirements,
+        responsibilities: detail.data.responsibilities,
+        requiredExperience: detail.data.requiredExperience,
+        companyNo: detail.data.company.companyNo,
+        skillNames: detail.data.skillNames.map(s => s.trim()),
+        status: detail.data.status,
       };
 
       setDialogState({
@@ -94,27 +99,37 @@ export default function JobAdminPage() {
     }
   };
 
-  // SUBMIT
   const handleSubmit = async (data: JobFormValues) => {
     try {
       if (dialogState.editingJob) {
-        // await updateJob(dialogState.editingJob.postId, data);
+        const skillIdsToSave = data.skillNames
+        .map((name) => skills.find((s) => s.name === name)?.skillId)
+        .filter((id): id is number => id !== undefined);
+
+        const newData = { ...data, jobId: dialogState.editingJob.postId, skillIds: skillIdsToSave };
+
+        console.log("Updating job with data:", newData);
+
+        await jobService.updateJob(newData);
         toast.success("Đã cập nhật công việc");
-      } else {
-        console.log("Creating job with data:", data);
-        await createJob(data);
-        toast.success("Đã tạo công việc miớ");
+      } else {        
+      const skillIdsToSave = data.skillNames
+        .map((name) => skills.find((s) => s.name === name)?.skillId)
+        .filter((id): id is number => id !== undefined);
+
+      const newData = { ...data, skillIds: skillIdsToSave };
+        await jobService.createJob(newData);
+        toast.success("Đã tạo công việc mới");
       }
     } catch (error) {
       toast.error("Có lỗi xảy ra");
     }
   };
 
-  // DELETE
   const handleDelete = async (id: string | number) => {
     if (confirm("Bạn có chắc chắn muốn xóa?")) {
       try {
-        await deleteJob(id);
+        // await deleteJob(id);
         toast.success("Đã xóa công việc");
       } catch (error) {
         toast.error("Xóa thất bại");
@@ -127,14 +142,14 @@ export default function JobAdminPage() {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Dashboard Tuyển Dụng
+            Job Post Management
           </h1>
           <p className="text-muted-foreground">
-            Quản lý danh sách các vị trí đang đăng tuyển.
+            Manage your job postings, view applications, and track performance all in one place.
           </p>
         </div>
         <Button onClick={handleOpenAdd} className="gap-2">
-          <Plus size={18} /> Thêm Job
+          <Plus size={18} /> Add Job
         </Button>
       </div>
 
@@ -149,10 +164,21 @@ export default function JobAdminPage() {
             <Card key={job.postId} className="hover:shadow-md transition-shadow">
               <CardContent className="flex justify-between items-center p-6">
                 <div>
-                  <h3 className="font-bold text-lg">{job.title}</h3>
+                  <h3 className="font-bold text-lg text-blue-700">{job.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {job.salaryMin} • {job.salaryMax}
+                    {job.shortDescription}
                   </p>
+                  <div className="flex gap-3 text-xs text-gray-500 mt-4">
+                    <span className="flex items-center gap-1">
+                      <Briefcase className="w-3 h-3 text-gray-400" />
+                      {job.employmentType}
+                    </span>
+
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-gray-400" />
+                      {new Date(job.createdDate).toLocaleDateString("vn-VN")}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="flex gap-1">

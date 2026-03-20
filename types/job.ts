@@ -11,6 +11,9 @@ export interface Job {
   skillNames: string[];
   salaryMin: number;
   salaryMax: number;
+  currency: string;
+  location: string;
+  status: string;
 }
 
 export interface JobDetail {
