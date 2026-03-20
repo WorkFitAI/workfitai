@@ -4,7 +4,7 @@ import JobDetailOverview from "@/components/jobs/detail/job-detail-overview";
 import JobDetailContent from "@/components/jobs/detail/job-detail-content";
 import CompanyCard from "@/components/jobs/detail/company-card";
 
-import { getJobById } from "@/app/api/job-api";
+import { jobService } from "@/lib/job/job-service";
 import SimilarJobs from "@/components/jobs/detail/similar-jobs";
 import FeaturedJobs from "@/components/jobs/featured-jobs";
 
@@ -20,7 +20,7 @@ export default async function JobDetail({ params }: Props) {
   let job = null;
 
   try {
-    const res = await getJobById(id);
+    const res = await jobService.getJobById(id);
     job = res.data;
   } catch (error) {
     console.error("Error fetching job details", error);

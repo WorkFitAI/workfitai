@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import FilterCheckboxGroup from "@/components/jobs/filters/filter-checkbox-group";
-import { getAllSkills } from "@/app/api/job-api";
+import { jobService } from "@/lib/job/job-service";
 import { Skill } from "@/types/skill";
 
 const LIMIT = 5;
@@ -15,7 +15,7 @@ const FilterSkills = () => {
   useEffect(() => {
     const fetchSkills = async () => {
       try {
-        const res = await getAllSkills();
+        const res = await jobService.getAllSkills();
         setSkills(res.data.result);
       } catch (err) {
         throw new Error("Fetch skills error:" + err);

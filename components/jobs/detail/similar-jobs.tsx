@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import SimilarJobCard from "@/components/jobs/detail/similar-jobs-card";
-import { getSimilarJobs } from "@/app/api/job-api";
+import { jobService } from "@/lib/job/job-service";
 import { Job } from "@/types/job";
 type Props = {
   jobId: string;
@@ -15,7 +15,7 @@ export default function SimilarJobs({ jobId }: Props) {
   useEffect(() => {
     const fetchSimilarJobs = async () => {
       try {
-        const res = await getSimilarJobs(jobId);
+        const res = await jobService.getSimilarJobs(jobId);
         setJobs(res?.data);
       } catch (error) {
         console.error("Failed to fetch similar jobs", error);

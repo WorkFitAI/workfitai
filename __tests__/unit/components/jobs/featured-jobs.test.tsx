@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import FeaturedJobs from "@/components/jobs/featured-jobs";
-import { getFeaturedJobs } from "@/app/api/job-api";
+import { getFeaturedJobs } from "@/lib/job/job-service";
 import "@testing-library/jest-dom/vitest";
 import { mockJobApiResponse } from "@/__tests__/mocks/jobs";
 

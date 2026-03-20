@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useJobs } from "@/hooks/useJobs";
-import { getJobs } from "@/app/api/job-api";
+import { jobService } from "@/lib/job/job-service";
 import { mockJobApiResponse } from "@/__tests__/mocks/jobs";
 
 vi.mock("@/app/api/job-api", () => ({
@@ -14,12 +14,12 @@ describe("useJobs hook", () => {
   });
 
   it("should fetch jobs on mount", async () => {
-    vi.mocked(getJobs).mockResolvedValue(mockJobApiResponse);
+    vi.mocked(jobService.getJobs).mockResolvedValue(mockJobApiResponse);
 
     const { result } = renderHook(() => useJobs(1, 4));
 
     await waitFor(() => {
-      expect(getJobs).toHaveBeenCalledTimes(1);
+      expect(jobService.getJobs).toHaveBeenCalledTimes(1);
     });
 
     expect(result.current.jobs.length).toBe(2);
@@ -28,7 +28,7 @@ describe("useJobs hook", () => {
   });
 
   it("should set loading state correctly", async () => {
-    vi.mocked(getJobs).mockResolvedValue(mockJobApiResponse);
+    vi.mocked(jobService.getJobs).mockResolvedValue(mockJobApiResponse);
 
     const { result } = renderHook(() => useJobs(1, 4));
 
@@ -40,12 +40,12 @@ describe("useJobs hook", () => {
   });
 
   it("should call API with correct params", async () => {
-    vi.mocked(getJobs).mockResolvedValue(mockJobApiResponse);
+    vi.mocked(jobService.getJobs).mockResolvedValue(mockJobApiResponse);
 
     renderHook(() => useJobs(2, 5));
 
     await waitFor(() => {
-      expect(getJobs).toHaveBeenCalledWith({
+      expect(jobService.getJobs).toHaveBeenCalledWith({
         page: 2,
         pageSize: 5,
         filter: "",
@@ -54,7 +54,7 @@ describe("useJobs hook", () => {
   });
 
   it("should apply filters correctly", async () => {
-    vi.mocked(getJobs).mockResolvedValue(mockJobApiResponse);
+    vi.mocked(jobService.getJobs).mockResolvedValue(mockJobApiResponse);
 
     const filters = {
       experienceLevel: ["Senior"],
@@ -68,10 +68,10 @@ describe("useJobs hook", () => {
     renderHook(() => useJobs(1, 4, filters));
 
     await waitFor(() => {
-      expect(getJobs).toHaveBeenCalled();
+      expect(jobService.getJobs).toHaveBeenCalled();
     });
 
-    const args = vi.mocked(getJobs).mock.calls[0][0];
+    const args = vi.mocked(jobService.getJobs).mock.calls[0][0];
 
     expect(args.filter).toContain("experienceLevel:'Senior'");
     expect(args.filter).toContain("employmentType:'Full-time'");

@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import SimilarJobs from "@/components/jobs/detail/similar-jobs";
-import { getSimilarJobs } from "@/app/api/job-api";
+import { getSimilarJobs } from "@/lib/job/job-service";
 import { mockJobs } from "@/__tests__/mocks/jobs";
 
 // Mock API

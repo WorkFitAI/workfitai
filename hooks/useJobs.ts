@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getJobs } from "@/app/api/job-api";
+
 import { Job } from "@/types/job";
+import { jobService } from "@/lib/job/job-service";
 
 type Filters = {
   experienceLevel?: string[];
@@ -16,7 +17,8 @@ type Filters = {
 export const useJobs = (
   page: number,
   pageSize: number,
-  filters?: Filters
+  filters?: Filters,
+  role?: string
 ) => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -68,10 +70,11 @@ export const useJobs = (
 
       const filter = buildFilter();
 
-      const res = await getJobs({
+      const res = await jobService.getJobs({
         page,
         pageSize,
         filter,
+        role,
       });
 
       setJobs(res.data.result);

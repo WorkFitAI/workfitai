@@ -71,3 +71,11 @@ export interface JobData {
   meta: JobMeta;
   result: Job[];
 }
+
+export type GetJobsParams = {
+  page?: number;
+  pageSize?: number;
+  sort?: string;
+  filter?: string;
+  role?: string;
+};
