@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useJobs } from "@/hooks/useJobs";
 import { useJobFilters } from "@/hooks/useJobFilters";
 
-import { Plus, Pencil, Trash2, Loader2, Briefcase, Clock, MapPin, Search, ChevronRight } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Briefcase, Clock, MapPin, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { JobDialog } from "@/components/jobs/post/job-dialog";
@@ -49,7 +49,7 @@ export default function JobAdminPage() {
         const res = await jobService.getAllSkills();
         setSkills(res.data.result); 
       } catch (err) {
-        console.error("Lỗi load skills", err);
+        console.error("Error fetching skills", err);
       }
     };
     fetchSkills();
@@ -87,7 +87,7 @@ export default function JobAdminPage() {
 
       setDialogState({ isOpen: true, editingJob: normalizedData });
     } catch (error) {
-      toast.error("Không lấy được chi tiết job");
+      toast.error("Failed to fetch job details");
     }
   };
 
@@ -100,27 +100,32 @@ export default function JobAdminPage() {
       if (dialogState.editingJob) {
         const newData = { ...data, jobId: dialogState.editingJob.postId, skillIds: skillIdsToSave };
         await jobService.updateJob(newData);
-        toast.success("Đã cập nhật công việc");
+        toast.success("Updated job successfully");
       } else {        
         const newData = { ...data, skillIds: skillIdsToSave };
         await jobService.createJob(newData);
-        toast.success("Đã tạo công việc mới");
+        toast.success("Created new job successfully");
       }
       setDialogState({ ...dialogState, isOpen: false });
-    } catch (error) {
-      toast.error("Có lỗi xảy ra");
+    } catch (error: unknown) {
+      toast.error((error as Error).message);
     }
   };
 
-  const handleDelete = async (id: string | number) => {
-    if (confirm("Bạn có chắc chắn muốn xóa?")) {
-      try {
-        // await deleteJob(id);
-        toast.success("Đã xóa công việc");
-      } catch (error) {
-        toast.error("Xóa thất bại");
-      }
-    }
+  const handleDelete = (id: string) => {
+    toast("Are you sure you want to delete?", {
+      action: {
+        label: "Delete",
+        onClick: async () => {
+          try {
+            await jobService.softDelete(id, "CLOSED");
+            toast.success("Deleted job successfully");
+          } catch (error: unknown) {
+            toast.error((error as Error).message);
+          }
+        },
+      },
+    });
   };
 
   return (

@@ -1,9 +1,11 @@
 import JobManagement from "@/components/jobs/job-post-client";
 
-export default function DashboardPage() {
+import { Suspense } from "react";
+
+export default function Page() {
   return (
-    <div className="space-y-4">
+    <Suspense fallback={<div>Loading...</div>}>
       <JobManagement />
-    </div>
-  )
+    </Suspense>
+  );
 }

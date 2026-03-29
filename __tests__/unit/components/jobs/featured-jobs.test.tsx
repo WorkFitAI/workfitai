@@ -1,16 +1,17 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import FeaturedJobs from "@/components/jobs/featured-jobs";
-import { getFeaturedJobs } from "@/lib/job/job-service";
+import { jobService } from "@/lib/job/job-service";
 import "@testing-library/jest-dom/vitest";
 import { mockJobApiResponse } from "@/__tests__/mocks/jobs";
 
-// 1. Mock API
-vi.mock("@/app/api/job-api", () => ({
-  getFeaturedJobs: vi.fn(),
+vi.mock("@/lib/job/job-service", () => ({
+  jobService: {
+    getFeaturedJobs: vi.fn(),
+  },
 }));
 
-// Mock Lucide Icons để tránh lỗi render SVG
+// Mock icon (OK rồi giữ nguyên)
 vi.mock("lucide-react", () => ({
   ChevronLeft: () => <div data-testid="chevron-left" />,
   ChevronRight: () => <div data-testid="chevron-right" />,
@@ -19,59 +20,74 @@ vi.mock("lucide-react", () => ({
   Briefcase: () => <svg data-testid="icon" />,
 }));
 
+const mockedJobService = vi.mocked(jobService);
+
 describe("FeaturedJobs Component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("Should display the correct title and call the API on mount", async () => {
-    
-    vi.mocked(getFeaturedJobs).mockResolvedValue(mockJobApiResponse);
+  /* =========================
+     TITLE + API CALL
+  ========================= */
+  it("Should display title and call the API on mount", async () => {
+    mockedJobService.getFeaturedJobs.mockResolvedValue(mockJobApiResponse);
 
     render(<FeaturedJobs />);
 
-    expect(screen.getByText("Featured Jobs")).toBeInTheDocument();
-    
+    expect(screen.getByText(/featured jobs/i)).toBeInTheDocument();
+
     await waitFor(() => {
-      expect(getFeaturedJobs).toHaveBeenCalledWith(1, 4);
+      expect(mockedJobService.getFeaturedJobs).toHaveBeenCalledWith(1, 4);
     });
   });
 
-  it("Should render the correct list of jobs after successful fetch", async () => {
-    vi.mocked(getFeaturedJobs).mockResolvedValue(mockJobApiResponse);
+  /* =========================
+     RENDER LIST
+  ========================= */
+  it("Should render the correct list of jobs after fetch", async () => {
+    mockedJobService.getFeaturedJobs.mockResolvedValue(mockJobApiResponse);
 
     render(<FeaturedJobs />);
+
     for (const job of mockJobApiResponse.data.result) {
       expect(await screen.findByText(job.title)).toBeInTheDocument();
     }
   });
 
-  it("Should handle pagination when clicking the Next button", async () => {
-    vi.mocked(getFeaturedJobs).mockResolvedValue(mockJobApiResponse);
+  /* =========================
+     PAGINATION NEXT
+  ========================= */
+  it("Should handle pagination when clicking Next", async () => {
+    mockedJobService.getFeaturedJobs.mockResolvedValue(mockJobApiResponse);
 
     render(<FeaturedJobs />);
 
-    // Lấy nút Next (nút thứ 2 trong phần pagination)
-    const buttons = screen.getAllByRole("button");
-    const nextButton = buttons[1]; 
-    
-    fireEvent.click(nextButton);
+    // Đợi data render xong trước
+    await screen.findByText(mockJobApiResponse.data.result[0].title);
+
+    // tìm nút next bằng testid/icon
+    const nextBtn = screen.getByTestId("chevron-right").closest("button");
+
+    if (nextBtn) fireEvent.click(nextBtn);
 
     await waitFor(() => {
-      // Kiểm tra API được gọi lại với page = 2
-      expect(getFeaturedJobs).toHaveBeenCalledWith(2, 4);
+      expect(mockedJobService.getFeaturedJobs).toHaveBeenCalledWith(2, 4);
     });
   });
 
-  it("Should have the Previous button enabled based on the current page", async () => {
-    vi.mocked(getFeaturedJobs).mockResolvedValue(mockJobApiResponse);
-    
+  /* =========================
+     PREVIOUS BUTTON
+  ========================= */
+  it("Should enable Previous button correctly", async () => {
+    mockedJobService.getFeaturedJobs.mockResolvedValue(mockJobApiResponse);
+
     render(<FeaturedJobs />);
 
-    const buttons = screen.getAllByRole("button");
-    const prevButton = buttons[0];
+    await screen.findByText(mockJobApiResponse.data.result[0].title);
 
-    // Với code hiện tại (page=1 và disabled={page === 0}), nút này sẽ KHÔNG bị disable
-    expect(prevButton).not.toBeDisabled(); 
+    const prevBtn = screen.getByTestId("chevron-left").closest("button");
+
+    expect(prevBtn).not.toBeDisabled();
   });
 });

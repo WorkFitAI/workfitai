@@ -93,4 +93,11 @@ export const jobService = {
       throw new Error("Failed to update job status");
     }
   },
+
+  async softDelete(id: string, newStatus: string): Promise<void> {
+    const res = await apiClient.put(`/job/hr/jobs/${id}/${newStatus}`) as ApiResponse<null>;
+    if (!res.status || res.status >= 400) {
+      throw new Error("Failed to update job status");
+    }
+  },
 }

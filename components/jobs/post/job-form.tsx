@@ -58,6 +58,7 @@ export function JobForm({ initialData, onSubmit }: Props) {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [query, setQuery] = useState("");
   const [isPublished, setIsPublished] = useState(initialData?.status === "PUBLISHED");
+  const isDeleted = initialData?.status === "CLOSED";
 
   const toggleStatus = async () => {
     const nextStatus = !isPublished;
@@ -97,7 +98,7 @@ export function JobForm({ initialData, onSubmit }: Props) {
         const res = await jobService.getAllSkills();
         setSkills(res.data.result);
       } catch (err) {
-        console.error("Lỗi load skills", err);
+        console.error("Error fetching skills", err);
       }
     };
     fetchSkills();
@@ -127,16 +128,18 @@ export function JobForm({ initialData, onSubmit }: Props) {
                     </CardTitle>
                     
                     {/* Toggle Status switch */}
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-medium text-slate-500">{isPublished ? "PUBLISHED" : "DRAFT"}</span>
-                      <div
-                        onClick={toggleStatus}
-                        className={`relative w-14 h-7 rounded-full cursor-pointer transition-all ${isPublished ? "bg-green-500" : "bg-slate-300"}`}
-                      >
+                    {!isDeleted && (
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs font-medium text-slate-500">{isPublished ? "PUBLISHED" : "DRAFT"}</span>
+                        <div
+                          onClick={toggleStatus}
+                          className={`relative w-14 h-7 rounded-full cursor-pointer transition-all ${isPublished ? "bg-green-500" : "bg-slate-300"}`}
+                        >
                         <div className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow transition-all ${isPublished ? "translate-x-7" : "translate-x-0"}`} />
+                        </div>
                       </div>
+                    )}
                     </div>
-                  </div>
                 </CardHeader>
                 <CardContent className="p-6 space-y-6 bg-white">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -169,7 +172,7 @@ export function JobForm({ initialData, onSubmit }: Props) {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex justify-between gap-6">
                     <FormField
                       control={form.control}
                       name="employmentType"
@@ -186,6 +189,8 @@ export function JobForm({ initialData, onSubmit }: Props) {
                               <SelectItem value="FULL_TIME">Full Time</SelectItem>
                               <SelectItem value="PART_TIME">Part Time</SelectItem>
                               <SelectItem value="CONTRACT">Contract</SelectItem>
+                              <SelectItem value="INTERN">Intern</SelectItem>
+                              <SelectItem value="REMOTE">Remote</SelectItem>
                             </SelectContent>
                           </Select>
                         </FormItem>
@@ -204,9 +209,11 @@ export function JobForm({ initialData, onSubmit }: Props) {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="INTERN">Intern</SelectItem>
+                              <SelectItem value="FRESHER">Fresher</SelectItem>
                               <SelectItem value="JUNIOR">Junior</SelectItem>
+                              <SelectItem value="MID">Middle</SelectItem>
                               <SelectItem value="SENIOR">Senior</SelectItem>
+                              <SelectItem value="LEAD">Leader</SelectItem>
                             </SelectContent>
                           </Select>
                         </FormItem>
@@ -412,7 +419,7 @@ export function JobForm({ initialData, onSubmit }: Props) {
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
                         <FormLabel className="text-xs font-bold uppercase flex items-center gap-1">
-                          <CalendarIcon className="w-3 h-3" /> Deadline
+                          <CalendarIcon className="w-3 h-3" /> Deadline <span className="text-red-500">(Date needs to be in future)</span>
                         </FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
