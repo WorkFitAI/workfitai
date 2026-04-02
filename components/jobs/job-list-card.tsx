@@ -18,7 +18,7 @@ const JobListCard = ({ job }: Props) => {
         <div className="flex gap-3 items-center">
           {/* Logo */}
           <Image
-            src={job.company.logoUrl}
+            src={job?.company?.logoUrl || '/imgs/brands/brand-1.png'}
             alt="company logo"
             width={48}
             height={48}
