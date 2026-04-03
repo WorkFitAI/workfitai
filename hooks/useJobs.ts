@@ -9,9 +9,10 @@ type Filters = {
   experienceLevel?: string[];
   employmentType?: string[];
   skillNames?: string[];
-  keyword?: string;
+  title?: string;
   salaryMin?: number;
   salaryMax?: number;
+  location?: string;
 };
 
 export const useJobs = (
@@ -49,8 +50,8 @@ export const useJobs = (
     buildCondition("employmentType", filters?.employmentType);
     buildCondition("skills.name", filters?.skillNames);
 
-    if (filters?.keyword) {
-      conditions.push(`title~'${filters.keyword}'`);
+    if (filters?.title) {
+      conditions.push(`title~'${filters.title}'`);
     }
 
     if (filters?.salaryMin) {
@@ -59,6 +60,10 @@ export const useJobs = (
 
     if (filters?.salaryMax) {
       conditions.push(`salaryMax :< ${filters.salaryMax}`);
+    }
+
+    if (filters?.location) {
+      conditions.push(`company.address~'${filters.location}'`);
     }
 
     return conditions.join(" and ");
@@ -95,9 +100,10 @@ export const useJobs = (
     filters?.experienceLevel?.join(","),
     filters?.employmentType?.join(","),
     filters?.skillNames?.join(","),
-    filters?.keyword,
+    filters?.title,
     filters?.salaryMin,
     filters?.salaryMax,
+    filters?.location,
   ]);
 
   return {
