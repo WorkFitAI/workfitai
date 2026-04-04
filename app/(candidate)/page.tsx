@@ -7,11 +7,15 @@ import { HomeTopRecruiters } from "@/components/home/home-top-recruiters"
 import { HomeLatestNews } from "@/components/home/home-latest-news"
 import { HomeJobsByLocation } from "@/components/home/home-jobs-by-location"
 import { HomeCtaBanner } from "@/components/home/home-cta-banner"
+import { Suspense } from "react"
+import { HomeHeroSearch } from "@/components/home/home-hero-search"
 
 export default function HomePage() {
   return (
     <>
-      <HomeHeroSection />
+      <Suspense fallback={<div>Loading...</div>}>
+        <HomeHeroSearch />
+      </Suspense>
       <HomeJobsOfDay />
       <HomeFindRightJob />
       <HomeLatestNews />

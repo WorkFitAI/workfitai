@@ -1,22 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getJobs } from "@/app/api/job-api";
+
 import { Job } from "@/types/job";
+import { jobService } from "@/lib/job/job-service";
 
 type Filters = {
   experienceLevel?: string[];
   employmentType?: string[];
   skillNames?: string[];
-  keyword?: string;
+  title?: string;
   salaryMin?: number;
   salaryMax?: number;
+  location?: string;
 };
 
 export const useJobs = (
   page: number,
   pageSize: number,
-  filters?: Filters
+  filters?: Filters,
+  role?: string
 ) => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -47,8 +50,8 @@ export const useJobs = (
     buildCondition("employmentType", filters?.employmentType);
     buildCondition("skills.name", filters?.skillNames);
 
-    if (filters?.keyword) {
-      conditions.push(`title~'${filters.keyword}'`);
+    if (filters?.title) {
+      conditions.push(`title~'${filters.title}'`);
     }
 
     if (filters?.salaryMin) {
@@ -57,6 +60,10 @@ export const useJobs = (
 
     if (filters?.salaryMax) {
       conditions.push(`salaryMax :< ${filters.salaryMax}`);
+    }
+
+    if (filters?.location) {
+      conditions.push(`company.address~'${filters.location}'`);
     }
 
     return conditions.join(" and ");
@@ -68,10 +75,11 @@ export const useJobs = (
 
       const filter = buildFilter();
 
-      const res = await getJobs({
+      const res = await jobService.getJobs({
         page,
         pageSize,
         filter,
+        role,
       });
 
       setJobs(res.data.result);
@@ -92,9 +100,10 @@ export const useJobs = (
     filters?.experienceLevel?.join(","),
     filters?.employmentType?.join(","),
     filters?.skillNames?.join(","),
-    filters?.keyword,
+    filters?.title,
     filters?.salaryMin,
     filters?.salaryMax,
+    filters?.location,
   ]);
 
   return {

@@ -22,12 +22,18 @@ export const useJobFilters = () => {
       ? Number(searchParams.get("salaryMax"))
       : undefined;
 
+    const title = searchParams.get("title") || undefined;
+
+    const location = searchParams.get("location") || undefined;
+
     return {
       experienceLevel,
       employmentType,
       skillNames,
       salaryMin,
       salaryMax,
+      title,
+      location
     };
   }, [searchParams]);
 

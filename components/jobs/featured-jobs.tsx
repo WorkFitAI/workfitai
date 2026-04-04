@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import FeaturedJobCard from "@/components/jobs/featured/featured-job-card";
-import { getFeaturedJobs } from "@/app/api/job-api";
+import { jobService } from "@/lib/job/job-service";
 import { Job } from "@/types/job";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -14,7 +14,7 @@ export default function FeaturedJobs() {
 
   useEffect(() => {
     const load = async () => {
-      const { data } = await getFeaturedJobs(page, size);
+      const { data } = await jobService.getFeaturedJobs(page, size);
 
       setJobs(data.result);
       setTotalPages(data.meta.pages);

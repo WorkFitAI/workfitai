@@ -1,18 +1,21 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import SimilarJobs from "@/components/jobs/detail/similar-jobs";
-import { getSimilarJobs } from "@/app/api/job-api";
+import { jobService } from "@/lib/job/job-service";
 import { mockJobs } from "@/__tests__/mocks/jobs";
 
-// Mock API
-vi.mock("@/app/api/job-api", () => ({
-  getSimilarJobs: vi.fn(),
+vi.mock("@/lib/job/job-service", () => ({
+  jobService: {
+    getSimilarJobs: vi.fn(),
+  },
 }));
 
-// Mock SimilarJobCard
+// mock card
 vi.mock("@/components/jobs/detail/similar-jobs-card", () => ({
-  default: ({ title }: { title: string }) => <div>{ title } </div>,
+  default: ({ title }: { title: string }) => <div>{title}</div>,
 }));
+
+const mockedJobService = vi.mocked(jobService);
 
 describe("<SimilarJobs />", () => {
   beforeEach(() => {
@@ -20,26 +23,42 @@ describe("<SimilarJobs />", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
+  /* =========================
+     LOADING
+  ========================= */
   it("should display loading state initially", () => {
-    vi.mocked(getSimilarJobs).mockResolvedValue({ data: [] });
+    // Promise không resolve → giữ loading
+    mockedJobService.getSimilarJobs.mockReturnValue(
+      new Promise(() => {})
+    );
 
     render(<SimilarJobs jobId="job-123" />);
 
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
   });
 
+  /* =========================
+     CALL API
+  ========================= */
   it("should call API with correct jobId", async () => {
-    vi.mocked(getSimilarJobs).mockResolvedValue({ data: mockJobs });
+    mockedJobService.getSimilarJobs.mockResolvedValue({
+      data: mockJobs,
+    });
 
     render(<SimilarJobs jobId="job-123" />);
 
     await waitFor(() => {
-      expect(getSimilarJobs).toHaveBeenCalledWith("job-123");
+      expect(mockedJobService.getSimilarJobs).toHaveBeenCalledWith("job-123");
     });
   });
 
+  /* =========================
+     SUCCESS
+  ========================= */
   it("should render similar jobs after fetch success", async () => {
-    vi.mocked(getSimilarJobs).mockResolvedValue({ data: mockJobs });
+    mockedJobService.getSimilarJobs.mockResolvedValue({
+      data: mockJobs,
+    });
 
     render(<SimilarJobs jobId="job-123" />);
 
@@ -47,15 +66,21 @@ describe("<SimilarJobs />", () => {
     expect(screen.getByText("Backend Engineer")).toBeInTheDocument();
   });
 
+  /* =========================
+     ERROR
+  ========================= */
   it("should handle API error gracefully", async () => {
-    vi.mocked(getSimilarJobs).mockRejectedValue(new Error("API error"));
+    mockedJobService.getSimilarJobs.mockRejectedValue(
+      new Error("API error")
+    );
 
     render(<SimilarJobs jobId="job-123" />);
 
     await waitFor(() => {
-      expect(getSimilarJobs).toHaveBeenCalled();
+      expect(mockedJobService.getSimilarJobs).toHaveBeenCalled();
     });
 
+    // không render data khi lỗi
     expect(screen.queryByText("Frontend Developer")).not.toBeInTheDocument();
   });
 });

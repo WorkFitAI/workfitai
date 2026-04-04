@@ -11,6 +11,9 @@ export interface Job {
   skillNames: string[];
   salaryMin: number;
   salaryMax: number;
+  currency: string;
+  location: string;
+  status: string;
 }
 
 export interface JobDetail {
@@ -71,3 +74,11 @@ export interface JobData {
   meta: JobMeta;
   result: Job[];
 }
+
+export type GetJobsParams = {
+  page?: number;
+  pageSize?: number;
+  sort?: string;
+  filter?: string;
+  role?: string;
+};
