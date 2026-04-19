@@ -48,7 +48,7 @@ formData.append("file", cvFile);
 formData.append("jobId", jobId);
 formData.append("coverLetter", "optional message");
 
-fetch('http://localhost:9085/api/v1/applications', {
+fetch('http://localhost:9085/application', {
   method: 'POST',
   headers: {
     'Authorization': `Bearer ${accessToken}`
@@ -64,7 +64,7 @@ fetch('http://localhost:9085/api/v1/applications', {
 
 ### Submit Application
 
-**`POST /api/v1/applications`**
+**`POST /application`**
 
 Submit job application with CV upload (multipart/form-data).
 
@@ -112,7 +112,7 @@ Submit job application with CV upload (multipart/form-data).
 
 ### Get My Applications
 
-**`GET /api/v1/applications/my?page=0&size=20&status=APPLIED`**
+**`GET /application/my?page=0&size=20&status=APPLIED`**
 
 List all applications submitted by current candidate (paginated).
 
@@ -153,7 +153,7 @@ List all applications submitted by current candidate (paginated).
 
 ### Get Application Details
 
-**`GET /api/v1/applications/{applicationId}`**
+**`GET /application/{applicationId}`**
 
 Get detailed application information.
 
@@ -213,7 +213,7 @@ Get detailed application information.
 
 ### Check If Already Applied
 
-**`GET /api/v1/applications/check?jobId={jobId}`**
+**`GET /application/check?jobId={jobId}`**
 
 Check if candidate has already applied to a job.
 
@@ -238,7 +238,7 @@ Check if candidate has already applied to a job.
 
 ### Get Application Count
 
-**`GET /api/v1/applications/my/count`**
+**`GET /application/my/count`**
 
 Get total count of candidate's applications.
 
@@ -258,7 +258,7 @@ Get total count of candidate's applications.
 
 ### Withdraw Application
 
-**`DELETE /api/v1/applications/{applicationId}`**
+**`DELETE /application/{applicationId}`**
 
 Withdraw submitted application (soft delete).
 
@@ -282,7 +282,7 @@ Withdraw submitted application (soft delete).
 
 ### Create Draft Application
 
-**`POST /api/v1/applications/draft`**
+**`POST /application/draft`**
 
 Create a draft application without CV (save for later).
 
@@ -315,7 +315,7 @@ Create a draft application without CV (save for later).
 
 ### Update Draft Application
 
-**`PUT /api/v1/applications/{applicationId}/draft`**
+**`PUT /application/{applicationId}/draft`**
 
 Update draft application (CV, cover letter).
 
@@ -353,7 +353,7 @@ Update draft application (CV, cover letter).
 
 ### Submit Draft Application
 
-**`POST /api/v1/applications/{applicationId}/submit`**
+**`POST /application/{applicationId}/submit`**
 
 Submit draft application (triggers Saga workflow).
 
@@ -391,7 +391,7 @@ Submit draft application (triggers Saga workflow).
 
 ### List My Drafts
 
-**`GET /api/v1/applications/drafts?page=0&size=20`**
+**`GET /application/drafts?page=0&size=20`**
 
 Get all draft applications for candidate.
 
@@ -429,7 +429,7 @@ Get all draft applications for candidate.
 
 ### View Status History
 
-**`GET /api/v1/applications/{applicationId}/status-history`**
+**`GET /application/{applicationId}/status-history`**
 
 View all status changes for an application.
 
@@ -467,7 +467,7 @@ View all status changes for an application.
 
 ### View Candidate-Visible Notes
 
-**`GET /api/v1/applications/{applicationId}/notes`**
+**`GET /application/{applicationId}/notes`**
 
 Get notes visible to candidate.
 
@@ -500,7 +500,7 @@ Get notes visible to candidate.
 
 ### Get Job Applications
 
-**`GET /api/v1/applications/job/{jobId}?page=0&size=20&status=APPLIED`**
+**`GET /application/job/{jobId}?page=0&size=20&status=APPLIED`**
 
 Get all applications for a specific job.
 
@@ -539,7 +539,7 @@ Get all applications for a specific job.
 
 ### Get Application Count for Job
 
-**`GET /api/v1/applications/job/{jobId}/count`**
+**`GET /application/job/{jobId}/count`**
 
 Get count of applications for job.
 
@@ -569,7 +569,7 @@ Get count of applications for job.
 
 ### Get Job Application Statistics
 
-**`GET /api/v1/applications/job/{jobId}/stats`**
+**`GET /application/job/{jobId}/stats`**
 
 Get funnel metrics and statistics for job.
 
@@ -605,7 +605,7 @@ Get funnel metrics and statistics for job.
 
 ### Update Application Status
 
-**`PUT /api/v1/applications/{applicationId}/status?status={status}`**
+**`PUT /application/{applicationId}/status?status={status}`**
 
 Change application status.
 
@@ -639,7 +639,7 @@ Change application status.
 
 ### Download CV
 
-**`GET /api/v1/applications/{applicationId}/cv/download`**
+**`GET /application/{applicationId}/cv/download`**
 
 Download candidate's CV file (PDF).
 
@@ -658,7 +658,7 @@ Download candidate's CV file (PDF).
 
 ### Add Application Note
 
-**`POST /api/v1/applications/{applicationId}/notes`**
+**`POST /application/{applicationId}/notes`**
 
 Add a note to application (visible or internal).
 
@@ -693,7 +693,7 @@ Add a note to application (visible or internal).
 
 ### Update Note
 
-**`PUT /api/v1/applications/{applicationId}/notes/{noteId}`**
+**`PUT /application/{applicationId}/notes/{noteId}`**
 
 Update existing note.
 
@@ -726,7 +726,7 @@ Update existing note.
 
 ### Delete Note
 
-**`DELETE /api/v1/applications/{applicationId}/notes/{noteId}`**
+**`DELETE /application/{applicationId}/notes/{noteId}`**
 
 Delete note.
 
@@ -738,7 +738,7 @@ Delete note.
 
 ### Get All Notes for Application
 
-**`GET /api/v1/applications/{applicationId}/notes`**
+**`GET /application/{applicationId}/notes`**
 
 Get all notes (internal and visible).
 
@@ -770,7 +770,7 @@ Get all notes (internal and visible).
 
 ### Get Public Notes Only
 
-**`GET /api/v1/applications/{applicationId}/notes/public`**
+**`GET /application/{applicationId}/notes/public`**
 
 Get notes visible to candidate.
 
@@ -800,7 +800,7 @@ Get notes visible to candidate.
 
 ### Get Status History
 
-**`GET /api/v1/applications/{applicationId}/history`**
+**`GET /application/{applicationId}/history`**
 
 Get full status change history.
 
@@ -831,7 +831,7 @@ Get full status change history.
 
 ### Advanced Search
 
-**`GET /api/v1/applications/search?keyword={keyword}&status=REVIEWING&page=0&size=20`**
+**`GET /application/search?keyword={keyword}&status=REVIEWING&page=0&size=20`**
 
 Search applications with advanced filters.
 
@@ -866,7 +866,7 @@ Search applications with advanced filters.
 
 ### Bulk Status Update
 
-**`PUT /api/v1/applications/bulk/status`**
+**`PUT /application/bulk/status`**
 
 Update status for multiple applications.
 
@@ -897,7 +897,7 @@ Update status for multiple applications.
 
 ### HR Dashboard Statistics
 
-**`GET /api/v1/applications/hr/dashboard`**
+**`GET /application/hr/dashboard`**
 
 Get HR dashboard metrics and statistics.
 
@@ -940,7 +940,7 @@ Get HR dashboard metrics and statistics.
 
 ### Get Company Applications
 
-**`GET /api/v1/applications/company/{companyId}?page=0&size=20`**
+**`GET /application/company/{companyId}?page=0&size=20`**
 
 Get all applications for company's jobs.
 
@@ -968,7 +968,7 @@ Get all applications for company's jobs.
 
 ### Assign Application to HR
 
-**`PUT /api/v1/applications/{applicationId}/assign`**
+**`PUT /application/{applicationId}/assign`**
 
 Assign application to specific HR user.
 
@@ -1000,7 +1000,7 @@ Assign application to specific HR user.
 
 ### Unassign Application
 
-**`DELETE /api/v1/applications/{applicationId}/assign`**
+**`DELETE /application/{applicationId}/assign`**
 
 Remove HR assignment.
 
@@ -1012,7 +1012,7 @@ Remove HR assignment.
 
 ### Get Assigned Applications
 
-**`GET /api/v1/applications/assigned/{hrUsername}?page=0&size=20`**
+**`GET /application/assigned/{hrUsername}?page=0&size=20`**
 
 Get applications assigned to specific HR user.
 
@@ -1040,7 +1040,7 @@ Get applications assigned to specific HR user.
 
 ### Manager Statistics
 
-**`GET /api/v1/applications/manager/stats?companyId={companyId}`**
+**`GET /application/manager/stats?companyId={companyId}`**
 
 Get manager-level analytics.
 
@@ -1080,7 +1080,7 @@ Get manager-level analytics.
 
 ### Export Applications
 
-**`GET /api/v1/applications/export?companyId={companyId}&format=CSV`**
+**`GET /application/export?companyId={companyId}&format=CSV`**
 
 Export applications to CSV or Excel.
 
@@ -1106,7 +1106,7 @@ Export applications to CSV or Excel.
 
 ### Get All Applications
 
-**`GET /api/v1/applications/admin/all?page=0&size=20`**
+**`GET /application/admin/all?page=0&size=20`**
 
 View all system applications (Admin only).
 
@@ -1135,7 +1135,7 @@ View all system applications (Admin only).
 
 ### System Statistics
 
-**`GET /api/v1/applications/admin/stats`**
+**`GET /application/admin/stats`**
 
 Get system-wide statistics.
 
@@ -1165,7 +1165,7 @@ Get system-wide statistics.
 
 ### Query Audit Logs
 
-**`GET /api/v1/applications/admin/audit?applicationId={id}&page=0&size=20`**
+**`GET /application/admin/audit?applicationId={id}&page=0&size=20`**
 
 Query audit logs for compliance and debugging.
 
@@ -1206,7 +1206,7 @@ Query audit logs for compliance and debugging.
 
 ### Create Application (Admin)
 
-**`POST /api/v1/applications/admin/create`**
+**`POST /application/admin/create`**
 
 Manually create application (bypass Saga).
 
@@ -1238,7 +1238,7 @@ Manually create application (bypass Saga).
 
 ### Override Status
 
-**`PUT /api/v1/applications/admin/{applicationId}/override-status`**
+**`PUT /application/admin/{applicationId}/override-status`**
 
 Force status change with audit trail.
 
@@ -1273,7 +1273,7 @@ Force status change with audit trail.
 
 ### Export Full System Data
 
-**`GET /api/v1/applications/admin/export-full?format=CSV`**
+**`GET /application/admin/export-full?format=CSV`**
 
 Export all applications with full details.
 
@@ -1291,7 +1291,7 @@ Export all applications with full details.
 
 ### View Deleted Applications
 
-**`GET /api/v1/applications/admin/deleted?page=0&size=20`**
+**`GET /application/admin/deleted?page=0&size=20`**
 
 View soft-deleted applications.
 
@@ -1329,7 +1329,7 @@ View soft-deleted applications.
 
 ### Restore Deleted Application
 
-**`PUT /api/v1/applications/admin/{applicationId}/restore`**
+**`PUT /application/admin/{applicationId}/restore`**
 
 Restore previously deleted application.
 
@@ -1480,6 +1480,6 @@ interface PaginatedResponse<T> {
 
 **API Version**: 1.0
 **Last Updated**: 2026-02-15
-**Gateway Route**: `/api/v1/applications/**`
+**Gateway Route**: `/application/**`
 **Database**: MongoDB (application_db)
 **File Storage**: MinIO (cvs-files bucket)

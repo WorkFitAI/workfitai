@@ -40,6 +40,7 @@ export default async function JobDetail({ params }: Props) {
         <JobDetailThumb bannerUrl={job.bannerUrl || null} />
 
         <JobDetailHead
+          jobId={id}
           title={job.title}
           employmentType={job.employmentType}
           createdDate={job.createdDate}

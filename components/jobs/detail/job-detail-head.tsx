@@ -1,13 +1,18 @@
-import { Briefcase, Clock, CheckCircle } from "lucide-react";
+"use client";
+
+import { Briefcase, Clock } from "lucide-react";
 import { formatPostedTime } from "@/lib/utils";
+import ApplyNowButton from "@/components/applications/apply-now-button";
 
 interface JobDetailHeadProps {
+  jobId: string;
   title: string;
   employmentType: string;
   createdDate: string;
 }
 
 const JobDetailHead = ({
+  jobId,
   title,
   employmentType,
   createdDate,
@@ -32,10 +37,7 @@ const JobDetailHead = ({
         </div>
 
         {/* RIGHT */}
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium transition">
-          <CheckCircle className="w-4 h-4 inline-block mr-2" />
-          Apply Now
-        </button>
+        <ApplyNowButton jobId={jobId} jobTitle={title} />
       </div>
     </div>
   );
