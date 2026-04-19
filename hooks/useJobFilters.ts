@@ -26,6 +26,10 @@ export const useJobFilters = () => {
 
     const location = searchParams.get("location") || undefined;
 
+    const status = searchParams.get("status") || undefined;
+
+    const sort = searchParams.get("sort") || "desc";
+
     return {
       experienceLevel,
       employmentType,
@@ -33,7 +37,9 @@ export const useJobFilters = () => {
       salaryMin,
       salaryMax,
       title,
-      location
+      location,
+      status,
+      sort,
     };
   }, [searchParams]);
 

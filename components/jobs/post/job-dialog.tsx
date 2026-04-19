@@ -13,9 +13,10 @@ interface JobDialogProps {
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: JobFormValues) => void;
   initialData?: JobFormValues | null;
+  onSuccess?: () => void;
 }
 
-export function JobDialog({ isOpen, onOpenChange, onSubmit, initialData }: JobDialogProps) {
+export const JobDialog = ({ isOpen, onOpenChange, onSubmit, initialData, onSuccess }: JobDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
@@ -41,6 +42,7 @@ export function JobDialog({ isOpen, onOpenChange, onSubmit, initialData }: JobDi
               onSubmit(data);
               onOpenChange(false);
             }} 
+            onSuccess={onSuccess}
           />
         </div>
       </DialogContent>
