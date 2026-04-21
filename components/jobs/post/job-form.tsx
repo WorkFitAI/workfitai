@@ -52,9 +52,11 @@ import { jobService } from "@/lib/job/job-service";
 type Props = {
   initialData?: JobFormValues;
   onSubmit: (data: JobFormValues) => void;
+  onSuccess?: () => void;
 };
 
-export function JobForm({ initialData, onSubmit }: Props) {
+export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
+
   const [skills, setSkills] = useState<Skill[]>([]);
   const [query, setQuery] = useState("");
   const [isPublished, setIsPublished] = useState(initialData?.status === "PUBLISHED");
@@ -64,6 +66,7 @@ export function JobForm({ initialData, onSubmit }: Props) {
     const nextStatus = !isPublished;
     setIsPublished(nextStatus);
     await jobService.toggleJobStatus(initialData?.postId || "", nextStatus ? "PUBLISHED" : "DRAFT");
+    onSuccess?.();
   };
 
   const form = useForm<JobFormValues>({

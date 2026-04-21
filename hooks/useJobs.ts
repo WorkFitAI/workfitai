@@ -13,6 +13,8 @@ type Filters = {
   salaryMin?: number;
   salaryMax?: number;
   location?: string;
+  status?: string;
+  sort?: string;
 };
 
 export const useJobs = (
@@ -51,7 +53,7 @@ export const useJobs = (
     buildCondition("skills.name", filters?.skillNames);
 
     if (filters?.title) {
-      conditions.push(`title~'${filters.title}'`);
+      conditions.push(`title~~'${filters.title}'`);
     }
 
     if (filters?.salaryMin) {
@@ -64,6 +66,10 @@ export const useJobs = (
 
     if (filters?.location) {
       conditions.push(`company.address~'${filters.location}'`);
+    }
+
+    if (filters?.status) {
+      conditions.push(`status:'${filters.status}'`);
     }
 
     return conditions.join(" and ");
@@ -80,6 +86,7 @@ export const useJobs = (
         pageSize,
         filter,
         role,
+        sort: filters?.sort
       });
 
       setJobs(res.data.result);
@@ -104,6 +111,8 @@ export const useJobs = (
     filters?.salaryMin,
     filters?.salaryMax,
     filters?.location,
+    filters?.status,
+    filters?.sort,
   ]);
 
   return {
@@ -113,5 +122,6 @@ export const useJobs = (
     loading,
     pageSize,
     total,
+    refetch: fetchJobs
   };
 };
