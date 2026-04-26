@@ -24,6 +24,9 @@ export default defineConfig({
       "__tests__/integration/toast.test.tsx",
       // Kafka OTP tests — requires live backend + Kafka (self-skips when unavailable)
       "__tests__/integration/kafka-otp.test.ts",
+      // Application system integration tests (MSW + RTL)
+      "__tests__/integration/applied-jobs-page.test.tsx",
+      "__tests__/integration/application-detail.test.tsx",
     ],
     coverage: {
       provider: "v8",
