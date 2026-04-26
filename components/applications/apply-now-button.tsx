@@ -82,12 +82,12 @@ export default function ApplyNowButton({
     openApplyModal(jobId, jobTitle);
   };
 
-  // Auth still loading or API check in flight
+  // Auth still loading or API check in flight — light skeleton
   if (isAuthLoading || checkState === "loading") {
     return (
       <Button
         disabled
-        className="min-w-36 h-11 rounded-xl bg-blue-100 text-blue-100 shadow-none border-0 animate-pulse select-none"
+        className="min-w-36 h-10 rounded-lg bg-blue-50 border border-blue-100 text-transparent animate-pulse select-none shadow-none"
       >
         Apply Now
       </Button>
@@ -99,10 +99,9 @@ export default function ApplyNowButton({
     return (
       <Button
         disabled
-        variant="outline"
-        className="min-w-36 h-11 rounded-xl border-green-200 bg-green-50 text-green-700 font-semibold cursor-default"
+        className="min-w-36 h-10 rounded-lg border border-green-200 bg-green-50 text-green-700 font-medium cursor-default shadow-none"
       >
-        <CheckCircle2 className="w-4 h-4 mr-2" />
+        <CheckCircle2 className="w-4 h-4 mr-1.5" />
         Applied
       </Button>
     );
@@ -112,7 +111,7 @@ export default function ApplyNowButton({
   return (
     <Button
       onClick={handleClick}
-      className="min-w-36 h-11 rounded-xl bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
+      className="min-w-36 h-10 rounded-lg bg-blue-50 border border-blue-200 text-blue-600 font-medium hover:bg-blue-600 hover:text-white hover:border-blue-600 shadow-none transition-all duration-200"
     >
       {label}
     </Button>

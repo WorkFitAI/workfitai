@@ -22,13 +22,9 @@ const STATUS_CONFIG: Record<
     label: "Reviewing",
     className: "bg-purple-50 text-purple-700 border-purple-200",
   },
-  INTERVIEW_SCHEDULED: {
-    label: "Interview Scheduled",
+  INTERVIEW: {
+    label: "Interview",
     className: "bg-orange-50 text-orange-700 border-orange-200",
-  },
-  INTERVIEW_COMPLETED: {
-    label: "Interview Completed",
-    className: "bg-amber-50 text-amber-700 border-amber-200",
   },
   OFFER: {
     label: "Offer Received",

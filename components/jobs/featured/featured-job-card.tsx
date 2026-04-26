@@ -1,7 +1,9 @@
-import { MapPin, Clock } from "lucide-react";
+import { MapPin } from "lucide-react";
 import Image from "next/image";
+import ApplyNowButton from "@/components/applications/apply-now-button";
 
 type Props = {
+  postId: string;
   logo: string;
   company: string;
   title: string;
@@ -12,6 +14,7 @@ type Props = {
 };
 
 export default function FeaturedJobCard({
+  postId,
   logo,
   company,
   title,
@@ -63,9 +66,7 @@ export default function FeaturedJobCard({
           {salary} 
         </span>
 
-        <button className="text-xs bg-blue-100 text-blue-600 px-5 py-3 rounded-sm">
-          Apply Now
-        </button>
+        <ApplyNowButton jobId={postId} jobTitle={title} />
       </div>
     </div>
   );

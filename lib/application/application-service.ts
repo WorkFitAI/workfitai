@@ -1,4 +1,6 @@
 import { apiClient } from "@/lib/api-client";
+import { getAccessToken } from "@/lib/auth/token-store";
+import { getDeviceId } from "@/lib/auth/device-fingerprint";
 import { ApiResponse } from "@/types/response";
 import {
   ApplicationListData,
@@ -10,6 +12,9 @@ import {
   ApplicationStatus,
   SubmitApplicationData,
 } from "@/types/application";
+
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:9085";
 
 export const applicationService = {
   /**
@@ -30,10 +35,9 @@ export const applicationService = {
     params.append("sortDirection", sortDirection);
     if (status) params.append("status", status);
 
-    const res = await apiClient.get<ApiResponse<ApplicationListData>>(
+    return apiClient.get<ApiResponse<ApplicationListData>>(
       `/application/my?${params.toString()}`,
     );
-    return res;
   },
 
   /**
@@ -43,10 +47,9 @@ export const applicationService = {
   async getApplicationById(
     applicationId: string,
   ): Promise<ApiResponse<ApplicationDetail>> {
-    const res = await apiClient.get<ApiResponse<ApplicationDetail>>(
+    return apiClient.get<ApiResponse<ApplicationDetail>>(
       `/application/${applicationId}`,
     );
-    return res;
   },
 
   /**
@@ -54,10 +57,9 @@ export const applicationService = {
    * Get total count of candidate's applications.
    */
   async getApplicationCount(): Promise<ApiResponse<ApplicationCount>> {
-    const res = await apiClient.get<ApiResponse<ApplicationCount>>(
+    return apiClient.get<ApiResponse<ApplicationCount>>(
       `/application/my/count`,
     );
-    return res;
   },
 
   /**
@@ -74,23 +76,22 @@ export const applicationService = {
    * Check if the candidate has already applied to a specific job.
    */
   async checkApplied(jobId: string): Promise<ApiResponse<ApplicationCheck>> {
-    const res = await apiClient.get<ApiResponse<ApplicationCheck>>(
+    return apiClient.get<ApiResponse<ApplicationCheck>>(
       `/application/check?jobId=${jobId}`,
     );
-    return res;
   },
 
   /**
-   * GET /application/{applicationId}/status-history
+   * GET /application/{applicationId}/history
    * Get full status change history for an application.
+   * Backend returns data as a plain array: StatusHistoryItem[]
    */
   async getStatusHistory(
     applicationId: string,
-  ): Promise<ApiResponse<{ statusHistory: StatusHistoryItem[] }>> {
-    const res = await apiClient.get<
-      ApiResponse<{ statusHistory: StatusHistoryItem[] }>
-    >(`/application/${applicationId}/status-history`);
-    return res;
+  ): Promise<ApiResponse<StatusHistoryItem[]>> {
+    return apiClient.get<ApiResponse<StatusHistoryItem[]>>(
+      `/application/${applicationId}/history`,
+    );
   },
 
   /**
@@ -100,10 +101,47 @@ export const applicationService = {
   async getVisibleNotes(
     applicationId: string,
   ): Promise<ApiResponse<{ notes: CandidateNote[] }>> {
-    const res = await apiClient.get<ApiResponse<{ notes: CandidateNote[] }>>(
+    return apiClient.get<ApiResponse<{ notes: CandidateNote[] }>>(
       `/application/${applicationId}/notes`,
     );
-    return res;
+  },
+
+  /**
+   * GET /application/{applicationId}/cv/download
+   * Download the uploaded CV as a PDF file.
+   *
+   * Uses raw fetch (NOT apiClient) because the response is a binary blob,
+   * not JSON. The Bearer token from the in-memory token store is attached
+   * so the request is properly authenticated.
+   *
+   * Triggers a browser file-save dialog with the original filename when
+   * provided, falling back to "cv-{applicationId}.pdf".
+   */
+  async downloadCv(applicationId: string, fileName?: string): Promise<void> {
+    const token = getAccessToken();
+    const deviceId = getDeviceId();
+
+    const headers: Record<string, string> = { "X-Device-Id": deviceId };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const response = await fetch(
+      `${API_BASE}/application/${applicationId}/cv/download`,
+      { method: "GET", headers, credentials: "include" },
+    );
+
+    if (!response.ok) {
+      throw new Error(`CV download failed (${response.status})`);
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = fileName ?? `cv-${applicationId}.pdf`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
   },
 
   /**

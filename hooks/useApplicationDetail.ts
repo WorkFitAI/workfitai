@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  ApplicationDetail,
-  StatusHistoryItem,
-  CandidateNote,
-} from "@/types/application";
+import { ApplicationDetail, StatusHistoryItem } from "@/types/application";
 import { applicationService } from "@/lib/application/application-service";
 
 export const useApplicationDetail = (applicationId: string) => {
@@ -13,7 +9,6 @@ export const useApplicationDetail = (applicationId: string) => {
     null
   );
   const [statusHistory, setStatusHistory] = useState<StatusHistoryItem[]>([]);
-  const [notes, setNotes] = useState<CandidateNote[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,16 +20,16 @@ export const useApplicationDetail = (applicationId: string) => {
         setLoading(true);
         setError(null);
 
-        // Parallel-fetch all three endpoints
-        const [detailRes, historyRes, notesRes] = await Promise.all([
+        // Fetch detail and history in parallel.
+        // NOTE: There is no /notes endpoint — do NOT add it here.
+        const [detailRes, historyRes] = await Promise.all([
           applicationService.getApplicationById(applicationId),
           applicationService.getStatusHistory(applicationId),
-          applicationService.getVisibleNotes(applicationId),
         ]);
 
         setApplication(detailRes.data);
-        setStatusHistory(historyRes.data.statusHistory);
-        setNotes(notesRes.data.notes);
+        // Backend returns data as a plain StatusHistoryItem[] array (not wrapped)
+        setStatusHistory(historyRes.data ?? []);
       } catch (err) {
         console.error("Fetch application detail error:", err);
         setError("Failed to load application details.");
@@ -46,5 +41,5 @@ export const useApplicationDetail = (applicationId: string) => {
     fetchAll();
   }, [applicationId]);
 
-  return { application, statusHistory, notes, loading, error };
+  return { application, statusHistory, loading, error };
 };

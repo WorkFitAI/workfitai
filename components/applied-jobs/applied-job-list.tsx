@@ -56,7 +56,7 @@ export default function AppliedJobList({
     <div className="flex flex-col gap-3">
       {applications.map((app) => (
         <AppliedJobCard
-          key={app.applicationId}
+          key={app.id}
           application={app}
           onWithdrawn={onWithdrawn}
         />

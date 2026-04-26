@@ -18,7 +18,7 @@ const STATUS_TABS: { label: string; value: ApplicationStatus | undefined }[] = [
   { label: "All", value: undefined },
   { label: "Applied", value: "APPLIED" },
   { label: "Reviewing", value: "REVIEWING" },
-  { label: "Interview", value: "INTERVIEW_SCHEDULED" },
+  { label: "Interview", value: "INTERVIEW" },
   { label: "Offer", value: "OFFER" },
   { label: "Hired", value: "HIRED" },
   { label: "Rejected", value: "REJECTED" },

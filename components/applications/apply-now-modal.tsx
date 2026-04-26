@@ -99,7 +99,7 @@ export default function ApplyNowModal({
   useEffect(() => {
     if (isOpen && jobId) {
       // Auto-fill email from session (user.email preferred, fallback username)
-      setEmail(user?.email ?? user?.username ?? "");
+      setEmail(user?.email ?? (user?.username ? `${user.username}@gmail.com` : ""));
       setCvFile(null);
       setCoverLetter("");
       setFileError(null);
@@ -239,21 +239,21 @@ export default function ApplyNowModal({
   // ---------------------------------------------------------------------------
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-145 p-0 overflow-hidden gap-0">
+      <DialogContent className="sm:max-w-145 p-0 gap-0 flex flex-col max-h-[90vh]">
 
-        {/* ── Gradient Header ── */}
-        <div className="bg-linear-to-r from-blue-600 to-indigo-600 px-6 pt-6 pb-5">
+        {/* ── Outline Header ── */}
+        <div className="bg-white px-6 pt-5 pb-4 border-b border-gray-100 rounded-lg">
           <DialogTitle className="sr-only">Apply for {jobTitle}</DialogTitle>
 
           <div className="flex items-center gap-3">
-            <div className="bg-white/20 rounded-xl p-2.5 shrink-0">
-              <Briefcase className="w-5 h-5 text-white" />
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-2.5 shrink-0">
+              <Briefcase className="w-5 h-5 text-blue-500" />
             </div>
             <div className="min-w-0">
-              <p className="text-blue-100 text-xs font-medium tracking-wide uppercase">
+              <p className="text-blue-500 text-xs font-medium tracking-wide uppercase">
                 Job Application
               </p>
-              <h2 className="text-white font-semibold text-lg leading-tight mt-0.5 line-clamp-2 max-w-85">
+              <h2 className="text-gray-900 font-semibold text-lg leading-tight mt-0.5 line-clamp-2 max-w-85">
                 {jobTitle}
               </h2>
             </div>
@@ -264,35 +264,36 @@ export default function ApplyNowModal({
             <div className="flex items-center gap-2 mt-4">
               <div className="flex items-center gap-1.5">
                 <div
-                  className={`w-2 h-2 rounded-full ${email.trim() ? "bg-white" : "bg-white/40"} transition-colors`}
+                  className={`w-2 h-2 rounded-full transition-colors ${email.trim() ? "bg-blue-500" : "bg-gray-200"}`}
                 />
-                <span className="text-blue-100 text-xs">Email</span>
+                <span className={`text-xs transition-colors ${email.trim() ? "text-blue-600 font-medium" : "text-gray-400"}`}>Email</span>
               </div>
-              <ArrowRight className="w-3 h-3 text-blue-300" />
+              <ArrowRight className="w-3 h-3 text-gray-300" />
               <div className="flex items-center gap-1.5">
                 <div
-                  className={`w-2 h-2 rounded-full ${cvFile ? "bg-white" : "bg-white/40"} transition-colors`}
+                  className={`w-2 h-2 rounded-full transition-colors ${cvFile ? "bg-blue-500" : "bg-gray-200"}`}
                 />
-                <span className="text-blue-100 text-xs">CV / Resume</span>
+                <span className={`text-xs transition-colors ${cvFile ? "text-blue-600 font-medium" : "text-gray-400"}`}>CV / Resume</span>
               </div>
-              <ArrowRight className="w-3 h-3 text-blue-300" />
+              <ArrowRight className="w-3 h-3 text-gray-300" />
               <div className="flex items-center gap-1.5">
                 <div
-                  className={`w-2 h-2 rounded-full ${coverLetter.length > 0 ? "bg-white" : "bg-white/40"} transition-colors`}
+                  className={`w-2 h-2 rounded-full transition-colors ${coverLetter.length > 0 ? "bg-blue-500" : "bg-gray-200"}`}
                 />
-                <span className="text-blue-100 text-xs">Cover Letter</span>
+                <span className={`text-xs transition-colors ${coverLetter.length > 0 ? "text-blue-600 font-medium" : "text-gray-400"}`}>Cover Letter</span>
               </div>
-              <ArrowRight className="w-3 h-3 text-blue-300" />
+              <ArrowRight className="w-3 h-3 text-gray-300" />
               <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-white/40" />
-                <span className="text-blue-100 text-xs">Submit</span>
+                <div className="w-2 h-2 rounded-full bg-gray-200" />
+                <span className="text-xs text-gray-400">Submit</span>
               </div>
             </div>
           )}
         </div>
 
-        {/* ── Body ── */}
-        <div className="px-6 py-5">
+
+        {/* ── Body (scrollable so a tall cover letter doesn't overflow) ── */}
+        <div className="px-6 py-5 overflow-y-auto flex-1">
           {alreadyApplied ? (
             /* Already-applied state */
             <div className="flex flex-col items-center gap-4 py-6 text-center">
@@ -463,19 +464,21 @@ export default function ApplyNowModal({
                     (optional)
                   </span>
                 </Label>
-                <div className="relative">
-                  <Textarea
-                    id="cover-letter"
-                    placeholder="Tell the hiring team why you're a great fit for this role…"
-                    rows={4}
-                    maxLength={MAX_COVER_LETTER_CHARS}
-                    value={coverLetter}
-                    onChange={(e) => setCoverLetter(e.target.value)}
-                    className="resize-none rounded-xl border-gray-200 focus:border-blue-300 text-sm placeholder:text-gray-400 pb-6"
-                  />
-                  <span
-                    className={`absolute bottom-2.5 right-3 text-xs ${charColor} tabular-nums transition-colors`}
-                  >
+                <Textarea
+                  id="cover-letter"
+                  placeholder="Tell the hiring team why you're a great fit for this role…&#10;&#10;Tip: mention your key achievements, relevant experience, and why this role excites you."
+                  rows={6}
+                  maxLength={MAX_COVER_LETTER_CHARS}
+                  value={coverLetter}
+                  onChange={(e) => setCoverLetter(e.target.value)}
+                  className="resize-y rounded-xl border-gray-200 focus:border-blue-300 text-sm placeholder:text-gray-400 leading-relaxed min-h-35 max-h-100 w-full"
+                />
+                {/* Char counter — below textarea, no longer overlapping resize handle */}
+                <div className="flex justify-between items-center">
+                  <p className="text-xs text-gray-400">
+                    Describe your motivation and relevant experience
+                  </p>
+                  <span className={`text-xs ${charColor} tabular-nums transition-colors shrink-0`}>
                     {coverLetter.length}/{MAX_COVER_LETTER_CHARS}
                   </span>
                 </div>

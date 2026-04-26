@@ -103,9 +103,8 @@ export function HomeJobsOfDay() {
                 </p>
 
                 <Button
-                  variant="outline"
                   size="sm"
-                  className="mt-3 w-full border-primary text-primary hover:bg-primary hover:text-white"
+                  className="mt-3 w-full bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white hover:border-blue-600 rounded-lg font-medium shadow-none transition-all duration-200"
                 >
                   Apply Now
                 </Button>

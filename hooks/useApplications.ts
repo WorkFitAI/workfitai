@@ -25,9 +25,10 @@ export const useApplications = (
         pageSize,
         statusFilter
       );
-      setApplications(res.data?.applications ?? []);
-      setTotalPages(res.data?.totalPages ?? 1);
-      setTotal(res.data?.totalElements ?? 0);
+      setApplications(res.data?.items ?? []);
+      setTotalPages(res.data?.meta.totalPages ?? 1);
+      setTotal(res.data?.meta.totalElements ?? 0);
+
     } catch (err) {
       console.error("Fetch applications error:", err);
       setError("Failed to load applications. Please try again.");

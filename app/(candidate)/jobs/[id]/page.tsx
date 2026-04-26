@@ -62,6 +62,8 @@ export default async function JobDetail({ params }: Props) {
             />
 
             <JobDetailContent
+              postId={id}
+              title={job.title}
               description={job.description}
               requirements={job.requirements}
               responsibilities={job.responsibilities}

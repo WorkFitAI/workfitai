@@ -87,6 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             ) as UserSession["roles"];
             applyUser({
               username,
+              email: username,
               roles: normalizedRoles,
               expiresAt: newExpiresAt,
             });
@@ -116,7 +117,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const normalizedRoles = (roles as string[]).map((r) =>
           r.startsWith("ROLE_") ? r : `ROLE_${r}`,
         ) as UserSession["roles"];
-        applyUser({ username, roles: normalizedRoles, expiresAt });
+        applyUser({ username, email: username, roles: normalizedRoles, expiresAt });
         scheduleRefresh(expiresAt);
         return true;
       }
@@ -196,6 +197,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       ) as UserSession["roles"];
       applyUser({
         username,
+        email: username,
         companyId: companyId ?? null,
         roles: normalizedRoles,
         expiresAt,

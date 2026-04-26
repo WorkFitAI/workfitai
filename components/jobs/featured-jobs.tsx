@@ -57,7 +57,7 @@ export default function FeaturedJobs() {
         {jobs.map((job) => (
           <FeaturedJobCard
             key={job.postId}
-            
+            postId={job.postId}
             logo={job.company.logoUrl}
             company={job.company.name}
             title={job.title}

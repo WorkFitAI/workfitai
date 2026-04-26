@@ -4,43 +4,94 @@ export type ApplicationStatus =
   | "DRAFT"
   | "APPLIED"
   | "REVIEWING"
-  | "INTERVIEW_SCHEDULED"
-  | "INTERVIEW_COMPLETED"
+  | "INTERVIEW"
   | "OFFER"
   | "HIRED"
   | "REJECTED"
   | "WITHDRAWN";
 
+// ---------------------------------------------------------------------------
+// Job snapshot embedded in list items and detail
+// ---------------------------------------------------------------------------
+export interface JobSnapshot {
+  postId: string;
+  title: string;
+  shortDescription: string;
+  description: string;
+  employmentType: string;
+  experienceLevel: string;
+  educationLevel: string;
+  requiredExperience: string;
+  salaryMin: number;
+  salaryMax: number;
+  currency: string;
+  location: string;
+  quantity: number;
+  totalApplications: number;
+  createdDate: string;
+  lastModifiedDate: string;
+  expiresAt: string;
+  status: string;
+  skillNames: string[];
+  bannerUrl: string | null;
+  createdBy: string;
+  companyNo: string;
+  companyName: string;
+  companyDescription: string;
+  companyAddress: string;
+  companyWebsiteUrl: string | null;
+  companyLogoUrl: string | null;
+  companySize: number | null;
+  snapshotAt: string;
+}
+
+// ---------------------------------------------------------------------------
+// Paginated list — GET /application/my
+// ---------------------------------------------------------------------------
+
 /** Single item returned by GET /application/my */
 export interface Application {
-  applicationId: string;
+  /** MongoDB _id  (was applicationId in old API docs) */
+  id: string;
+  username: string;
+  email: string;
   jobId: string;
-  jobTitle: string;
-  companyName: string;
+  cvFileName: string;
+  cvContentType: string;
+  cvFileSize: number;
   status: ApplicationStatus;
-  appliedAt: string;
-  lastUpdated: string;
+  coverLetter?: string;
+  /** ISO datetime — backend field is createdAt (not appliedAt) */
+  createdAt: string;
+  updatedAt: string;
+  jobSnapshot: JobSnapshot;
+  companyId: string;
+  assignedTo: string;
+  assignedAt: string;
+  assignedBy: string;
+}
+
+/** Pagination meta block */
+export interface PaginationMeta {
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  first: boolean;
+  last: boolean;
+  hasNext: boolean;
+  hasPrevious: boolean;
 }
 
 /** Paginated list response from GET /application/my */
 export interface ApplicationListData {
-  applications: Application[];
-  totalElements: number;
-  totalPages: number;
-  currentPage: number;
-  pageSize: number;
+  items: Application[];
+  meta: PaginationMeta;
 }
 
-/** Job snapshot embedded in application detail */
-export interface JobSnapshot {
-  title: string;
-  description: string;
-  companyName: string;
-  location: string;
-  employmentType: string;
-  salaryMin: number;
-  salaryMax: number;
-}
+// ---------------------------------------------------------------------------
+// Application detail — GET /application/{id}
+// ---------------------------------------------------------------------------
 
 /** Single entry in status history */
 export interface StatusHistoryItem {
@@ -60,21 +111,27 @@ export interface CandidateNote {
   updatedAt?: string;
 }
 
-/** Full application detail from GET /application/{applicationId} */
+/** Full application detail from GET /application/{id} */
 export interface ApplicationDetail {
-  applicationId: string;
+  id: string;
+  username: string;
+  email: string;
   jobId: string;
-  jobTitle: string;
-  companyName: string;
-  companyId: string;
   status: ApplicationStatus;
-  appliedAt: string;
+  createdAt: string;
+  updatedAt: string;
   cvFileName: string;
+  cvContentType?: string;
+  cvFileSize?: number;
   coverLetter?: string;
   jobSnapshot: JobSnapshot;
-  statusHistory: StatusHistoryItem[];
-  candidateVisibleNotes: CandidateNote[];
+  companyId: string;
+  statusHistory?: StatusHistoryItem[];
 }
+
+// ---------------------------------------------------------------------------
+// Misc
+// ---------------------------------------------------------------------------
 
 /** GET /application/my/count */
 export interface ApplicationCount {
@@ -100,3 +157,4 @@ export interface SubmitApplicationData {
   coverLetter?: string;
   message: string;
 }
+
