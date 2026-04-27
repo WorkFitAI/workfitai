@@ -4,16 +4,16 @@
 **Framework**: Next.js 16.1.6 (App Router with React Server Components)
 **Language**: TypeScript 5.x
 **UI Framework**: TailwindCSS v4 (CSS-first) + shadcn/ui v3.8.4
-**Last Updated**: 2026-02-15
-**Version**: 0.3.0
-**Status**: Base Setup + Authentication Complete (Route Groups, Layout Components, Auth System, Form Infrastructure)
+**Last Updated**: 2026-04-27
+**Version**: 1.4.0
+**Status**: Jobs, Applications & CV Management Complete
 
 ## Project Overview
 
 WorkfitAI is a dual-portal Next.js platform supporting both public job seekers and admin workforce management. The architecture uses Route Groups for isolated portal logic, with centralized layout components and form validation infrastructure.
 
 **Key Features:**
-- Candidate Portal: Job search and applications (public)
+- Candidate Portal: Job search, applications, and CV management (public)
 - Control/Admin Portal: Workforce management dashboard (protected)
 - Full authentication flow with opaque token handling
 - Role-based route protection (CANDIDATE, HR, HR_MANAGER, ADMIN)
@@ -24,6 +24,8 @@ WorkfitAI is a dual-portal Next.js platform supporting both public job seekers a
 - Multi-tab logout synchronization
 - OTP verification for registration and password reset
 - OAuth callback support
+- Job applications with status tracking and modal workflows
+- CV management: upload, list (paginated), download, and delete
 
 ## Directory Structure
 
@@ -35,7 +37,8 @@ workfitai/
 │   ├── (candidate)/                       # PUBLIC: Job portal route group
 │   │   ├── layout.tsx                    # Header + footer layout
 │   │   ├── page.tsx                      # Home /
-│   │   └── jobs/page.tsx                 # Job listings /jobs
+│   │   ├── jobs/page.tsx                 # Job listings /jobs
+│   │   └── my-cvs/page.tsx               # CV management /my-cvs
 │   ├── (control)/                         # ADMIN: Control panel route group
 │   │   ├── layout.tsx                    # Sidebar + header layout
 │   │   └── dashboard/page.tsx            # Dashboard /dashboard
@@ -70,13 +73,25 @@ workfitai/
 │   │       └── control-layout-wrapper.tsx# Sidebar state management
 │   └── shared/                            # Cross-feature components (empty, ready)
 │
+├── components/
+│   ├── my-cvs/                            # CV management components
+│   │   ├── cv-card.tsx                   # CV file display card
+│   │   ├── cv-delete-dialog.tsx          # Delete confirmation dialog
+│   │   ├── cv-upload-dialog.tsx          # File upload dialog
+│   │   ├── cv-list.tsx                   # Paginated CV list
+│   │   └── my-cvs-page-client.tsx        # Client component wrapper
+│
 ├── contexts/
 │   └── auth-context.tsx                   # Auth state + actions provider
-├── hooks/                                 # Custom React hooks (directory ready)
+├── hooks/
+│   └── useCVs.ts                          # Paginated CV list fetching hook
 ├── lib/
 │   ├── utils.ts                           # cn() utility for class merging
 │   ├── navigation.ts                      # Centralized nav config + types
-│   ├── api-client.ts                      # Fetch wrapper with 401 refresh
+│   ├── api-client.ts                      # Fetch wrapper with 401 refresh + PATCH
+│   ├── format.ts                          # File size formatting utility
+│   ├── cv/
+│   │   └── cv-service.ts                 # CV CRUD & download operations
 │   ├── schemas/
 │   │   └── auth-schemas.ts               # Zod schemas for all auth forms
 │   └── auth/
@@ -86,7 +101,8 @@ workfitai/
 │       └── auth-service.ts               # All auth API endpoints
 ├── types/
 │   ├── index.ts                           # Type exports (NavItem)
-│   └── auth.ts                            # Auth types (LoginRequest, UserSession, etc)
+│   ├── auth.ts                            # Auth types (LoginRequest, UserSession, etc)
+│   └── cv.ts                              # CV entity types
 │
 ├── docs/                                  # Project documentation
 │   ├── codebase-summary.md               # This file
@@ -558,11 +574,27 @@ npm run lint
 - ✅ Multi-tab logout synchronization
 - ✅ Integration: headers with real auth state
 
-### Phase 3: Job Listings & Search (Next)
-- Candidate portal: Job search, filtering, application forms
-- Admin portal: Job posting, candidate management
-- Job detail pages
-- Application tracking
+### Phase 3: ✅ Job Listings, Search & Applications Complete
+- ✅ Job listings page with search and filtering
+- ✅ Job detail pages with rich metadata
+- ✅ HomeHeroSearch component with location and keyword filters
+- ✅ Job application modal-based workflow
+- ✅ Application status tracking
+- ✅ Candidate dashboard with application history
+- ✅ Job snapshots in applications
+- ✅ CV download from application detail view
+- ✅ 46+ tests covering all flows
+
+### Phase 4: ✅ CV Management Complete
+- ✅ `/my-cvs/` page with paginated CV list
+- ✅ CV upload dialog (drag-drop + file input)
+- ✅ CV delete confirmation dialog
+- ✅ CV download functionality
+- ✅ File size formatting utility
+- ✅ CV service layer (CRUD + download)
+- ✅ React hook for paginated CV fetching
+- ✅ Type definitions for CV entities
+- ✅ API client PATCH method extension
 
 ## Common Tasks
 
@@ -602,7 +634,9 @@ cd components/ui/[name].tsx  # Do not edit
 
 ---
 
-**Last Updated**: 2026-02-15
-**Status**: Base Setup + Authentication Complete (v0.3.0)
-**Auth Files**: 14 new/modified
-**LOC**: ~2100 (including all auth components and pages)
+**Last Updated**: 2026-04-27
+**Status**: Jobs, Applications & CV Management Complete (v1.4.0)
+**New Files**: types/cv.ts, lib/format.ts, lib/cv/cv-service.ts, hooks/useCVs.ts, components/my-cvs/* (5 components)
+**Test Files**: __tests__/unit/lib/format.test.ts, __tests__/integration/cv-service.test.ts, __tests__/unit/hooks/use-cvs.test.ts
+**Tests Added**: 46 new tests covering CV management and application flows
+**LOC**: ~3200 (including CV management, applications, and all tests)

@@ -13,6 +13,7 @@ export default defineConfig({
       "__tests__/unit/**/*.test.{ts,tsx}",
       // Integration tests — service layer (vi.mock'd api-client, no real fetch/render)
       "__tests__/integration/auth-service.test.ts",
+      "__tests__/integration/cv-service.test.ts",
       "__tests__/integration/forgot-password.test.tsx",
       // Registration flow integration tests (MSW + RTL)
       "__tests__/integration/register-candidate.test.tsx",

@@ -1,7 +1,7 @@
 # WorkfitAI - Project Roadmap
 
-**Last Updated**: 2026-02-15
-**Current Version**: 1.2.0
+**Last Updated**: 2026-04-27
+**Current Version**: 1.4.0
 **Repository**: /Users/phatlee/source/workfitai/workfitai
 **Stack**: Next.js 16 + React 19 + TailwindCSS v4 + shadcn/ui
 
@@ -123,19 +123,92 @@ Implement full frontend authentication with opaque token handling, route protect
 
 ---
 
+### Phase 3: Job Listings, Search & Applications
+**Status**: ✅ **COMPLETE** | **Completed**: 2026-04-15
+**Priority**: P0
+**Progress**: 100%
+
+Implement job discovery and application workflow for candidates, with admin job posting capabilities.
+
+**Achievements**:
+- ✅ Job listings page with search and filtering (`app/(candidate)/jobs/page.tsx`)
+- ✅ Job detail pages with rich metadata
+- ✅ HomeHeroSearch component with location and keyword filters + debounce
+- ✅ Job application modal-based workflow
+- ✅ Application status tracking (DRAFT, SUBMITTED, UNDER_REVIEW, ACCEPTED, REJECTED)
+- ✅ Candidate dashboard with application history
+- ✅ Job snapshots in applications (immutable job data at application time)
+- ✅ CV download functionality from application detail view
+- ✅ Unit and integration tests (46+ tests covering all flows)
+
+**Deliverables**:
+- Job discovery: `/jobs` with search + filters
+- Job detail: dynamic route with rich display
+- Applications: modal workflow + status tracking
+- Dashboard: candidate view of applications
+- Tests: comprehensive unit + integration coverage
+- Type safety: full TypeScript for jobs + applications
+
+**Code Quality**:
+- ✅ All components under 200 LOC
+- ✅ 46+ tests with high coverage
+- ✅ TypeScript strict mode compliance
+- ✅ Error boundaries and fallbacks
+
+---
+
+### Phase 4: CV Management (Candidate Portal)
+**Status**: ✅ **COMPLETE** | **Completed**: 2026-04-27
+**Priority**: P1
+**Progress**: 100%
+
+Implement CV management for candidates: upload, view, download, and delete CV files with paginated listing.
+
+**Achievements**:
+- ✅ `/my-cvs/` page with paginated CV list
+- ✅ CV upload dialog (drag-drop + file input)
+- ✅ CV delete confirmation dialog
+- ✅ CV download (file retrieval from backend)
+- ✅ File size formatting utility (bytes → human-readable)
+- ✅ CV service layer (CRUD + download operations)
+- ✅ React hook for paginated CV list fetching
+- ✅ Type definitions for CV entities
+- ✅ API client extended with PATCH method
+- ✅ Comprehensive unit and integration tests (46 tests)
+
+**Deliverables**:
+- Route: `app/(candidate)/my-cvs/page.tsx`
+- Services: `lib/cv/cv-service.ts` (upload, delete, list, download)
+- Hook: `hooks/useCVs.ts` (pagination + refetch)
+- Components: 5 components (card, dialogs, list, page)
+- Types: `types/cv.ts` with CV entity definitions
+- Utils: `lib/format.ts` with file size formatting
+- Tests: unit + integration (46 total)
+
+**Code Quality**:
+- ✅ Modular service architecture
+- ✅ Custom hook for data fetching
+- ✅ Component composition (CV card, dialogs, list)
+- ✅ Proper error handling and user feedback
+- ✅ All files under 200 LOC
+- ✅ TypeScript strict mode compliance
+
+---
+
 ## Current Roadmap
 
 ### Short-term (0-1 month)
 - ✅ Complete Phase 1: Layout & Homepage Design (2026-02-15)
 - ✅ Complete Phase 2: Authentication & User Profile (2026-02-15)
-- Plan Phase 3: Job Listings & Search
+- ✅ Complete Phase 3: Job Listings, Search & Applications (2026-04-15)
+- ✅ Complete Phase 4: CV Management (2026-04-27)
 - Establish testing framework (Vitest + RTL)
 
 ### Medium-term (1-3 months)
-- Begin Phase 3: Job Listings & Search
-- Implement candidate job applications
-- Add admin dashboard features
-- Setup testing with > 80% coverage
+- Plan Phase 5: Admin Dashboard & Job Management
+- Implement HR/Admin features for job posting
+- Setup comprehensive testing (Vitest + RTL)
+- Achieve > 80% code coverage
 
 ### Long-term (3-6 months)
 - Complete Phase 3 features
@@ -205,11 +278,12 @@ Implement full frontend authentication with opaque token handling, route protect
 |----------|---------|--------|-------|
 | P0 | Layout & Homepage Design | ✅ Complete | Phase 1 |
 | P0 | Authentication & User Profile | ✅ Complete | Phase 2 |
-| P0 | Job Listings & Search | ⏳ Planning | Phase 3 |
-| P1 | Job Applications | ⏳ Backlog | Phase 3 |
-| P1 | Admin Dashboard | ⏳ Backlog | Phase 3 |
-| P1 | Advanced Job Matching | ⏳ Backlog | Phase 4 |
-| P2 | AI Matching Algorithm | ⏳ Backlog | Phase 5 |
+| P0 | Job Listings & Search | ✅ Complete | Phase 3 |
+| P0 | Job Applications | ✅ Complete | Phase 3 |
+| P1 | CV Management | ✅ Complete | Phase 4 |
+| P1 | Admin Dashboard | ⏳ Backlog | Phase 5 |
+| P1 | Advanced Job Matching | ⏳ Backlog | Phase 6 |
+| P2 | AI Matching Algorithm | ⏳ Backlog | Phase 7 |
 
 *Features added as they are planned and implemented*
 
@@ -259,8 +333,9 @@ Implement full frontend authentication with opaque token handling, route protect
 | 1.0.0 | 2026-02-14 | ✅ Released | Foundation setup |
 | 1.1.0 | 2026-02-15 | ✅ Released | Layout & Homepage Design |
 | 1.2.0 | 2026-02-15 | ✅ Released | Authentication & User Profile |
-| 1.3.0 | TBD | ⏳ Planning | Job Listings & Search |
-| 2.0.0 | TBD | ⏳ Backlog | Advanced features |
+| 1.3.0 | 2026-04-15 | ✅ Released | Job Listings, Search & Applications |
+| 1.4.0 | 2026-04-27 | ✅ Released | CV Management (Candidate Portal) |
+| 2.0.0 | TBD | ⏳ Backlog | Admin Dashboard + Advanced features |
 
 ---
 
