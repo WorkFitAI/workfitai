@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useJobs } from "@/hooks/useJobs";
 import { useJobFilters } from "@/hooks/useJobFilters";
 
-import { Plus, Pencil, Trash2, Loader2, Briefcase, Clock, MapPin, Search } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Briefcase, Clock, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { JobDialog } from "@/components/jobs/post/job-dialog";
@@ -23,10 +23,11 @@ import {
 } from "@/components/ui/pagination";
 import { Skill } from "@/types/skill";
 import { jobService } from "@/lib/job/job-service";
+import JobFilterBar from "@/components/jobs/job-filter-bar";
 
 export default function JobAdminPage() {
   const { page, pageSize, filters, buildUrl } = useJobFilters();
-  const { jobs, totalPages, loading } = useJobs(
+  const { jobs, totalPages, loading, refetch } = useJobs(
     page,
     pageSize,
     filters,
@@ -109,6 +110,8 @@ export default function JobAdminPage() {
       setDialogState({ ...dialogState, isOpen: false });
     } catch (error: unknown) {
       toast.error((error as Error).message);
+    } finally {
+      refetch();
     }
   };
 
@@ -122,6 +125,8 @@ export default function JobAdminPage() {
             toast.success("Deleted job successfully");
           } catch (error: unknown) {
             toast.error((error as Error).message);
+          } finally {
+            refetch();
           }
         },
       },
@@ -145,6 +150,7 @@ export default function JobAdminPage() {
             <Plus size={20} /> Create New Job
           </Button>
         </div>
+        <JobFilterBar />
 
         {/* LOADING STATE */}
         {loading ? (
@@ -159,7 +165,10 @@ export default function JobAdminPage() {
                 <CardContent className="p-0">
                   <div className="flex flex-col md:flex-row">
                     {/* Status Bar (Dọc bên trái) */}
-                    <div className={`w-1.5 ${job.status === 'PUBLISHED' ? 'bg-green-500' : 'bg-slate-300'}`} />
+                    <div className={`w-1.5 ${job.status === 'PUBLISHED' ? 'bg-green-100 text-green-700 hover:bg-green-100 border-none'
+                                : job.status === 'CLOSED'
+                                ? 'bg-red-100 text-red-700 hover:bg-red-100 border-none'
+                                : 'bg-slate-100 text-slate-600 border-none'}`} />
                     
                     <div className="flex-1 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                       <div className="space-y-3">
@@ -167,7 +176,16 @@ export default function JobAdminPage() {
                           <h3 className="font-bold text-xl text-slate-800 group-hover:text-blue-600 transition-colors">
                             {job.title}
                           </h3>
-                          <Badge variant={job.status === 'PUBLISHED' ? 'default' : 'secondary'} className={job.status === 'PUBLISHED' ? 'bg-green-100 text-green-700 hover:bg-green-100 border-none' : 'bg-slate-100 text-slate-600 border-none'}>
+                          <Badge
+                            variant="default"
+                            className={
+                              job.status === 'PUBLISHED'
+                                ? 'bg-green-100 text-green-700 hover:bg-green-100 border-none'
+                                : job.status === 'CLOSED'
+                                ? 'bg-red-100 text-red-700 hover:bg-red-100 border-none'
+                                : 'bg-slate-100 text-slate-600 border-none'
+                            }
+                          >
                             {job.status}
                           </Badge>
                         </div>
@@ -271,6 +289,7 @@ export default function JobAdminPage() {
             setDialogState({ ...dialogState, isOpen: open })
           }
           onSubmit={handleSubmit}
+          onSuccess={refetch}
         />
       </div>
     </div>

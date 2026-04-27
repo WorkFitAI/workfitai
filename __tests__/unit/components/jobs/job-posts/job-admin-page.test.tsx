@@ -50,8 +50,10 @@ describe("JobAdminPage", () => {
         skillNames: [],
         salaryMin: undefined,
         salaryMax: undefined,
-        title: undefined,
-        location: undefined,
+        title: "",
+        location: "",
+        status: "",
+        sort: ""
       },
       buildUrl: vi.fn(),
     });
@@ -87,6 +89,7 @@ describe("JobAdminPage", () => {
       totalPages: 1,
       total: 1,
       loading: false,
+      refetch: vi.fn(),
     });
 
     render(<JobAdminPage />);
@@ -106,6 +109,7 @@ describe("JobAdminPage", () => {
       totalPages: 0,
       total: 0,
       loading: true,
+      refetch: vi.fn(),
     });
 
     render(<JobAdminPage />);
@@ -124,6 +128,7 @@ describe("JobAdminPage", () => {
       totalPages: 0,
       total: 0,
       loading: false,
+      refetch: vi.fn(),
     });
 
     render(<JobAdminPage />);
@@ -142,6 +147,7 @@ describe("JobAdminPage", () => {
       totalPages: 1,
       total: 1,
       loading: false,
+      refetch: vi.fn(),
     });
 
     render(<JobAdminPage />);
@@ -166,6 +172,7 @@ describe("JobAdminPage", () => {
       totalPages: 1,
       total: 1,
       loading: false,
+      refetch: vi.fn(),
     });
 
     mockedJobService.getJobByIdFromHr.mockResolvedValue({
