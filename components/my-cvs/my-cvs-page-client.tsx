@@ -18,10 +18,10 @@ export default function MyCVsPageClient() {
   const { cvs, totalPages, total, loading, error, refresh } = useCVs(page);
 
   const handleUploaded = () => {
-    // If already on page 1, useEffect won't re-fire — call refresh directly.
-    // Otherwise setPage(1) triggers the useEffect which handles the fetch.
-    if (page === 1) refresh();
-    else setPage(1);
+    // If already on page 0, useEffect won't re-fire — call refresh directly.
+    // Otherwise setPage(0) triggers the useEffect which handles the fetch.
+    if (page === 0) refresh();
+    else setPage(0);
   };
 
   return (
@@ -61,15 +61,15 @@ export default function MyCVsPageClient() {
                   href="#"
                   onClick={(e) => {
                     e.preventDefault();
-                    if (page > 1) setPage((p) => p - 1);
+                    if (page > 0) setPage((p) => p - 1);
                   }}
                   className={
-                    page === 1 ? "pointer-events-none opacity-50" : ""
+                    page === 0 ? "pointer-events-none opacity-50" : ""
                   }
                 />
               </PaginationItem>
 
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              {Array.from({ length: totalPages }, (_, i) => i).map((p) => (
                 <PaginationItem key={p}>
                   <PaginationLink
                     href="#"
@@ -79,7 +79,7 @@ export default function MyCVsPageClient() {
                     }}
                     isActive={p === page}
                   >
-                    {p}
+                    {p + 1}
                   </PaginationLink>
                 </PaginationItem>
               ))}
@@ -89,10 +89,10 @@ export default function MyCVsPageClient() {
                   href="#"
                   onClick={(e) => {
                     e.preventDefault();
-                    if (page < totalPages) setPage((p) => p + 1);
+                    if (page < totalPages - 1) setPage((p) => p + 1);
                   }}
                   className={
-                    page === totalPages ? "pointer-events-none opacity-50" : ""
+                    page === totalPages - 1 ? "pointer-events-none opacity-50" : ""
                   }
                 />
               </PaginationItem>

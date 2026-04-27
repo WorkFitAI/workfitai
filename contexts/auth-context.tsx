@@ -87,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             ) as UserSession["roles"];
             applyUser({
               username,
-              email: username,
+              email: `${username}@gmail.com`,
               roles: normalizedRoles,
               expiresAt: newExpiresAt,
             });

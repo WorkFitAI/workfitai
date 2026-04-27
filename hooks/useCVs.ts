@@ -23,7 +23,6 @@ export const useCVs = (page: number) => {
     try {
       setLoading(true);
       setError(null);
-      // API is 1-indexed (meta.page reflects 1-based page numbers)
       const res = await cvService.listMyCVs(session.username, page, PAGE_SIZE);
       setCvs(res.data?.result ?? []);
       setTotalPages(res.data?.meta?.pages ?? 1);

@@ -1,6 +1,6 @@
 /**
  * Unit tests for hooks/useCVs.ts
- * Schema aligned with actual API response (meta.result, meta.pages, 1-indexed pagination).
+ * Schema aligned with actual API response (meta.result, meta.pages, 0-indexed pagination).
  */
 import { describe, it, expect, beforeAll, afterEach, afterAll } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
@@ -34,7 +34,7 @@ function mockCVMetadata(overrides: Partial<CVMetadata> = {}): CVMetadata {
 
 function mockCVListResponse(overrides: Partial<CVListResponse> = {}): CVListResponse {
   return {
-    meta: { page: 1, pageSize: 10, pages: 1, total: 1 },
+    meta: { page: 0, pageSize: 10, pages: 1, total: 1 },
     result: [mockCVMetadata()],
     ...overrides,
   };
@@ -63,7 +63,7 @@ describe("useCVs", () => {
         http.get(`${API}/cv/candidate/testuser`, () => new Promise(() => {})),
       );
 
-      const { result } = renderHook(() => useCVs(1));
+      const { result } = renderHook(() => useCVs(0));
 
       expect(result.current.loading).toBe(true);
       expect(result.current.cvs).toEqual([]);
@@ -78,14 +78,14 @@ describe("useCVs", () => {
         ),
       );
 
-      const { result } = renderHook(() => useCVs(1));
+      const { result } = renderHook(() => useCVs(0));
 
       await waitFor(() => expect(result.current.loading).toBe(false));
     });
   });
 
   describe("success state", () => {
-    it("fetches CVs on mount — UI page 1 → API page 1 (1-indexed)", async () => {
+    it("fetches CVs on mount — page 0 sent as page=0", async () => {
       setupSession();
       let capturedUrl = "";
       server.use(
@@ -95,11 +95,11 @@ describe("useCVs", () => {
         }),
       );
 
-      const { result } = renderHook(() => useCVs(1));
+      const { result } = renderHook(() => useCVs(0));
 
       await waitFor(() => expect(result.current.loading).toBe(false));
 
-      expect(capturedUrl).toContain("page=1");
+      expect(capturedUrl).toContain("page=0");
       expect(result.current.cvs).toHaveLength(1);
       expect(result.current.cvs[0].cvId).toBe("cv-001");
     });
@@ -110,7 +110,7 @@ describe("useCVs", () => {
         http.get(`${API}/cv/candidate/testuser`, () =>
           apiSuccess(
             mockCVListResponse({
-              meta: { page: 1, pageSize: 10, pages: 3, total: 25 },
+              meta: { page: 0, pageSize: 10, pages: 3, total: 25 },
               result: [
                 mockCVMetadata({ cvId: "cv-001" }),
                 mockCVMetadata({ cvId: "cv-002" }),
@@ -120,7 +120,7 @@ describe("useCVs", () => {
         ),
       );
 
-      const { result } = renderHook(() => useCVs(1));
+      const { result } = renderHook(() => useCVs(0));
 
       await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -129,7 +129,7 @@ describe("useCVs", () => {
       expect(result.current.cvs).toHaveLength(2);
     });
 
-    it("passes page 2 directly to API (1-indexed)", async () => {
+    it("passes page 1 directly to API (0-indexed second page)", async () => {
       setupSession();
       let capturedUrl = "";
       server.use(
@@ -141,11 +141,11 @@ describe("useCVs", () => {
         }),
       );
 
-      const { result } = renderHook(() => useCVs(2));
+      const { result } = renderHook(() => useCVs(1));
 
       await waitFor(() => expect(result.current.loading).toBe(false));
 
-      expect(capturedUrl).toContain("page=2");
+      expect(capturedUrl).toContain("page=1");
       expect(result.current.cvs[0].cvId).toBe("cv-011");
     });
 
@@ -155,14 +155,14 @@ describe("useCVs", () => {
         http.get(`${API}/cv/candidate/testuser`, () =>
           apiSuccess(
             mockCVListResponse({
-              meta: { page: 1, pageSize: 10, pages: 0, total: 0 },
+              meta: { page: 0, pageSize: 10, pages: 0, total: 0 },
               result: [],
             }),
           ),
         ),
       );
 
-      const { result } = renderHook(() => useCVs(1));
+      const { result } = renderHook(() => useCVs(0));
 
       await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -182,7 +182,7 @@ describe("useCVs", () => {
         ),
       );
 
-      const { result } = renderHook(() => useCVs(1));
+      const { result } = renderHook(() => useCVs(0));
 
       await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -198,7 +198,7 @@ describe("useCVs", () => {
         ),
       );
 
-      const { result } = renderHook(() => useCVs(1));
+      const { result } = renderHook(() => useCVs(0));
 
       await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -219,12 +219,12 @@ describe("useCVs", () => {
       );
 
       const { rerender } = renderHook(({ page }) => useCVs(page), {
-        initialProps: { page: 1 },
+        initialProps: { page: 0 },
       });
 
       await waitFor(() => expect(callCount).toBe(1));
 
-      rerender({ page: 2 });
+      rerender({ page: 1 });
 
       await waitFor(() => expect(callCount).toBe(2));
     });
@@ -241,7 +241,7 @@ describe("useCVs", () => {
         }),
       );
 
-      const { result } = renderHook(() => useCVs(1));
+      const { result } = renderHook(() => useCVs(0));
 
       await waitFor(() => expect(result.current.loading).toBe(false));
       expect(callCount).toBe(1);
@@ -263,7 +263,7 @@ describe("useCVs", () => {
         }),
       );
 
-      const { result } = renderHook(() => useCVs(1));
+      const { result } = renderHook(() => useCVs(0));
 
       await waitFor(() => expect(result.current.error).toBeTruthy());
 
