@@ -1,7 +1,7 @@
 # Code Standards & Codebase Structure
 
-**Last Updated**: 2026-02-14
-**Version**: 1.0.0
+**Last Updated**: 2026-04-27
+**Version**: 1.1.0
 **Project**: WorkfitAI
 **Stack**: Next.js 16 + React 19 + TailwindCSS v4 + shadcn/ui
 
@@ -12,22 +12,32 @@
 **App Router** (`app/`):
 - Root layout: `app/layout.tsx`
 - Root styles: `app/globals.css`
-- Pages: `app/page.tsx`, `app/[route]/page.tsx`
-- Shared layout: `app/layout.tsx`
-- Future route groups: `app/(candidate)/`, `app/(control)/` (when needed)
+- Route groups: `app/(candidate)/`, `app/(control)/`, `app/(auth)/`
+- Pages: `app/[group]/page.tsx`, `app/[group]/[route]/page.tsx`
 
 **Components** (`components/`):
-- shadcn/ui auto-generated components: `components/ui/`
-- Custom components: `components/my-component.tsx`
-- Feature-based organization as project grows
+- shadcn/ui auto-generated: `components/ui/` (auto-managed, do not edit)
+- Feature-specific: `components/{feature}/` (e.g., `components/my-cvs/`)
+- Layout: `components/layout/{portal}/` (e.g., `components/layout/candidate/`)
+- Domain-specific: `components/{feature}-form.tsx`, `components/{feature}-card.tsx`
 
-**Utilities** (`lib/`):
-- Shared utilities: `lib/utils.ts`
-- API clients (when needed): `lib/api.ts`
-- Hooks (when needed): `lib/hooks/use-*.ts`
+**Utilities & Services** (`lib/`):
+- Core utilities: `lib/utils.ts` (cn() function)
+- API clients: `lib/api-client.ts` (HTTP client with auth)
+- Service layer: `lib/{feature}/` (business logic, e.g., `lib/cv/cv-service.ts`)
+- Shared utilities: `lib/format.ts`, `lib/navigation.ts`
+- Auth: `lib/auth/` (token store, device fingerprint, session, auth service)
+- Schemas: `lib/schemas/` (Zod validation schemas)
 
-**Types** (`types/` - optional):
-- Domain models and interfaces
+**Hooks** (`hooks/`):
+- Custom React hooks: `hooks/use{Feature}.ts`
+- Data fetching hooks: `hooks/useCVs.ts` (wraps service layer + useState)
+- Never place hooks in `lib/hooks/` — use root `hooks/` directory
+
+**Types** (`types/`):
+- Domain models: `types/{feature}.ts` (e.g., `types/cv.ts`)
+- API types: `types/response.ts`, `types/auth.ts`
+- Index for re-exports: `types/index.ts`
 
 **Public Assets** (`public/`):
 - Static images
@@ -673,7 +683,92 @@ export function LoginForm() {
 }
 ```
 
-### Data Fetching
+### Service Layer Pattern
+
+**Why**: Separation of concerns — business logic (API calls, data transformation) lives in services, components only handle UI.
+
+**Service Example** (`lib/cv/cv-service.ts`):
+```typescript
+import { apiClient } from "@/lib/api-client"
+import type { CVMetadata, CVListResponse } from "@/types/cv"
+
+export const cvService = {
+  async listMyCVs(username: string, page = 0, size = 10) {
+    const params = new URLSearchParams({ page: String(page), size: String(size) })
+    return apiClient.get<ApiResponse<CVListResponse>>(`/cv/candidate/${username}?${params}`)
+  },
+
+  async uploadCV(file: File) {
+    const formData = new FormData()
+    formData.append("file", file)
+    return apiClient.upload<ApiResponse<CVUploadResponse>>("/cv/upload", formData)
+  },
+
+  async deleteCV(cvId: string) {
+    return apiClient.delete<void>(`/cv/candidate/${cvId}`)
+  },
+}
+```
+
+**Hook Using Service** (`hooks/useCVs.ts`):
+```typescript
+"use client"
+
+import { useState, useEffect, useCallback } from "react"
+import { CVMetadata } from "@/types/cv"
+import { cvService } from "@/lib/cv/cv-service"
+
+export const useCVs = (page: number) => {
+  const [cvs, setCvs] = useState<CVMetadata[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchCVs = useCallback(async () => {
+    try {
+      setLoading(true)
+      const res = await cvService.listMyCVs(username, page - 1, 10)
+      setCvs(res.data?.cvs ?? [])
+    } catch (err) {
+      setError("Failed to load CVs")
+    } finally {
+      setLoading(false)
+    }
+  }, [page])
+
+  useEffect(() => {
+    fetchCVs()
+  }, [fetchCVs])
+
+  return { cvs, loading, error, refresh: fetchCVs }
+}
+```
+
+**Component Using Hook** (`components/my-cvs/my-cvs-page-client.tsx`):
+```typescript
+"use client"
+
+import { useCVs } from "@/hooks/useCVs"
+import { CVList } from "./cv-list"
+import { CVUploadDialog } from "./cv-upload-dialog"
+
+export function MysCVsPageClient() {
+  const [page, setPage] = useState(1)
+  const { cvs, loading, error, refresh } = useCVs(page)
+
+  return (
+    <div className="space-y-6">
+      <CVUploadDialog onSuccess={refresh} />
+      {error && <p className="text-destructive">{error}</p>}
+      <CVList cvs={cvs} loading={loading} onRefresh={refresh} />
+    </div>
+  )
+}
+```
+
+### Data Fetching with Custom Hooks
+
+Use custom hooks to wrap service calls and manage loading/error states:
+
 ```typescript
 import { useEffect, useState } from 'react'
 

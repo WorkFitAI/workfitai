@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server'
 
 // Routes requiring HR/Admin roles
 const CONTROL_ROUTES = ['/dashboard', '/candidates', '/job-posts', '/settings']
+// Routes that require any authenticated user (CANDIDATE)
+const CANDIDATE_ROUTES = ['/applied-jobs', '/saved-jobs', '/my-cvs', '/account-settings']
 // Auth pages that authenticated users should be redirected away from
 const AUTH_ROUTES = ['/login', '/register', '/forgot-password']
 // Roles that can access control (HR) routes
@@ -45,6 +47,15 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  // Protect candidate-only routes (any authenticated user)
+  if (CANDIDATE_ROUTES.some((r) => pathname.startsWith(r))) {
+    if (!isAuthenticated) {
+      const loginUrl = new URL('/login', request.url)
+      loginUrl.searchParams.set('callbackUrl', pathname)
+      return NextResponse.redirect(loginUrl)
+    }
+  }
+
   // Redirect authenticated users away from auth pages
   if (AUTH_ROUTES.some((r) => pathname.startsWith(r))) {
     if (isAuthenticated) {
@@ -63,6 +74,10 @@ export const config = {
     '/candidates/:path*',
     '/job-posts/:path*',
     '/settings/:path*',
+    '/applied-jobs/:path*',
+    '/saved-jobs/:path*',
+    '/my-cvs/:path*',
+    '/account-settings/:path*',
     '/login',
     '/register',
     '/register/:path*',

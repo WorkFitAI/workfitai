@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 
 import { Briefcase, MapPin, Clock } from "lucide-react";
 import { Job } from "@/types/job";
+import ApplyNowButton from "@/components/applications/apply-now-button";
 
 interface Props {
   job: Job;
@@ -12,7 +13,10 @@ const JobListCard = ({ job }: Props) => {
   const router = useRouter();
 
   return (
-    <div className="bg-white border rounded-xl p-6 flex flex-col gap-3 shadow-sm hover:shadow-md transition cursor-pointer" onClick={() => router.push(`/jobs/${job.postId}`)}>
+    <div
+      className="bg-white border rounded-xl p-6 flex flex-col gap-3 shadow-sm hover:shadow-md transition cursor-pointer"
+      onClick={() => router.push(`/jobs/${job.postId}`)}
+    >
       {/* Top */}
       <div className="flex justify-between items-start ">
         <div className="flex gap-3 items-center">
@@ -72,9 +76,10 @@ const JobListCard = ({ job }: Props) => {
           {job.salaryMax.toLocaleString("en-US")}
         </p>
 
-        <button className="bg-blue-100 text-blue-600 px-4 py-2 rounded-md text-sm hover:bg-blue-200">
-          Apply Now
-        </button>
+        {/* Stop card click from firing when interacting with the button */}
+        <div onClick={(e) => e.stopPropagation()}>
+          <ApplyNowButton jobId={job.postId} jobTitle={job.title} />
+        </div>
       </div>
     </div>
   );

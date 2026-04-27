@@ -1,7 +1,7 @@
 # System Architecture
 
-**Last Updated**: 2026-02-14
-**Version**: 1.0.0
+**Last Updated**: 2026-04-27
+**Version**: 1.1.0
 **Project**: WorkfitAI
 **Stack**: Next.js 16 + React 19 + TailwindCSS v4 + shadcn/ui
 
@@ -263,13 +263,30 @@ types/
 
 ### 5. Data Layer
 
-**Current State**: Minimal (foundation only)
+**Current Implementation**:
 
-**Future Integration** (when features are added):
-- API clients for backend communication
-- State management (if needed)
-- Data fetching and caching
-- Authentication/Authorization
+1. **API Client** (`lib/api-client.ts`)
+   - Centralized fetch wrapper with auth headers
+   - 401 error handling with silent token refresh
+   - Concurrent refresh deduplication
+   - Supports GET, POST, PUT, PATCH, DELETE
+   - FormData upload method for multipart requests
+
+2. **Service Layer** (`lib/cv/cv-service.ts`, `lib/auth/auth-service.ts`)
+   - Business logic abstraction for API calls
+   - Type-safe request/response handling
+   - Auth: login, register, token refresh, password reset, OAuth
+   - CV: list (paginated), upload, update, delete, download
+
+3. **Custom Hooks** (`hooks/useCVs.ts`)
+   - React state management for async data
+   - Pagination logic (page → API offset conversion)
+   - Error handling and loading states
+
+4. **Type Safety** (`types/cv.ts`, `types/auth.ts`, `types/response.ts`)
+   - TypeScript interfaces for all API models
+   - Generic ApiResponse wrapper
+   - Entity-specific types (CVMetadata, CVListResponse, etc.)
 
 ## Design Principles
 
@@ -333,43 +350,36 @@ TypeScript strict mode:
 
 ## Data Flow
 
-### Current (Foundation Phase)
+### Current Implementation
 
 ```
 User Input
     ↓
-React Component
+React Component ("use client" for interactive)
     ↓
-Event Handler
+Event Handler / Custom Hook (useCVs, etc.)
     ↓
-State Update (local or future global state)
+Service Layer (cvService, authService)
     ↓
-Component Re-render
+API Client (apiClient.get/post/patch/upload)
     ↓
-Browser Display
-```
-
-### Future (When Features Added)
-
-```
-User Input
+Backend Server (CV Service @ localhost:9085 + MinIO)
     ↓
-React Component
+Response JSON → TypeScript Model (CVMetadata, CVListResponse)
     ↓
-Event Handler
-    ↓
-API Client
-    ↓
-Backend Server
-    ↓
-Response Processing
-    ↓
-State Management (Redux/Zustand/Context)
+State Update (useState, custom hook state)
     ↓
 Component Re-render
     ↓
-Browser Display
+Browser Display + Toast Notification
 ```
+
+**Key Features**:
+- 401 Error Handling: Automatic silent token refresh + retry
+- Concurrent Refresh Deduplication: Only one refresh promise per browser tab
+- Type Safety: All responses parsed to TypeScript interfaces
+- Error States: Loading, error messages, and retry mechanisms
+- Authentication: Bearer token + X-Device-Id header on all requests
 
 ## Performance Considerations
 
@@ -557,6 +567,102 @@ npm run lint
 - Add integration tests
 - Add e2e tests (Playwright/Cypress)
 
+## CV Management System
+
+### Backend Integration
+
+**CV Service API**: `http://localhost:9085`
+
+**Endpoints**:
+- `GET /cv/candidate/{username}?page=0&size=10` — List CVs (paginated, 0-indexed)
+- `POST /cv/upload` — Upload CV (multipart/form-data, PDF only, ≤5MB)
+- `PATCH /cv/candidate/{cvId}` — Update CV metadata (filename, templateType, isDefault)
+- `DELETE /cv/candidate/{cvId}` — Soft-delete CV (204 No Content)
+- `GET /cv/candidate/download/{objectName}` — Download CV file as blob
+
+**Storage**: MinIO (S3-compatible object storage)
+
+### Frontend Architecture
+
+**Components** (`components/my-cvs/`):
+- `cv-card.tsx` — Display single CV metadata (filename, size, date, actions)
+- `cv-list.tsx` — Paginated CV list grid + pagination controls
+- `cv-upload-dialog.tsx` — Drag-drop file input, validation, submission
+- `cv-delete-dialog.tsx` — Confirmation modal before deletion
+- `my-cvs-page-client.tsx` — Client wrapper (hooks + layout)
+
+**Route**: `app/(candidate)/my-cvs/page.tsx` → `/my-cvs`
+
+**Service Layer** (`lib/cv/cv-service.ts`):
+```typescript
+listMyCVs(username, page, size)       // Paginated list
+uploadCV(file)                         // FormData upload
+updateCV(cvId, data)                  // PATCH metadata
+deleteCV(cvId)                        // DELETE
+downloadCV(cv)                        // Fetch blob + browser save
+```
+
+**Custom Hook** (`hooks/useCVs.ts`):
+```typescript
+useCVs(page)  // Returns: { cvs, totalPages, total, loading, error, refresh }
+```
+
+**Type Definitions** (`types/cv.ts`):
+- `CVMetadata` — File metadata, size, template type, dates, URL
+- `CVListResponse` — Paginated list response wrapper
+- `CVUploadResponse` — Upload response with file metadata
+- `CVUpdateRequest` — Optional fields for PATCH requests
+
+**Utilities** (`lib/format.ts`):
+- `formatFileSize(bytes)` — Convert bytes to human-readable (B/KB/MB)
+
+### API Client Extension
+
+**New Method** (`lib/api-client.ts`):
+```typescript
+apiClient.patch<T>(path, body, options?)  // PATCH with JSON body
+```
+
+### Data Flow: CV Upload
+
+```
+User selects PDF file in upload dialog
+    ↓
+Validation: File type (application/pdf) + Size (≤5MB)
+    ↓
+cvService.uploadCV(file) creates FormData
+    ↓
+apiClient.upload() sends multipart/form-data
+    ↓
+CV Service processes & stores in MinIO
+    ↓
+Returns CVUploadResponse (cvId, filename, size, etc.)
+    ↓
+Hook state updates, toast notification
+    ↓
+CV list refreshes via useCVs().refresh()
+```
+
+### Data Flow: CV Download
+
+```
+User clicks download button on cv-card
+    ↓
+cvService.downloadCV(cv) reads CV metadata
+    ↓
+Creates authenticated fetch with Bearer token + X-Device-Id
+    ↓
+Requests GET /cv/candidate/download/{objectName}
+    ↓
+CV Service retrieves blob from MinIO
+    ↓
+Browser receives blob (application/pdf)
+    ↓
+Triggers file download (anchor.download = cv.filename)
+    ↓
+Browser saves PDF locally
+```
+
 ## Architecture Decision Records (ADRs)
 
 ### ADR-001: TailwindCSS v4 CSS-First Approach
@@ -576,5 +682,6 @@ npm run lint
 
 ---
 
-**Generated**: 2026-02-14
+**Generated**: 2026-04-27
 **Maintained by**: WorkfitAI Development Team
+**Latest Changes**: CV Management System implementation (Phase 4)

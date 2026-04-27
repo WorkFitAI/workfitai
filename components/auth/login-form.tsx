@@ -3,7 +3,7 @@
 // Login form — email with Mail icon + check, password with Lock icon + eye, remember me checkbox
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -20,7 +20,7 @@ const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:9085";
 
 export function LoginForm() {
-  const router = useRouter();
+
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -39,11 +39,12 @@ export function LoginForm() {
     setIsLoading(true);
     try {
       await login(data);
+      // login() throws on failure, so reaching here means success.
       if (rememberMe) {
         localStorage.setItem("rememberedEmail", data.usernameOrEmail);
       }
       toast.success("Signed in successfully");
-      router.push("/");
+      // Navigation is handled by the auth context (role-based redirect).
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Sign in failed";
       toast.error(message);

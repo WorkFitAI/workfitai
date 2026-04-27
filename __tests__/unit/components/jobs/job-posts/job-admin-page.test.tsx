@@ -11,7 +11,6 @@ import userEvent from "@testing-library/user-event";
 
 import { toast } from "sonner";
 
-
 // ================= MOCK =================
 vi.mock("@/hooks/useJobs");
 vi.mock("@/hooks/useJobFilters");
@@ -115,9 +114,7 @@ describe("JobAdminPage", () => {
 
     render(<JobAdminPage />);
 
-    expect(
-      screen.getByText(/Fetching your job posts/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Fetching your job posts/i)).toBeInTheDocument();
   });
 
   /* =========================

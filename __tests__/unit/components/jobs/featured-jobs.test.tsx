@@ -11,6 +11,12 @@ vi.mock("@/lib/job/job-service", () => ({
   },
 }));
 
+// ApplyNowButton requires AuthProvider + ApplyModalProvider — stub it out
+// since this test is focused on FeaturedJobs fetching and pagination behavior.
+vi.mock("@/components/applications/apply-now-button", () => ({
+  default: () => <button>Apply Now</button>,
+}));
+
 // Mock icon (OK rồi giữ nguyên)
 vi.mock("lucide-react", () => ({
   ChevronLeft: () => <div data-testid="chevron-left" />,

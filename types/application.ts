@@ -1,0 +1,160 @@
+// Application domain types for Candidate-facing applied-jobs pages
+
+export type ApplicationStatus =
+  | "DRAFT"
+  | "APPLIED"
+  | "REVIEWING"
+  | "INTERVIEW"
+  | "OFFER"
+  | "HIRED"
+  | "REJECTED"
+  | "WITHDRAWN";
+
+// ---------------------------------------------------------------------------
+// Job snapshot embedded in list items and detail
+// ---------------------------------------------------------------------------
+export interface JobSnapshot {
+  postId: string;
+  title: string;
+  shortDescription: string;
+  description: string;
+  employmentType: string;
+  experienceLevel: string;
+  educationLevel: string;
+  requiredExperience: string;
+  salaryMin: number;
+  salaryMax: number;
+  currency: string;
+  location: string;
+  quantity: number;
+  totalApplications: number;
+  createdDate: string;
+  lastModifiedDate: string;
+  expiresAt: string;
+  status: string;
+  skillNames: string[];
+  bannerUrl: string | null;
+  createdBy: string;
+  companyNo: string;
+  companyName: string;
+  companyDescription: string;
+  companyAddress: string;
+  companyWebsiteUrl: string | null;
+  companyLogoUrl: string | null;
+  companySize: number | null;
+  snapshotAt: string;
+}
+
+// ---------------------------------------------------------------------------
+// Paginated list — GET /application/my
+// ---------------------------------------------------------------------------
+
+/** Single item returned by GET /application/my */
+export interface Application {
+  /** MongoDB _id  (was applicationId in old API docs) */
+  id: string;
+  username: string;
+  email: string;
+  jobId: string;
+  cvFileName: string;
+  cvContentType: string;
+  cvFileSize: number;
+  status: ApplicationStatus;
+  coverLetter?: string;
+  /** ISO datetime — backend field is createdAt (not appliedAt) */
+  createdAt: string;
+  updatedAt: string;
+  jobSnapshot: JobSnapshot;
+  companyId: string;
+  assignedTo: string;
+  assignedAt: string;
+  assignedBy: string;
+}
+
+/** Pagination meta block */
+export interface PaginationMeta {
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  first: boolean;
+  last: boolean;
+  hasNext: boolean;
+  hasPrevious: boolean;
+}
+
+/** Paginated list response from GET /application/my */
+export interface ApplicationListData {
+  items: Application[];
+  meta: PaginationMeta;
+}
+
+// ---------------------------------------------------------------------------
+// Application detail — GET /application/{id}
+// ---------------------------------------------------------------------------
+
+/** Single entry in status history */
+export interface StatusHistoryItem {
+  previousStatus: ApplicationStatus | null;
+  newStatus: ApplicationStatus;
+  changedBy: string;
+  changedAt: string;
+  reason?: string;
+}
+
+/** HR note visible to candidate */
+export interface CandidateNote {
+  id: string;
+  author: string;
+  content: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+/** Full application detail from GET /application/{id} */
+export interface ApplicationDetail {
+  id: string;
+  username: string;
+  email: string;
+  jobId: string;
+  status: ApplicationStatus;
+  createdAt: string;
+  updatedAt: string;
+  cvFileName: string;
+  cvContentType?: string;
+  cvFileSize?: number;
+  coverLetter?: string;
+  jobSnapshot: JobSnapshot;
+  companyId: string;
+  statusHistory?: StatusHistoryItem[];
+}
+
+// ---------------------------------------------------------------------------
+// Misc
+// ---------------------------------------------------------------------------
+
+/** GET /application/my/count */
+export interface ApplicationCount {
+  totalApplications: number;
+}
+
+/** GET /application/check?jobId= */
+export interface ApplicationCheck {
+  applied: boolean;
+  applicationId?: string;
+  status?: ApplicationStatus;
+}
+
+/** POST /application — response data after submitting an application */
+export interface SubmitApplicationData {
+  applicationId: string;
+  jobId: string;
+  jobTitle: string;
+  companyName: string;
+  status: ApplicationStatus;
+  appliedAt: string;
+  cvFileName: string;
+  coverLetter?: string;
+  message: string;
+}
+

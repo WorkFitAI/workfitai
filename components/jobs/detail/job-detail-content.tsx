@@ -1,8 +1,10 @@
 import { JobDetail } from "@/types/job";
-import { CheckCircle } from "lucide-react";
+import ApplyNowButton from "@/components/applications/apply-now-button";
 
 type JobContentProps = Pick<
   JobDetail,
+  | "postId"
+  | "title"
   | "description"
   | "requirements"
   | "responsibilities"
@@ -11,6 +13,8 @@ type JobContentProps = Pick<
 >;
 
 const JobDetailContent = ({
+  postId,
+  title,
   description,
   requirements,
   responsibilities,
@@ -61,12 +65,9 @@ const JobDetailContent = ({
       </div>
 
       <div className="flex justify-start mt-10 mx-auto gap-2">
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium transition">
-          <CheckCircle className="w-4 h-4 inline-block mr-2" />
-          Apply Now
-        </button>
+        <ApplyNowButton jobId={postId} jobTitle={title} />
 
-        <button className="text-gray-500 px-6 py-3 border border-gray-500 rounded-md hover:bg-gray-100 font-medium transition">
+        <button className="text-gray-500 px-6 py-3 border border-gray-500 rounded-lg hover:bg-gray-100 font-medium transition">
           Save Job
         </button>
       </div>

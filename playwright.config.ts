@@ -13,11 +13,21 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [
-    // E2E — functional flows
+    // Auth setup — logs in as candidate once and saves storageState
+    {
+      name: 'candidate-setup',
+      testMatch: 'e2e/setup/candidate-auth.setup.ts',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    // E2E — functional flows (application-flow.spec.ts uses saved auth)
     {
       name: 'e2e-chromium',
       testMatch: 'e2e/*.spec.ts',
-      use: { ...devices['Desktop Chrome'] },
+      dependencies: ['candidate-setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'e2e/.auth/candidate.json',
+      },
     },
     {
       name: 'e2e-firefox',

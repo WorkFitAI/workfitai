@@ -87,6 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             ) as UserSession["roles"];
             applyUser({
               username,
+              email: `${username}@gmail.com`,
               roles: normalizedRoles,
               expiresAt: newExpiresAt,
             });
@@ -116,7 +117,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const normalizedRoles = (roles as string[]).map((r) =>
           r.startsWith("ROLE_") ? r : `ROLE_${r}`,
         ) as UserSession["roles"];
-        applyUser({ username, roles: normalizedRoles, expiresAt });
+        applyUser({ username, email: username, roles: normalizedRoles, expiresAt });
         scheduleRefresh(expiresAt);
         return true;
       }
@@ -178,27 +179,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback(
     async (data: LoginRequest) => {
       const response = await authService.login(data);
-      if (response.data?.accessToken) {
-        isLoggedOutRef.current = false; // reset in case of re-login after logout
-        const { username, roles, expiryInMs, companyId } = response.data;
-        const expiresAt = Date.now() + expiryInMs;
-        const normalizedRoles = (roles as string[]).map((r) =>
-          r.startsWith("ROLE_") ? r : `ROLE_${r}`,
-        ) as UserSession["roles"];
-        applyUser({
-          username,
-          companyId: companyId ?? null,
-          roles: normalizedRoles,
-          expiresAt,
-        });
-        scheduleRefresh(expiresAt);
 
-        // Role-based redirect: ADMIN / HR → /dashboard, candidates → /
-        const isControlUser = normalizedRoles.some((r) =>
-          CONTROL_ROLES.includes(r),
-        );
-        routerRef.current.push(isControlUser ? "/dashboard" : "/");
+      // Guard: a 200-status error body (e.g. invalid credentials) has no accessToken.
+      // Throw so callers can surface the server's error message to the user.
+      if (!response.data?.accessToken) {
+        const message =
+          (response as { message?: string }).message ??
+          "Login failed. Please check your credentials.";
+        throw new Error(message);
       }
+
+      isLoggedOutRef.current = false; // reset in case of re-login after logout
+      const { username, roles, expiryInMs, companyId } = response.data;
+      const expiresAt = Date.now() + expiryInMs;
+      const normalizedRoles = (roles as string[]).map((r) =>
+        r.startsWith("ROLE_") ? r : `ROLE_${r}`,
+      ) as UserSession["roles"];
+      applyUser({
+        username,
+        email: username,
+        companyId: companyId ?? null,
+        roles: normalizedRoles,
+        expiresAt,
+      });
+      scheduleRefresh(expiresAt);
+
+      // Role-based redirect: ADMIN / HR → /dashboard, candidates → /
+      const isControlUser = normalizedRoles.some((r) =>
+        CONTROL_ROLES.includes(r),
+      );
+      routerRef.current.push(isControlUser ? "/dashboard" : "/");
     },
     [applyUser, scheduleRefresh],
   );
