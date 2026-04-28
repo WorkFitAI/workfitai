@@ -7,9 +7,6 @@ import { jobService } from "@/lib/job/job-service";
 import JobAdminPage from "@/components/jobs/job-post-client";
 import { createMockJob } from "@/__tests__/mocks/jobs";
 
-import userEvent from "@testing-library/user-event";
-
-import { toast } from "sonner";
 
 // ================= MOCK =================
 vi.mock("@/hooks/useJobs");
@@ -21,7 +18,7 @@ vi.mock("@/lib/job/job-service", () => ({
     getJobByIdFromHr: vi.fn(),
     updateJob: vi.fn(),
     createJob: vi.fn(),
-    softDelete: vi.fn(),
+    onClose: vi.fn(),
   },
 }));
 

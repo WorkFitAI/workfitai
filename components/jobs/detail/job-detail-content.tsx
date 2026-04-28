@@ -1,5 +1,10 @@
+"use client";
+
 import { JobDetail } from "@/types/job";
 import ApplyNowButton from "@/components/applications/apply-now-button";
+import { ReportDialog } from "@/components/report/ReportButton";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 type JobContentProps = Pick<
   JobDetail,
@@ -21,6 +26,7 @@ const JobDetailContent = ({
   benefits,
   skillNames,
 }: JobContentProps) => {
+  const [open, setOpen] = useState(false);
   return (
     <div className="space-y-8">
       {/* About */}
@@ -67,9 +73,19 @@ const JobDetailContent = ({
       <div className="flex justify-start mt-10 mx-auto gap-2">
         <ApplyNowButton jobId={postId} jobTitle={title} />
 
-        <button className="text-gray-500 px-6 py-3 border border-gray-500 rounded-lg hover:bg-gray-100 font-medium transition">
-          Save Job
-        </button>
+      <Button
+        onClick={() => setOpen(true)}
+        className="min-w-36 h-10 bg-red-50 text-red-600 border border-red-200 
+        hover:bg-red-600 hover:text-white"
+      >
+        Report
+      </Button>
+
+      <ReportDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        jobId={postId}
+      />
       </div>
     </div>
   );

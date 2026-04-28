@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useJobs } from "@/hooks/useJobs";
 import { useJobFilters } from "@/hooks/useJobFilters";
 
-import { Plus, Pencil, Trash2, Loader2, Briefcase, Clock, Search } from "lucide-react";
+import { Plus, Pencil, Loader2, Briefcase, Clock, Search, LockOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { JobDialog } from "@/components/jobs/post/job-dialog";
@@ -121,7 +121,7 @@ export default function JobAdminPage() {
         label: "Delete",
         onClick: async () => {
           try {
-            await jobService.softDelete(id, "CLOSED");
+            await jobService.onClose(id, "CLOSED");
             toast.success("Deleted job successfully");
           } catch (error: unknown) {
             toast.error((error as Error).message);
@@ -225,7 +225,7 @@ export default function JobAdminPage() {
                           className="h-10 w-10 rounded-lg hover:bg-white hover:text-red-600 hover:shadow-sm transition-all"
                           onClick={() => handleDelete(job.postId)}
                         >
-                          <Trash2 size={18} />
+                          <LockOpen size={18} />
                         </Button>
                       </div>
                     </div>

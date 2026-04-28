@@ -20,6 +20,8 @@ export const jobService = {
 
     if (filter) {
       params.append("filter", filter);
+
+      console.log("Filter string:", filter);
     }
 
     const endpoint = role === 'hr' ? `/job/hr/jobs?${params.toString()}` : `/job/public/jobs?${params.toString()}`;
@@ -94,10 +96,17 @@ export const jobService = {
     }
   },
 
-  async softDelete(id: string, newStatus: string): Promise<void> {
+  async onClose(id: string, newStatus: string): Promise<void> {
     const res = await apiClient.put(`/job/hr/jobs/${id}/${newStatus}`) as ApiResponse<null>;
-    if (!res.status || res.status >= 400) {
+    if (!res.status || res.status >= 500) {
       throw new Error("Failed to update job status");
+    }
+  },
+
+  async softDeleteForAdmin(id: string): Promise<void> {
+    const res = await apiClient.delete(`/job/admin/jobs/${id}`) as ApiResponse<null>;
+    if (!res.status || res.status >= 500) {
+      throw new Error("Failed to delete job");
     }
   },
 }
