@@ -2,7 +2,7 @@ import { GetJobsParams, Job, JobData, JobDetail } from "@/types/job";
 import { ApiResponse } from "@/types/response";
 import { apiClient } from "@/lib/api-client";
 import { SkillResponse } from "@/types/skill";
-import { JobFormValues } from "../schemas/job-schemas";
+import { JobFormValues } from "@/lib/schemas/job-schemas";
 
 export const jobService = {
   async getJobs({
