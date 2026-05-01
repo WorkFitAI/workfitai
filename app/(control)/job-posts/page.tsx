@@ -8,15 +8,17 @@ export default async function Page() {
   const cookieValue = cookieStore.get("auth_session")?.value;
 
   let roles: string[] | null = null;
+  let companyId: string = "";
 
   if (cookieValue) {
     const decoded = decodeURIComponent(cookieValue);
     const data = JSON.parse(decoded);
     roles = data.roles;
+    companyId = data.companyId; 
   }
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <JobManagement roles={roles as string[]} />
+      <JobManagement roles={roles as string[]} companyId={companyId} />
     </Suspense>
   );
 }

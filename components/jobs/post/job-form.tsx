@@ -160,6 +160,7 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                       )}
                     />
                     <FormField
+                      disabled={!initialData}
                       control={form.control}
                       name="companyNo"
                       render={({ field }) => (

@@ -23,8 +23,8 @@ export const jobService = {
 
       console.log("Filter string:", filter);
     }
+    const endpoint = getEndpoint(role as string, params);
 
-    const endpoint = role === 'hr' ? `/job/hr/jobs?${params.toString()}` : `/job/public/jobs?${params.toString()}`;
     const res = await apiClient.get(endpoint) as ApiResponse<JobData>;
 
     if (!res.status || res.status >= 400) {
@@ -110,3 +110,14 @@ export const jobService = {
     }
   },
 }
+
+const rolePathMap: Record<string, string> = {
+  admin: "/job/admin/jobs",
+  hr: "/job/hr/jobs",
+  "hr-manager": "/job/hr/jobs",
+};
+
+const getEndpoint = (role: string, params: URLSearchParams) => {
+  const path = rolePathMap[role] || "/job/public/jobs";
+  return `${path}?${params.toString()}`;
+};

@@ -111,7 +111,7 @@ describe("JobAdminPage", () => {
       refetch: vi.fn(),
     });
 
-    render(<JobAdminPage roles={["ROLE_HR"]} />);
+    render(<JobAdminPage roles={["ROLE_HR"]} companyId="C1" />);
 
     expect(await screen.findByText("Frontend Dev")).toBeInTheDocument();
     expect(screen.getByText("React job")).toBeInTheDocument();
@@ -136,7 +136,7 @@ describe("JobAdminPage", () => {
       refetch: vi.fn(),
     });
 
-    render(<JobAdminPage roles={["ROLE_ADMIN"]} />);
+    render(<JobAdminPage roles={["ROLE_ADMIN"]} companyId="C1" />);
 
     expect(await screen.findByText("Senior Developer")).toBeInTheDocument();
     expect(screen.getByText("Java role")).toBeInTheDocument();
@@ -156,7 +156,7 @@ describe("JobAdminPage", () => {
       refetch: vi.fn(),
     });
 
-    render(<JobAdminPage roles={["ROLE_HR"]} />);
+    render(<JobAdminPage roles={["ROLE_HR"]} companyId="C1" />);
 
     expect(screen.getByText(/Fetching your job posts/i)).toBeInTheDocument();
   });
@@ -175,7 +175,7 @@ describe("JobAdminPage", () => {
       refetch: vi.fn(),
     });
 
-    render(<JobAdminPage roles={["ROLE_HR"]} />);
+    render(<JobAdminPage roles={["ROLE_HR"]} companyId="C1" />);
 
     expect(screen.getByText(/No jobs/i)).toBeInTheDocument();
   });
@@ -194,7 +194,7 @@ describe("JobAdminPage", () => {
       refetch: vi.fn(),
     });
 
-    render(<JobAdminPage roles={["ROLE_HR"]} />);
+    render(<JobAdminPage roles={["ROLE_HR"]} companyId="C1" />);
 
     fireEvent.click(screen.getByRole("button", { name: /create/i }));
 
@@ -212,7 +212,7 @@ describe("JobAdminPage", () => {
       refetch: vi.fn(),
     });
 
-    render(<JobAdminPage roles={["ROLE_ADMIN"]} />);
+    render(<JobAdminPage roles={["ROLE_ADMIN"]} companyId="C1" />);
 
     expect(screen.queryByRole("button", { name: /create/i })).not.toBeInTheDocument();
   });
@@ -273,7 +273,7 @@ describe("JobAdminPage", () => {
       },
     });
 
-    render(<JobAdminPage roles={["ROLE_HR"]} />);
+    render(<JobAdminPage roles={["ROLE_HR"]} companyId="C1" />);
 
     const editBtn = screen
       .getAllByRole("button")
@@ -297,7 +297,7 @@ describe("JobAdminPage", () => {
       refetch: vi.fn(),
     });
 
-    render(<JobAdminPage roles={["ROLE_ADMIN"]} />);
+    render(<JobAdminPage roles={["ROLE_ADMIN"]} companyId="C1" />);
 
     const editBtn = screen
       .getAllByRole("button")
@@ -324,7 +324,7 @@ describe("JobAdminPage", () => {
 
     mockedJobService.softDeleteForAdmin.mockResolvedValue(undefined);
 
-    render(<JobAdminPage roles={["ROLE_ADMIN"]} />);
+    render(<JobAdminPage roles={["ROLE_ADMIN"]} companyId="C1" />);
 
     const deleteBtn = screen
       .getAllByRole("button")
@@ -357,7 +357,7 @@ describe("JobAdminPage", () => {
       refetch: vi.fn(),
     });
 
-    render(<JobAdminPage roles={["ROLE_HR"]} />);
+    render(<JobAdminPage roles={["ROLE_HR"]} companyId="C1" />);
 
     expect(await screen.findByText("PUBLISHED")).toBeInTheDocument();
   });
@@ -376,7 +376,7 @@ describe("JobAdminPage", () => {
       refetch: vi.fn(),
     });
 
-    render(<JobAdminPage roles={["ROLE_HR"]} />);
+    render(<JobAdminPage roles={["ROLE_HR"]} companyId="C1" />);
 
     const link = await screen.findByRole("link", { name: /View Job Post/i });
     expect(link).toHaveAttribute("href", "/jobs/1");

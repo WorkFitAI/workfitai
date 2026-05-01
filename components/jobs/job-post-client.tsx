@@ -27,14 +27,21 @@ import JobFilterBar from "@/components/jobs/job-filter-bar";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function JobAdminPage({ roles }: { roles: string[] }) {
-  const isAdmin = roles?.includes("ROLE_ADMIN");
+export default function JobAdminPage({ roles, companyId }: { roles: string[]; companyId: string }) {
+  const getUserType = (roles: string[]) => {
+  if (roles?.includes("ROLE_ADMIN")) return "admin";
+  if (roles?.includes("ROLE_HR_MANAGER")) return "hr-manager";
+  if (roles?.includes("ROLE_HR")) return "hr";
+  return "guest";
+};
+
+  const userType = getUserType(roles);
   const { page, pageSize, filters, buildUrl } = useJobFilters();
   const { jobs, totalPages, loading, refetch } = useJobs(
     page,
     pageSize,
     filters,
-    isAdmin ? "admin" : "hr"
+    userType
   );
 
   const router = useRouter();
@@ -86,7 +93,7 @@ export default function JobAdminPage({ roles }: { roles: string[] }) {
         requirements: detail.data.requirements,
         responsibilities: detail.data.responsibilities,
         requiredExperience: detail.data.requiredExperience,
-        companyNo: detail.data.company.companyNo,
+        companyNo: companyId,
         skillNames: detail.data.skillNames.map(s => s.trim()),
         status: detail.data.status,
       };
@@ -108,7 +115,7 @@ export default function JobAdminPage({ roles }: { roles: string[] }) {
         await jobService.updateJob(newData);
         toast.success("Updated job successfully");
       } else {        
-        const newData = { ...data, skillIds: skillIdsToSave };
+        const newData = { ...data, companyNo: companyId, skillIds: skillIdsToSave };
         await jobService.createJob(newData);
         toast.success("Created new job successfully");
       }
@@ -121,7 +128,7 @@ export default function JobAdminPage({ roles }: { roles: string[] }) {
   };
 
   const handleDelete = async (id: string) => {
-    if (isAdmin) {
+    if (userType === "admin") {
       try {
         await jobService.softDeleteForAdmin(id);
         toast.success("Deleted job successfully");
@@ -162,7 +169,7 @@ export default function JobAdminPage({ roles }: { roles: string[] }) {
               Manage your career opportunities and track applicant engagement in real-time.
             </p>
           </div>
-          {!isAdmin && (
+          {userType !== "admin" && (
             <Button onClick={handleOpenAdd} className="bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-100 px-6 h-12 gap-2 text-md font-semibold transition-all active:scale-95">
               <Plus size={20} /> Create New Job
             </Button>
@@ -240,7 +247,7 @@ export default function JobAdminPage({ roles }: { roles: string[] }) {
                         <Button
                           variant="ghost"
                           size="icon"
-                          disabled={isAdmin}
+                          disabled={userType === "admin"}
                           className="h-10 w-10 rounded-lg hover:bg-white hover:text-blue-600 hover:shadow-sm transition-all"
                           onClick={() => handleOpenEdit(job)}
                         >
