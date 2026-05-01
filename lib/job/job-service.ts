@@ -2,7 +2,7 @@ import { GetJobsParams, Job, JobData, JobDetail } from "@/types/job";
 import { ApiResponse } from "@/types/response";
 import { apiClient } from "@/lib/api-client";
 import { SkillResponse } from "@/types/skill";
-import { JobFormValues } from "../schemas/job-schemas";
+import { JobFormValues } from "@/lib/schemas/job-schemas";
 
 export const jobService = {
   async getJobs({
@@ -20,9 +20,11 @@ export const jobService = {
 
     if (filter) {
       params.append("filter", filter);
-    }
 
-    const endpoint = role === 'hr' ? `/job/hr/jobs?${params.toString()}` : `/job/public/jobs?${params.toString()}`;
+      console.log("Filter string:", filter);
+    }
+    const endpoint = getEndpoint(role as string, params);
+
     const res = await apiClient.get(endpoint) as ApiResponse<JobData>;
 
     if (!res.status || res.status >= 400) {
@@ -94,10 +96,28 @@ export const jobService = {
     }
   },
 
-  async softDelete(id: string, newStatus: string): Promise<void> {
+  async onClose(id: string, newStatus: string): Promise<void> {
     const res = await apiClient.put(`/job/hr/jobs/${id}/${newStatus}`) as ApiResponse<null>;
-    if (!res.status || res.status >= 400) {
+    if (!res.status || res.status >= 500) {
       throw new Error("Failed to update job status");
     }
   },
+
+  async softDeleteForAdmin(id: string): Promise<void> {
+    const res = await apiClient.delete(`/job/admin/jobs/${id}`) as ApiResponse<null>;
+    if (!res.status || res.status >= 500) {
+      throw new Error("Failed to delete job");
+    }
+  },
 }
+
+const rolePathMap: Record<string, string> = {
+  admin: "/job/admin/jobs",
+  hr: "/job/hr/jobs",
+  "hr-manager": "/job/hr/jobs",
+};
+
+const getEndpoint = (role: string, params: URLSearchParams) => {
+  const path = rolePathMap[role] || "/job/public/jobs";
+  return `${path}?${params.toString()}`;
+};

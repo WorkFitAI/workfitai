@@ -44,6 +44,8 @@ export default async function JobDetail({ params }: Props) {
           title={job.title}
           employmentType={job.employmentType}
           createdDate={job.createdDate}
+          status={job.status}
+          expiresAt={job.expiresAt}
         />
 
         <div className="grid grid-cols-12 gap-10 mt-10">

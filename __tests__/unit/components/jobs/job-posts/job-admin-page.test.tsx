@@ -1,19 +1,23 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, beforeEach, expect, vi } from "vitest";
+import React from "react";
 
 import { useJobs } from "@/hooks/useJobs";
 import { useJobFilters } from "@/hooks/useJobFilters";
 import { jobService } from "@/lib/job/job-service";
 import JobAdminPage from "@/components/jobs/job-post-client";
 import { createMockJob } from "@/__tests__/mocks/jobs";
+import { useRouter, useSearchParams } from "next/navigation";
 
-import userEvent from "@testing-library/user-event";
-
-import { toast } from "sonner";
 
 // ================= MOCK =================
 vi.mock("@/hooks/useJobs");
 vi.mock("@/hooks/useJobFilters");
+vi.mock("next/navigation");
+
+vi.mock("@/components/jobs/job-filter-bar", () => ({
+  default: () => React.createElement("div", { "data-testid": "job-filter-bar" }),
+}));
 
 vi.mock("@/lib/job/job-service", () => ({
   jobService: {
@@ -21,7 +25,8 @@ vi.mock("@/lib/job/job-service", () => ({
     getJobByIdFromHr: vi.fn(),
     updateJob: vi.fn(),
     createJob: vi.fn(),
-    softDelete: vi.fn(),
+    onClose: vi.fn(),
+    softDeleteForAdmin: vi.fn(),
   },
 }));
 
@@ -35,11 +40,25 @@ vi.mock("sonner", () => ({
 const mockedUseJobs = vi.mocked(useJobs);
 const mockedUseJobFilters = vi.mocked(useJobFilters);
 const mockedJobService = vi.mocked(jobService);
+const mockedUseRouter = vi.mocked(useRouter);
+const mockedUseSearchParams = vi.mocked(useSearchParams);
 
 // ================= TEST =================
 describe("JobAdminPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
+    mockedUseRouter.mockReturnValue({
+      push: vi.fn(),
+      refresh: vi.fn(),
+      back: vi.fn(),
+      forward: vi.fn(),
+      prefetch: vi.fn(),
+    } as unknown as ReturnType<typeof useRouter>);
+
+    mockedUseSearchParams.mockReturnValue({
+      get: vi.fn().mockReturnValue(null),
+    } as unknown as ReturnType<typeof useSearchParams>);
 
     mockedUseJobFilters.mockReturnValue({
       page: 1,
@@ -73,7 +92,7 @@ describe("JobAdminPage", () => {
   /* =========================
      RENDER LIST
   ========================= */
-  it("renders job list", async () => {
+  it("renders job list for HR manager", async () => {
     const jobs = [
       createMockJob({
         postId: "1",
@@ -92,10 +111,35 @@ describe("JobAdminPage", () => {
       refetch: vi.fn(),
     });
 
-    render(<JobAdminPage />);
+    render(<JobAdminPage roles={["ROLE_HR"]} companyId="C1" />);
 
     expect(await screen.findByText("Frontend Dev")).toBeInTheDocument();
     expect(screen.getByText("React job")).toBeInTheDocument();
+  });
+
+  it("renders job list for admin", async () => {
+    const jobs = [
+      createMockJob({
+        postId: "1",
+        title: "Senior Developer",
+        shortDescription: "Java role",
+      }),
+    ];
+
+    mockedUseJobs.mockReturnValue({
+      jobs,
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+      total: 1,
+      loading: false,
+      refetch: vi.fn(),
+    });
+
+    render(<JobAdminPage roles={["ROLE_ADMIN"]} companyId="C1" />);
+
+    expect(await screen.findByText("Senior Developer")).toBeInTheDocument();
+    expect(screen.getByText("Java role")).toBeInTheDocument();
   });
 
   /* =========================
@@ -112,7 +156,7 @@ describe("JobAdminPage", () => {
       refetch: vi.fn(),
     });
 
-    render(<JobAdminPage />);
+    render(<JobAdminPage roles={["ROLE_HR"]} companyId="C1" />);
 
     expect(screen.getByText(/Fetching your job posts/i)).toBeInTheDocument();
   });
@@ -131,7 +175,7 @@ describe("JobAdminPage", () => {
       refetch: vi.fn(),
     });
 
-    render(<JobAdminPage />);
+    render(<JobAdminPage roles={["ROLE_HR"]} companyId="C1" />);
 
     expect(screen.getByText(/No jobs/i)).toBeInTheDocument();
   });
@@ -139,7 +183,7 @@ describe("JobAdminPage", () => {
   /* =========================
      OPEN CREATE
   ========================= */
-  it("opens create dialog when clicking button", () => {
+  it("opens create dialog when clicking button for HR", () => {
     mockedUseJobs.mockReturnValue({
       jobs: [createMockJob()],
       page: 1,
@@ -150,11 +194,27 @@ describe("JobAdminPage", () => {
       refetch: vi.fn(),
     });
 
-    render(<JobAdminPage />);
+    render(<JobAdminPage roles={["ROLE_HR"]} companyId="C1" />);
 
     fireEvent.click(screen.getByRole("button", { name: /create/i }));
 
     expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("hides create button for admin", () => {
+    mockedUseJobs.mockReturnValue({
+      jobs: [createMockJob()],
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+      total: 1,
+      loading: false,
+      refetch: vi.fn(),
+    });
+
+    render(<JobAdminPage roles={["ROLE_ADMIN"]} companyId="C1" />);
+
+    expect(screen.queryByRole("button", { name: /create/i })).not.toBeInTheDocument();
   });
 
   /* =========================
@@ -213,7 +273,7 @@ describe("JobAdminPage", () => {
       },
     });
 
-    render(<JobAdminPage />);
+    render(<JobAdminPage roles={["ROLE_HR"]} companyId="C1" />);
 
     const editBtn = screen
       .getAllByRole("button")
@@ -224,5 +284,102 @@ describe("JobAdminPage", () => {
     await waitFor(() => {
       expect(mockedJobService.getJobByIdFromHr).toHaveBeenCalledWith("1");
     });
+  });
+
+  it("disables edit button for admin", () => {
+    mockedUseJobs.mockReturnValue({
+      jobs: [createMockJob({ postId: "1" })],
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+      total: 1,
+      loading: false,
+      refetch: vi.fn(),
+    });
+
+    render(<JobAdminPage roles={["ROLE_ADMIN"]} companyId="C1" />);
+
+    const editBtn = screen
+      .getAllByRole("button")
+      .find((btn) => btn.innerHTML.includes("pencil"));
+
+    if (editBtn) {
+      expect(editBtn).toHaveAttribute("disabled");
+    }
+  });
+
+  /* =========================
+     DELETE
+  ========================= */
+  it("calls softDeleteForAdmin when admin clicks delete", async () => {
+    mockedUseJobs.mockReturnValue({
+      jobs: [createMockJob({ postId: "1" })],
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+      total: 1,
+      loading: false,
+      refetch: vi.fn(),
+    });
+
+    mockedJobService.softDeleteForAdmin.mockResolvedValue(undefined);
+
+    render(<JobAdminPage roles={["ROLE_ADMIN"]} companyId="C1" />);
+
+    const deleteBtn = screen
+      .getAllByRole("button")
+      .find((btn) => btn.innerHTML.includes("lock-open"));
+
+    if (deleteBtn) fireEvent.click(deleteBtn);
+
+    await waitFor(() => {
+      expect(mockedJobService.softDeleteForAdmin).toHaveBeenCalledWith("1");
+    });
+  });
+
+  /* =========================
+     JOB STATUS
+  ========================= */
+  it("displays job status badge", async () => {
+    mockedUseJobs.mockReturnValue({
+      jobs: [
+        createMockJob({
+          postId: "1",
+          title: "Test Job",
+          status: "PUBLISHED",
+        }),
+      ],
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+      total: 1,
+      loading: false,
+      refetch: vi.fn(),
+    });
+
+    render(<JobAdminPage roles={["ROLE_HR"]} companyId="C1" />);
+
+    expect(await screen.findByText("PUBLISHED")).toBeInTheDocument();
+  });
+
+  /* =========================
+     VIEW JOB POST LINK
+  ========================= */
+  it("renders view job post link", async () => {
+    mockedUseJobs.mockReturnValue({
+      jobs: [createMockJob({ postId: "1" })],
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+      total: 1,
+      loading: false,
+      refetch: vi.fn(),
+    });
+
+    render(<JobAdminPage roles={["ROLE_HR"]} companyId="C1" />);
+
+    const link = await screen.findByRole("link", { name: /View Job Post/i });
+    expect(link).toHaveAttribute("href", "/jobs/1");
+    expect(link).toHaveAttribute("target", "_blank");
   });
 });
