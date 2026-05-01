@@ -102,6 +102,23 @@ export interface UserSessionInfo {
   current: boolean;
 }
 
+// ─── Security / Auth ──────────────────────────────────────────────────────
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export interface EnableTwoFactorRequest {
+  method: "EMAIL";
+}
+
+export interface DisableTwoFactorRequest {
+  password: string;
+  code: string;
+}
+
 // ─── Account danger-zone ──────────────────────────────────────────────────
 
 export interface DeactivateRequest {

@@ -7,7 +7,7 @@ import { useEffect, useState } from "react"
 import { ChevronDown, Menu, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +18,7 @@ import {
 import { cn } from "@/lib/utils"
 import { candidateNavItems } from "@/lib/navigation"
 import { useAuth } from "@/contexts/auth-context"
+import { userService } from "@/lib/user/user-service"
 
 /** Guest auth buttons — Register text link + filled Sign In button */
 function GuestButtons({ scrolled }: { scrolled: boolean }) {
@@ -44,36 +45,53 @@ function GuestButtons({ scrolled }: { scrolled: boolean }) {
 /** Logged-in avatar dropdown */
 function UserDropdown() {
   const { user, logout } = useAuth()
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+
   const initials = user?.username?.charAt(0).toUpperCase() ?? "U"
   const firstName = user?.username?.split(" ")[0] ?? "User"
 
+  useEffect(() => {
+    if (!user) return
+    userService.getAvatar()
+      .then((res) => setAvatarUrl(res.data?.avatarUrl ?? null))
+      .catch(() => {})
+  }, [user])
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 rounded-full outline-none">
-          <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-primary text-white">{initials}</AvatarFallback>
-          </Avatar>
-          <span className="hidden text-sm font-medium md:block">{firstName}</span>
-          <ChevronDown className="h-4 w-4 text-muted-foreground" />
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-lg">
-        <DropdownMenuItem asChild>
-          <Link href="/saved-jobs">Saved Jobs</Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/applied-jobs">Applied Jobs</Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/account-settings">Account Settings</Link>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-destructive" onClick={logout}>
-          Logout
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="flex items-center gap-1">
+      {/* Avatar → direct link to account settings */}
+      <Link href="/account-settings" className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-primary">
+        <Avatar className="h-8 w-8">
+          {avatarUrl && <AvatarImage src={avatarUrl} alt={user?.username ?? "avatar"} />}
+          <AvatarFallback className="bg-primary text-white text-xs">{initials}</AvatarFallback>
+        </Avatar>
+      </Link>
+
+      {/* Name + chevron → dropdown */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="flex items-center gap-1 rounded-md px-1 outline-none focus-visible:ring-2 focus-visible:ring-primary">
+            <span className="hidden text-sm font-medium md:block">{firstName}</span>
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-lg">
+          <DropdownMenuItem asChild>
+            <Link href="/account-settings">Account Settings</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/saved-jobs">Saved Jobs</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/applied-jobs">Applied Jobs</Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="text-destructive" onClick={logout}>
+            Logout
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   )
 }
 

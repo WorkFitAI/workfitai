@@ -35,7 +35,7 @@ export default function ProfileEditModal({ open, profile, onClose, onSaved }: Pr
     register,
     handleSubmit,
     reset,
-    formState: { errors, isDirty },
+    formState: { errors },
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -151,29 +151,36 @@ export default function ProfileEditModal({ open, profile, onClose, onSaved }: Pr
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <Label className="text-xs text-muted-foreground">Username</Label>
-              <Input value={profile?.username ?? ""} disabled className="mt-1 bg-muted/40" />
+              <Input
+                value={profile?.username ?? ""}
+                disabled
+                className="mt-1 bg-muted/40"
+              />
             </div>
             <div>
               <Label className="text-xs text-muted-foreground">Email</Label>
-              <Input value={profile?.email ?? ""} disabled className="mt-1 bg-muted/40" />
-              <p className="mt-1 text-xs text-muted-foreground">Email cannot be changed here.</p>
+              <Input
+                value={profile?.email ?? ""}
+                disabled
+                className="mt-1 bg-muted/40"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Email cannot be changed here.
+              </p>
             </div>
           </div>
-
-          {/* Full name */}
-          <div>
-            <Label htmlFor="fullName">Full Name</Label>
-            <Input
-              id="fullName"
-              {...register("fullName")}
-              placeholder="Your full name"
-              className="mt-1"
-            />
-            <FieldError message={errors.fullName?.message} />
-          </div>
-
-          {/* Phone + Position */}
+          {/* Full Name | Phone Number */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="fullName">Full Name</Label>
+              <Input
+                id="fullName"
+                {...register("fullName")}
+                placeholder="Your full name"
+                className="mt-1"
+              />
+              <FieldError message={errors.fullName?.message} />
+            </div>
             <div>
               <Label htmlFor="phoneNumber">Phone Number</Label>
               <Input
@@ -185,6 +192,9 @@ export default function ProfileEditModal({ open, profile, onClose, onSaved }: Pr
               />
               <FieldError message={errors.phoneNumber?.message} />
             </div>
+          </div>
+          {/* Current Position | Years of Experience */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <Label htmlFor="expectedPosition">Current Position</Label>
               <Input
@@ -195,10 +205,6 @@ export default function ProfileEditModal({ open, profile, onClose, onSaved }: Pr
               />
               <FieldError message={errors.expectedPosition?.message} />
             </div>
-          </div>
-
-          {/* Years of experience */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <Label htmlFor="totalExperience">Years of Experience</Label>
               <Input
@@ -213,11 +219,12 @@ export default function ProfileEditModal({ open, profile, onClose, onSaved }: Pr
               <FieldError message={errors.totalExperience?.message} />
             </div>
           </div>
-
           {/* Skills */}
           <div>
             <Label>Skills</Label>
-            <p className="text-xs text-muted-foreground mb-2">Press Enter or comma to add a skill</p>
+            <p className="text-xs text-muted-foreground mb-2">
+              Press Enter or comma to add a skill
+            </p>
             <div className="flex flex-wrap gap-1.5 min-h-[36px] rounded-md border border-input bg-background px-3 py-2 mb-2">
               {skills.map((skill) => (
                 <span
@@ -240,12 +247,13 @@ export default function ProfileEditModal({ open, profile, onClose, onSaved }: Pr
                 onChange={(e) => setSkillInput(e.target.value)}
                 onKeyDown={handleSkillKeyDown}
                 onBlur={() => skillInput.trim() && addSkill(skillInput)}
-                placeholder={skills.length === 0 ? "React, Node.js, TypeScript…" : ""}
+                placeholder={
+                  skills.length === 0 ? "React, Node.js, TypeScript…" : ""
+                }
                 className="flex-1 min-w-[120px] bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               />
             </div>
           </div>
-
           {/* Summary */}
           <div>
             <Label htmlFor="summary">Summary / About Me</Label>
@@ -258,7 +266,6 @@ export default function ProfileEditModal({ open, profile, onClose, onSaved }: Pr
             />
             <FieldError message={errors.summary?.message} />
           </div>
-
           {/* Career Objective */}
           <div>
             <Label htmlFor="careerObjective">Career Objective</Label>
@@ -271,7 +278,6 @@ export default function ProfileEditModal({ open, profile, onClose, onSaved }: Pr
             />
             <FieldError message={errors.careerObjective?.message} />
           </div>
-
           {/* Certifications */}
           <div>
             <Label htmlFor="certifications">Certifications</Label>
@@ -284,7 +290,6 @@ export default function ProfileEditModal({ open, profile, onClose, onSaved }: Pr
             />
             <FieldError message={errors.certifications?.message} />
           </div>
-
           {/* Education */}
           <div>
             <Label htmlFor="education">Education</Label>
@@ -297,14 +302,17 @@ export default function ProfileEditModal({ open, profile, onClose, onSaved }: Pr
             />
             <FieldError message={errors.education?.message} />
           </div>
-
           {/* Social links */}
           <div className="space-y-1">
             <p className="text-sm font-medium">Social Links</p>
-            <p className="text-xs text-muted-foreground mb-3">Add your professional profiles</p>
+            <p className="text-xs text-muted-foreground mb-3">
+              Add your professional profiles
+            </p>
             <div className="space-y-3">
               <div>
-                <Label htmlFor="linkedinUrl" className="text-xs">LinkedIn URL</Label>
+                <Label htmlFor="linkedinUrl" className="text-xs">
+                  LinkedIn URL
+                </Label>
                 <Input
                   id="linkedinUrl"
                   type="url"
@@ -315,7 +323,9 @@ export default function ProfileEditModal({ open, profile, onClose, onSaved }: Pr
                 <FieldError message={errors.linkedinUrl?.message} />
               </div>
               <div>
-                <Label htmlFor="githubUrl" className="text-xs">GitHub URL</Label>
+                <Label htmlFor="githubUrl" className="text-xs">
+                  GitHub URL
+                </Label>
                 <Input
                   id="githubUrl"
                   type="url"
@@ -326,7 +336,9 @@ export default function ProfileEditModal({ open, profile, onClose, onSaved }: Pr
                 <FieldError message={errors.githubUrl?.message} />
               </div>
               <div>
-                <Label htmlFor="portfolioLink" className="text-xs">Portfolio URL</Label>
+                <Label htmlFor="portfolioLink" className="text-xs">
+                  Portfolio URL
+                </Label>
                 <Input
                   id="portfolioLink"
                   type="url"
@@ -338,7 +350,6 @@ export default function ProfileEditModal({ open, profile, onClose, onSaved }: Pr
               </div>
             </div>
           </div>
-
           {/* Footer */}
           <div className="flex justify-end gap-3 pt-2 border-t border-border">
             <Button type="button" variant="outline" onClick={onClose}>

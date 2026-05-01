@@ -7,6 +7,8 @@ import { useUserProfile } from "@/hooks/use-user-profile";
 import ProfileView from "./profile-view";
 import NotificationsForm from "./notifications-form";
 import PrivacyForm from "./privacy-form";
+import ChangePasswordForm from "./change-password-form";
+import TwoFactorForm from "./two-factor-form";
 import DangerZone from "./danger-zone";
 import SessionsPanel from "./sessions-panel";
 
@@ -15,7 +17,7 @@ type Tab = "profile" | "notifications" | "privacy" | "sessions" | "danger";
 const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
   { id: "profile", label: "My Profile", icon: User },
   { id: "notifications", label: "Notifications", icon: Bell },
-  { id: "privacy", label: "Privacy", icon: Lock },
+  { id: "privacy", label: "Privacy & Security", icon: Lock },
   { id: "sessions", label: "Active Sessions", icon: Monitor },
   { id: "danger", label: "Account", icon: ShieldAlert },
 ];
@@ -131,12 +133,19 @@ export default function AccountSettingsPageClient() {
               </div>
             )}
             {activeTab === "privacy" && (
-              <div className="rounded-lg border border-border bg-white p-6 shadow-sm">
-                <h2 className="text-lg font-semibold mb-1">Privacy settings</h2>
-                <p className="text-sm text-muted-foreground mb-6">
-                  Manage who can see your profile and data.
-                </p>
-                <PrivacyForm />
+              <div className="space-y-4">
+                <div>
+                  <h2 className="text-lg font-semibold">Privacy & Security</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Manage your password, two-factor authentication, and profile visibility.
+                  </p>
+                </div>
+                <ChangePasswordForm />
+                <TwoFactorForm />
+                <div className="rounded-lg border border-border bg-white p-6 shadow-sm">
+                  <h3 className="text-sm font-semibold mb-4">Profile Visibility</h3>
+                  <PrivacyForm />
+                </div>
               </div>
             )}
             {activeTab === "sessions" && <SessionsPanel />}

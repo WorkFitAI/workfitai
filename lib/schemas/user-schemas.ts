@@ -31,6 +31,25 @@ export const profileSchema = z.object({
     .or(z.literal("")),
 });
 
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Required"),
+    newPassword: z.string().min(8, "Min 8 characters"),
+    confirmPassword: z.string().min(1, "Required"),
+  })
+  .refine((d) => d.newPassword === d.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
+
+export const disableTwoFactorSchema = z.object({
+  password: z.string().min(1, "Required"),
+  code: z.string().length(6, "Must be 6 digits"),
+});
+
+export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
+export type DisableTwoFactorFormValues = z.infer<typeof disableTwoFactorSchema>;
+
 export const deactivateSchema = z.object({
   password: z.string().min(1, "Password is required"),
   reason: z.string().optional().or(z.literal("")),

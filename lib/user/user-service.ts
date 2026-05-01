@@ -9,6 +9,9 @@ import {
   DeactivateRequest,
   DeleteAccountRequest,
   UserSessionInfo,
+  ChangePasswordRequest,
+  EnableTwoFactorRequest,
+  DisableTwoFactorRequest,
 } from "@/types/user";
 
 export const userService = {
@@ -92,6 +95,20 @@ export const userService = {
       "/user/profile/privacy-settings",
       data,
     );
+  },
+
+  // ─── Security ────────────────────────────────────────────────────────────
+
+  async changePassword(data: ChangePasswordRequest): Promise<ApiResponse<unknown>> {
+    return apiClient.post<ApiResponse<unknown>>("/auth/change-password", data);
+  },
+
+  async enableTwoFactor(data: EnableTwoFactorRequest): Promise<ApiResponse<unknown>> {
+    return apiClient.post<ApiResponse<unknown>>("/auth/enable-2fa", data);
+  },
+
+  async disableTwoFactor(data: DisableTwoFactorRequest): Promise<ApiResponse<unknown>> {
+    return apiClient.post<ApiResponse<unknown>>("/auth/disable-2fa", data);
   },
 
   // ─── Danger zone ──────────────────────────────────────────────────────────
