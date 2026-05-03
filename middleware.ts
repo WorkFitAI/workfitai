@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 // Routes requiring HR/Admin roles
-const CONTROL_ROUTES = ['/dashboard', '/candidates', '/job-posts', '/settings']
+const CONTROL_ROUTES = ['/dashboard', '/candidates', '/job-posts', '/settings', '/users']
 // Routes that require any authenticated user (CANDIDATE)
 const CANDIDATE_ROUTES = ['/applied-jobs', '/saved-jobs', '/my-cvs', '/account-settings']
 // Auth pages that authenticated users should be redirected away from
@@ -70,6 +70,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    '/users/:path*',
     '/dashboard/:path*',
     '/candidates/:path*',
     '/job-posts/:path*',
