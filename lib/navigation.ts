@@ -1,4 +1,4 @@
-import { Home, Briefcase, LayoutDashboard, Users, Settings, FileText, type LucideIcon } from "lucide-react"
+import { Home, Briefcase, LayoutDashboard, Users, Users2, Settings, FileText, type LucideIcon } from "lucide-react"
 
 export interface NavItem {
   title: string
@@ -21,6 +21,7 @@ export const authNavItems = {
 
 export const controlNavItems: NavItem[] = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { title: "Users", href: "/users", icon: Users2 },
   { title: "Candidates", href: "/candidates", icon: Users },
   { title: "Job Posts", href: "/job-posts", icon: FileText },
   { title: "Settings", href: "/settings", icon: Settings },
