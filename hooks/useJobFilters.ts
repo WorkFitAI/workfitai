@@ -30,6 +30,8 @@ export const useJobFilters = () => {
 
     const sort = searchParams.get("sort") || "desc";
 
+    const hrName = searchParams.get("hrName") || undefined;
+
     return {
       experienceLevel,
       employmentType,
@@ -40,6 +42,7 @@ export const useJobFilters = () => {
       location,
       status,
       sort,
+      hrName,
     };
   }, [searchParams]);
 

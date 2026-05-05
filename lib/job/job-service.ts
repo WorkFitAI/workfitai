@@ -14,9 +14,11 @@ export const jobService = {
   }: GetJobsParams): Promise<ApiResponse<JobData>> {
     const params = new URLSearchParams();
 
+    const sortValue = sort === "asc" ? "createdDate,asc" : "createdDate,desc";
+
     params.append("page", String(page - 1));
     params.append("size", String(pageSize));
-    params.append("sort", sort);
+    params.append("sort", sortValue);
 
     if (filter) {
       params.append("filter", filter);

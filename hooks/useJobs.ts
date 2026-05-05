@@ -15,6 +15,7 @@ type Filters = {
   location?: string;
   status?: string;
   sort?: string;
+  hrName?: string;
 };
 
 export const useJobs = (
@@ -71,6 +72,9 @@ export const useJobs = (
     if (filters?.status) {
       conditions.push(`status:'${filters.status}'`);
     }
+    if (filters?.hrName) {
+      conditions.push(`createdBy:'${filters.hrName}'`);
+    }
 
     return conditions.join(" and ");
   };
@@ -113,6 +117,7 @@ export const useJobs = (
     filters?.location,
     filters?.status,
     filters?.sort,
+    filters?.hrName
   ]);
 
   return {

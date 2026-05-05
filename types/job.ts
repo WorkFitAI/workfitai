@@ -8,12 +8,15 @@ export interface Job {
   employmentType: string;
   experienceLevel: string;
   createdDate: Date;
+  createdBy: string;
   skillNames: string[];
   salaryMin: number;
   salaryMax: number;
   currency: string;
   location: string;
   status: string;
+  lastModifiedDate: string;
+  lastModifiedBy: string;
 }
 
 export interface JobDetail {

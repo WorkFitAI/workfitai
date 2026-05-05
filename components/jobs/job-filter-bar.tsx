@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useDebounce } from "@/hooks/useDebounce";
 
-const JobFilterBar = () => {
+const JobFilterBar = ({ hrNames }: { hrNames: Record<string, string> }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -67,7 +67,7 @@ const JobFilterBar = () => {
         {/* FILTERS */}
         <div className="flex flex-wrap gap-3">
 
-          {/* STATUS */}
+           {/* STATUS */}
           <select
             value={searchParams.get("status") || ""}
             onChange={(e) => updateParam("status", e.target.value)}
@@ -77,6 +77,20 @@ const JobFilterBar = () => {
             <option value="PUBLISHED">Published</option>
             <option value="CLOSED">Closed</option>
             <option value="DRAFT">Draft</option>
+          </select>
+
+          {/* HR NAME */}
+          <select
+            value={searchParams.get("hrName") || ""}
+            onChange={(e) => updateParam("hrName", e.target.value)}
+            className="px-3 py-2.5 rounded-md border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All HRs</option>
+            {Object.entries(hrNames).map(([key, value]) => (
+              <option key={key} value={key}>
+                {value}
+              </option>
+            ))}
           </select>
 
           {/* JOB TYPE */}

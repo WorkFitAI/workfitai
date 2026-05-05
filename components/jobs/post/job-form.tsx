@@ -356,12 +356,34 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
             </div>
 
             {/* CỘT PHẢI (SIDEBAR) */}
-            <div className="space-y-6 lg:sticky lg:top-8 h-fit">
+            <div className="space-y-6 lg:block lg:top-8 h-fit">
               <Card className="shadow-md border-t-4 border-t-blue-600">
                 <CardHeader>
                   <CardTitle className="text-base uppercase tracking-wider text-slate-500 font-bold">Logistics & Budget</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
+
+                     <FormField
+                      control={form.control}
+                      name="currency"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-semibold">Currency</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl className="w-full md:w-[423px]">
+                              <SelectTrigger className="h-11">
+                                <SelectValue />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="USD">USD</SelectItem>
+                              <SelectItem value="VND">VND</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormItem>
+                      )}
+                    />
+                  
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}

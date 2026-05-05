@@ -1,10 +1,10 @@
 import { useRouter } from "next/navigation";
 
 import { TextAlignJustify, LayoutGrid } from "lucide-react";
+import { useState } from "react";
 
 const JobToolbar = ({
   page,
-  totalPages,
   pageSize,
   total,
 }: {
@@ -14,6 +14,8 @@ const JobToolbar = ({
   total: number;
 }) => {
   const router = useRouter();
+
+  const [sort, setSort] = useState("desc");
 
   return (
     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-2 bg-white">
@@ -40,10 +42,15 @@ const JobToolbar = ({
         </select>
 
         {/* Sort */}
-        <select className="border rounded-sm px-3 py-1 text-sm bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500">
-          <option>Sort by: Newest Post</option>
-          <option>Sort by: Salary</option>
-          <option>Sort by: Relevance</option>
+        <select
+            value={sort}
+            className="border rounded-sm px-3 py-1 text-sm bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            onChange={(e) => {
+              setSort(e.target.value);
+              router.push(`?page=${page}&size=${pageSize}&sort=${e.target.value}`);
+            }}>
+          <option value="desc">Sort by: Newest Post</option>
+          <option value="asc">Sort by: Oldest Post</option>
         </select>
 
         {/* View buttons */}
