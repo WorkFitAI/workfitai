@@ -46,14 +46,14 @@ describe("JobFilterBar", () => {
   it("should initialize search input from title query param", () => {
     navigationMocks.setSearch("title=Frontend");
 
-    render(<JobFilterBar />);
+    render(<JobFilterBar hrNames={{ "john.doe": "John Doe", "jane.smith": "Jane Smith" }} />);
 
     const input = screen.getByPlaceholderText("Search jobs...") as HTMLInputElement;
     expect(input.value).toBe("Frontend");
   });
 
   it("should update title query param when typing in search", async () => {
-    render(<JobFilterBar />);
+    render(<JobFilterBar hrNames={{ "john.doe": "John Doe" }} />);
 
     const input = screen.getByPlaceholderText("Search jobs...");
     fireEvent.change(input, { target: { value: "React" } });
@@ -65,7 +65,7 @@ describe("JobFilterBar", () => {
 
   it("should update status query param when selecting status", async () => {
     navigationMocks.setSearch("title=Frontend");
-    render(<JobFilterBar />);
+    render(<JobFilterBar hrNames={{ "john.doe": "John Doe" }} />);
 
     const selects = screen.getAllByRole("combobox");
     fireEvent.change(selects[0], { target: { value: "PUBLISHED" } });
@@ -78,7 +78,7 @@ describe("JobFilterBar", () => {
 
   it("should reset filters when clicking reset button", async () => {
     navigationMocks.setSearch("title=Backend&status=CLOSED");
-    render(<JobFilterBar />);
+    render(<JobFilterBar hrNames={{ "john.doe": "John Doe", "jane.smith": "Jane Smith" }} />);
 
     const resetButton = screen.getByRole("button");
     fireEvent.click(resetButton);
@@ -89,5 +89,31 @@ describe("JobFilterBar", () => {
 
     const input = screen.getByPlaceholderText("Search jobs...") as HTMLInputElement;
     expect(input.value).toBe("");
+  });
+
+  it("should update hrName query param when selecting HR", async () => {
+    navigationMocks.setSearch("title=Frontend");
+    render(<JobFilterBar hrNames={{ "john.doe": "John Doe", "jane.smith": "Jane Smith" }} />);
+
+    const selects = screen.getAllByRole("combobox");
+    // The hrName select is the second one (after status)
+    fireEvent.change(selects[1], { target: { value: "john.doe" } });
+
+    await waitFor(() => {
+      const calls = navigationMocks.replace.mock.calls.map((call) => call[0]);
+      expect(calls.some((call) => call.includes("hrName=john.doe"))).toBe(true);
+    });
+  });
+
+  it("should display all available HR options", async () => {
+    render(<JobFilterBar hrNames={{ "john.doe": "John Doe", "jane.smith": "Jane Smith" }} />);
+
+    const selects = screen.getAllByRole("combobox");
+    const hrSelect = selects[1] as HTMLSelectElement;
+
+    const options = Array.from(hrSelect.options).map((opt) => opt.text);
+    expect(options).toContain("All HRs");
+    expect(options).toContain("John Doe");
+    expect(options).toContain("Jane Smith");
   });
 });

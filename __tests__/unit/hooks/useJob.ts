@@ -77,4 +77,22 @@ describe("useJobs hook", () => {
     expect(args.filter).toContain("employmentType:'Full-time'");
     expect(args.filter).toContain("skills.name");
   });
+
+  it("should apply hrName filter correctly", async () => {
+    vi.mocked(jobService.getJobs).mockResolvedValue(mockJobApiResponse);
+
+    const filters = {
+      hrName: "john.doe",
+    };
+
+    renderHook(() => useJobs(1, 4, filters));
+
+    await waitFor(() => {
+      expect(jobService.getJobs).toHaveBeenCalled();
+    });
+
+    const args = vi.mocked(jobService.getJobs).mock.calls[0][0];
+
+    expect(args.filter).toContain("createdBy:'john.doe'");
+  });
 });

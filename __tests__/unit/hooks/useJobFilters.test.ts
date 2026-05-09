@@ -5,7 +5,7 @@ import { useJobFilters } from "@/hooks/useJobFilters";
 vi.mock("next/navigation", () => ({
   useSearchParams: () =>
     new URLSearchParams(
-      "page=2&size=20&experienceLevel=Senior,Junior&employmentType=Full-time&skillNames=React,Next&salaryMin=2000&salaryMax=5000"
+      "page=2&size=20&experienceLevel=Senior,Junior&employmentType=Full-time&skillNames=React,Next&salaryMin=2000&salaryMax=5000&hrName=john.doe&sort=asc"
     ),
 }));
 
@@ -31,6 +31,18 @@ describe("useJobFilters", () => {
 
     expect(result.current.filters.salaryMin).toBe(2000);
     expect(result.current.filters.salaryMax).toBe(5000);
+  });
+
+  it("should parse hrName filter correctly", () => {
+    const { result } = renderHook(() => useJobFilters());
+
+    expect(result.current.filters.hrName).toBe("john.doe");
+  });
+
+  it("should parse sort filter correctly", () => {
+    const { result } = renderHook(() => useJobFilters());
+
+    expect(result.current.filters.sort).toBe("asc");
   });
 
   it("should build correct url for pagination", () => {

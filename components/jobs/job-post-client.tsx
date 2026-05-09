@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useJobs } from "@/hooks/useJobs";
 import { useJobFilters } from "@/hooks/useJobFilters";
 
@@ -56,20 +56,37 @@ export default function JobAdminPage({ roles, companyId }: { roles: string[]; co
 
   const [skills, setSkills] = useState<Skill[]>([]);
 
+ const [hrNameToFullName, setHrNameToFullName] = useState<Record<string, string>>({});
+
+// fetch skills
   useEffect(() => {
     const fetchSkills = async () => {
       try {
         const res = await jobService.getAllSkills();
-        setSkills(res.data.result); 
+        setSkills(res.data.result);
       } catch (err) {
         console.error("Error fetching skills", err);
       }
     };
+
     fetchSkills();
   }, []);
 
-  const handleOpenAdd = () => {
-    setDialogState({ isOpen: true, editingJob: null });
+  const initializedRef = useRef(false);
+
+  useEffect(() => {
+    if (!jobs || jobs.length === 0 || initializedRef.current) return;
+
+    const map = Object.fromEntries(
+      [...new Set(jobs.map((j) => j.createdBy))].map((name) => [name, name])
+    );
+
+    setHrNameToFullName(map);
+    initializedRef.current = true;
+  }, [jobs]);
+
+    const handleOpenAdd = () => {
+      setDialogState({ isOpen: true, editingJob: null });
   };
 
   const handleOpenEdit = async (job: Job) => {
@@ -175,7 +192,7 @@ export default function JobAdminPage({ roles, companyId }: { roles: string[]; co
             </Button>
           )}
         </div>
-        <JobFilterBar />
+        <JobFilterBar hrNames={hrNameToFullName} />
 
         {/* LOADING STATE */}
         {loading ? (
@@ -199,7 +216,14 @@ export default function JobAdminPage({ roles, companyId }: { roles: string[]; co
                       <div className="space-y-3">
                         <div className="flex items-center gap-3">
                           <h3 className="font-bold text-xl text-slate-800 group-hover:text-blue-600 transition-colors">
-                            {job.title}
+                            <Link
+                              href={`/jobs/${job.postId}`}
+                              target="_blank"
+                              className="text-sm text-gray-500 hover:text-blue-500 flex items-center gap-1"
+                            >
+                              {job.title}
+                            </Link>
+                          
                           </h3>
                           <Badge
                             variant="default"
@@ -219,16 +243,14 @@ export default function JobAdminPage({ roles, companyId }: { roles: string[]; co
                           {job.shortDescription}
                         </p>
 
-                         <div className="text-xs text-gray-400 mt-2 flex items-center gap-2">
-                                  <Link
-                                    href={`/jobs/${job.postId}`}
-                                    target="_blank"
-                                    className="text-sm text-gray-500 hover:text-blue-500 flex items-center gap-1"
-                                  >
-                                    <MousePointerClick size={16} />
-                                    View Job Post
-                                  </Link>
-                          </div>
+                        <div className="flex flex-wrap gap-6 pt-1">
+                          <p className="text-slate-500 text-sm line-clamp-1 max-w-xl italic">
+                            <span className="font-semibold">Created By:</span> {job.createdBy}
+                          </p>
+                          <p className="text-slate-500 text-sm line-clamp-1 max-w-xl italic">
+                            <span className="font-semibold">Modified By:</span> {job.lastModifiedBy}
+                          </p>
+                        </div>
 
                         <div className="flex flex-wrap gap-4 pt-1">
                           <span className="flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded-md">
@@ -238,6 +260,10 @@ export default function JobAdminPage({ roles, companyId }: { roles: string[]; co
                           <span className="flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded-md">
                             <Clock className="w-3.5 h-3.5 text-orange-500" />
                             Posted: {new Date(job.createdDate).toLocaleDateString("vi-VN")}
+                          </span>
+                          <span className="flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded-md">
+                            <Clock className="w-3.5 h-3.5 text-green-500" />
+                            Modified: {new Date(job.lastModifiedDate).toLocaleDateString("vi-VN")}
                           </span>
                         </div>
                       </div>

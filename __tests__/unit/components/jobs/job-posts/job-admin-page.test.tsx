@@ -72,7 +72,8 @@ describe("JobAdminPage", () => {
         title: "",
         location: "",
         status: "",
-        sort: ""
+        sort: "",
+        hrName: "",
       },
       buildUrl: vi.fn(),
     });
@@ -365,9 +366,9 @@ describe("JobAdminPage", () => {
   /* =========================
      VIEW JOB POST LINK
   ========================= */
-  it("renders view job post link", async () => {
+  it("renders view job post link on job title", async () => {
     mockedUseJobs.mockReturnValue({
-      jobs: [createMockJob({ postId: "1" })],
+      jobs: [createMockJob({ postId: "1", title: "Frontend Developer" })],
       page: 1,
       pageSize: 10,
       totalPages: 1,
@@ -378,7 +379,7 @@ describe("JobAdminPage", () => {
 
     render(<JobAdminPage roles={["ROLE_HR"]} companyId="C1" />);
 
-    const link = await screen.findByRole("link", { name: /View Job Post/i });
+    const link = await screen.findByRole("link", { name: /Frontend Developer/i });
     expect(link).toHaveAttribute("href", "/jobs/1");
     expect(link).toHaveAttribute("target", "_blank");
   });
