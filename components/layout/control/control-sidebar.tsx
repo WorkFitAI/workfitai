@@ -94,27 +94,29 @@ export function ControlSidebar({ isCollapsed, onToggle }: ControlSidebarProps) {
 
       {/* Nav links */}
       <nav className="flex-1 space-y-0.5 p-3">
-        {controlNavItems.map((item) => {
-          const Icon = item.icon
-          const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              title={isCollapsed ? item.title : undefined}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150",
-                isCollapsed && "justify-center px-2",
-                isActive
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-              )}
-            >
-              {Icon && <Icon className="h-4.5 w-4.5 shrink-0" />}
-              {!isCollapsed && <span>{item.title}</span>}
-            </Link>
-          )
-        })}
+        {controlNavItems
+          .filter((item) => !item.roles || item.roles.some((r) => user?.roles?.includes(r)))
+          .map((item) => {
+            const Icon = item.icon
+            const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                title={isCollapsed ? item.title : undefined}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150",
+                  isCollapsed && "justify-center px-2",
+                  isActive
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                )}
+              >
+                {Icon && <Icon className="h-4.5 w-4.5 shrink-0" />}
+                {!isCollapsed && <span>{item.title}</span>}
+              </Link>
+            )
+          })}
       </nav>
 
       {/* Collapse toggle */}

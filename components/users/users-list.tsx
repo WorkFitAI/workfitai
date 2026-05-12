@@ -15,6 +15,8 @@ import {
   ArrowUp,
   ArrowDown,
   ArrowUpDown,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react"
 import { useAdminUsers } from "@/hooks/useAdminUsers"
 import { adminUserService } from "@/lib/admin/admin-user-service"
@@ -211,6 +213,8 @@ export function UsersList() {
   const [roleFilter, setRoleFilter] = useState<AdminUserRole | "">("")
   const [confirm, setConfirm] = useState<ConfirmState | null>(null)
   const [actionId, setActionId] = useState<string | null>(null)
+  const [approveId, setApproveId] = useState<string | null>(null)
+  const [rejectId, setRejectId] = useState<string | null>(null)
 
   // Sort state
   const [sortKey, setSortKey] = useState<SortKey | null>(null)
@@ -268,6 +272,30 @@ export function UsersList() {
       // error shown via refresh
     } finally {
       setActionId(null)
+    }
+  }
+
+  async function handleApprove(user: EsUserHit) {
+    try {
+      setApproveId(user.userId)
+      await adminUserService.approveManager(user.username)
+      refresh()
+    } catch {
+      // error visible via list refresh
+    } finally {
+      setApproveId(null)
+    }
+  }
+
+  async function handleReject(user: EsUserHit) {
+    try {
+      setRejectId(user.userId)
+      await adminUserService.rejectManager(user.username)
+      refresh()
+    } catch {
+      // error visible via list refresh
+    } finally {
+      setRejectId(null)
     }
   }
 
@@ -439,6 +467,27 @@ export function UsersList() {
                             <ShieldOff className="h-4 w-4" />
                           )}
                         </button>
+
+                        {/* Approve — only for WAIT_APPROVED HR Managers, and only visible to HR Manager viewers */}
+                        {u.status === "WAIT_APPROVED" &&
+                          u.role === "HR_MANAGER" &&
+                          authUser?.roles?.includes("ROLE_HR_MANAGER") && (
+                          <button
+                            title="Approve HR Manager"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleApprove(u)
+                            }}
+                            disabled={approveId === u.userId}
+                            className="flex h-7 w-7 items-center justify-center rounded-lg text-blue-600 hover:bg-blue-50 transition-colors disabled:opacity-40"
+                          >
+                            {approveId === u.userId ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <CheckCircle2 className="h-4 w-4" />
+                            )}
+                          </button>
+                        )}
 
                         {/* Delete */}
                         <button

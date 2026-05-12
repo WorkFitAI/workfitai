@@ -10,7 +10,7 @@ const STATUS_CONFIG: Record<
   BLOCKED: { label: "Blocked", classes: "bg-red-100 text-red-700 ring-red-200" },
   SUSPENDED: { label: "Suspended", classes: "bg-orange-100 text-orange-700 ring-orange-200" },
   DEACTIVATED: { label: "Deactivated", classes: "bg-yellow-100 text-yellow-700 ring-yellow-200" },
-  WAIT_APPROVED: { label: "Pending", classes: "bg-amber-100 text-amber-700 ring-amber-200" },
+  WAIT_APPROVED: { label: "Waiting", classes: "bg-amber-100 text-amber-700 ring-amber-200" },
 }
 
 interface UserStatusBadgeProps {

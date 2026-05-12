@@ -97,6 +97,7 @@ export function useApprovalQueue({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [approvingId, setApprovingId] = useState<string | null>(null)
+  const [rejectingId, setRejectingId] = useState<string | null>(null)
 
   const fetchQueue = useCallback(async () => {
     try {
@@ -141,6 +142,21 @@ export function useApprovalQueue({
     [fetchQueue],
   )
 
+  const reject = useCallback(
+    async (user: EsUserHit) => {
+      try {
+        setRejectingId(user.userId)
+        await adminUserService.rejectManager(user.username)
+        await fetchQueue()
+      } catch {
+        setError(`Failed to reject ${user.fullName}.`)
+      } finally {
+        setRejectingId(null)
+      }
+    },
+    [fetchQueue],
+  )
+
   return {
     queue: data?.hits ?? [],
     totalHits: data?.totalHits ?? 0,
@@ -148,7 +164,9 @@ export function useApprovalQueue({
     loading,
     error,
     approvingId,
+    rejectingId,
     approve,
+    reject,
     refresh: fetchQueue,
   }
 }

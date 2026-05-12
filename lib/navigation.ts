@@ -1,9 +1,12 @@
-import { Home, Briefcase, LayoutDashboard, Users, Users2, Settings, FileText, type LucideIcon } from "lucide-react"
+import { Home, Briefcase, LayoutDashboard, Users2, Settings, FileText, ClipboardList, UserCog, type LucideIcon } from "lucide-react"
+import type { UserRole } from "@/types/auth"
 
 export interface NavItem {
   title: string
   href: string
   icon?: LucideIcon
+  /** Roles allowed to see this item. Undefined = visible to all control users. */
+  roles?: UserRole[]
 }
 
 export const candidateNavItems: NavItem[] = [
@@ -21,8 +24,9 @@ export const authNavItems = {
 
 export const controlNavItems: NavItem[] = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { title: "Users", href: "/users", icon: Users2 },
-  { title: "Candidates", href: "/candidates", icon: Users },
-  { title: "Job Posts", href: "/job-posts", icon: FileText },
+  { title: "Users", href: "/users", icon: Users2, roles: ["ROLE_ADMIN"] },
+  { title: "Job Posts", href: "/job-posts", icon: FileText, roles: ["ROLE_ADMIN", "ROLE_HR_MANAGER", "ROLE_HR"] },
+  { title: "Applications", href: "/applications", icon: ClipboardList, roles: ["ROLE_ADMIN", "ROLE_HR_MANAGER", "ROLE_HR"] },
+  { title: "HR Management", href: "/hr-management", icon: UserCog, roles: ["ROLE_ADMIN", "ROLE_HR_MANAGER"] },
   { title: "Settings", href: "/settings", icon: Settings },
 ]

@@ -1,13 +1,17 @@
 // Next.js Edge middleware for route protection based on auth_session cookie
 import { NextRequest, NextResponse } from 'next/server'
 
-// Routes requiring HR/Admin roles
-const CONTROL_ROUTES = ['/dashboard', '/candidates', '/job-posts', '/settings', '/users']
-// Routes that require any authenticated user (CANDIDATE)
+// Routes accessible to any control role (HR, HRM, Admin)
+const CONTROL_ROUTES = ['/dashboard', '/job-posts', '/settings', '/applications']
+// Routes restricted to HR Manager and Admin only
+const HRM_ROUTES = ['/hr-management']
+// Routes restricted to Admin only
+const ADMIN_ROUTES = ['/users']
+// Routes that require any authenticated user
 const CANDIDATE_ROUTES = ['/applied-jobs', '/saved-jobs', '/my-cvs', '/account-settings']
 // Auth pages that authenticated users should be redirected away from
 const AUTH_ROUTES = ['/login', '/register', '/forgot-password']
-// Roles that can access control (HR) routes
+// Roles that can access any control route
 const CONTROL_ROLES = ['ROLE_HR', 'ROLE_HR_MANAGER', 'ROLE_ADMIN']
 
 interface SessionPayload {
@@ -35,16 +39,26 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const session = parseSession(request)
   const isAuthenticated = session !== null
+  const roles = session?.roles ?? []
 
-  // Protect control (HR/Admin) routes
+  // Admin-only routes
+  if (ADMIN_ROUTES.some((r) => pathname.startsWith(r))) {
+    if (!isAuthenticated) return NextResponse.redirect(new URL('/login', request.url))
+    if (!roles.includes('ROLE_ADMIN')) return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
+  // HR Manager + Admin routes
+  if (HRM_ROUTES.some((r) => pathname.startsWith(r))) {
+    if (!isAuthenticated) return NextResponse.redirect(new URL('/login', request.url))
+    const allowed = roles.includes('ROLE_ADMIN') || roles.includes('ROLE_HR_MANAGER')
+    if (!allowed) return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
+  // General control routes (any HR/HRM/Admin)
   if (CONTROL_ROUTES.some((r) => pathname.startsWith(r))) {
-    if (!isAuthenticated) {
-      return NextResponse.redirect(new URL('/login', request.url))
-    }
-    const hasControlRole = session!.roles.some((r) => CONTROL_ROLES.includes(r))
-    if (!hasControlRole) {
-      return NextResponse.redirect(new URL('/', request.url))
-    }
+    if (!isAuthenticated) return NextResponse.redirect(new URL('/login', request.url))
+    const hasControlRole = roles.some((r) => CONTROL_ROLES.includes(r))
+    if (!hasControlRole) return NextResponse.redirect(new URL('/', request.url))
   }
 
   // Protect candidate-only routes (any authenticated user)
@@ -59,7 +73,7 @@ export function middleware(request: NextRequest) {
   // Redirect authenticated users away from auth pages
   if (AUTH_ROUTES.some((r) => pathname.startsWith(r))) {
     if (isAuthenticated) {
-      const isControlUser = session!.roles.some((r) => CONTROL_ROLES.includes(r))
+      const isControlUser = roles.some((r) => CONTROL_ROLES.includes(r))
       const dest = isControlUser ? '/dashboard' : '/'
       return NextResponse.redirect(new URL(dest, request.url))
     }
@@ -72,7 +86,6 @@ export const config = {
   matcher: [
     '/users/:path*',
     '/dashboard/:path*',
-    '/candidates/:path*',
     '/job-posts/:path*',
     '/settings/:path*',
     '/applied-jobs/:path*',
@@ -84,5 +97,8 @@ export const config = {
     '/register/:path*',
     '/forgot-password',
     '/forgot-password/:path*',
+    '/applications/:path*',
+    '/hr-management',
+    '/hr-management/:path*',
   ],
 }

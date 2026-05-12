@@ -158,3 +158,50 @@ export interface SubmitApplicationData {
   message: string;
 }
 
+// ---------------------------------------------------------------------------
+// HRM / HR management types
+// ---------------------------------------------------------------------------
+
+/** HR user within a company — GET /application/company/:companyNo/hr-users */
+export interface HRUser {
+  userId: string;
+  username: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  userRole: "HR_MANAGER" | "HR";
+  userStatus: string;
+  companyId: string;
+  companyName?: string;
+  companyNo?: string;
+  department?: string;
+  address?: string;
+  createdBy?: string;
+  createdDate?: string;
+}
+
+/** HR note on an application — GET /application/:id/notes */
+export interface ApplicationNote {
+  id: string;
+  author: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string | null;
+  candidateVisible: boolean;
+}
+
+/** PUT /application/:id/assign body */
+export interface AssignApplicationRequest {
+  assignedTo: string; // HR username
+}
+
+/** POST/PUT /application/:id/notes body */
+export interface NoteUpsertRequest {
+  content: string;
+  candidateVisible: boolean;
+}
+
+/** GET /application/job/:jobId/count response data */
+export interface JobApplicationCount {
+  count: number;
+}
