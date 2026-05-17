@@ -21,6 +21,9 @@ import {
   apiError,
   mockCompanyApplication,
   mockHRUser,
+  mockHRJobItem,
+  mockHRCandidateItem,
+  mockCandidateDetail,
   mockPaginationMeta,
 } from "../mocks/handlers";
 import HrmApplicationsClient from "@/app/(control)/applications/hrm-applications-client";
@@ -57,11 +60,12 @@ function asHrManager() {
   });
 }
 
-/** Register MSW handlers for the two endpoints HrmApplicationsClient fetches */
+/** Register MSW handlers for all endpoints HrmApplicationsClient fetches */
 function setupApplicationHandlers(
   applications = [mockCompanyApplication()],
   hrUsers = [mockHRUser()],
   meta = mockPaginationMeta({ totalElements: applications.length }),
+  jobs = [mockHRJobItem()],
 ) {
   server.use(
     http.get(`${API}/application/company/C001`, () =>
@@ -69,6 +73,15 @@ function setupApplicationHandlers(
     ),
     http.get(`${API}/application/company/C001/hr-users`, () =>
       apiSuccess(hrUsers),
+    ),
+    http.get(`${API}/application/company/C001/jobs`, () =>
+      apiSuccess({ items: jobs, meta: mockPaginationMeta({ totalElements: jobs.length }) }),
+    ),
+    http.get(`${API}/application/company/C001/candidates`, () =>
+      apiSuccess({ items: [mockHRCandidateItem()], meta: mockPaginationMeta() }),
+    ),
+    http.get(`${API}/application/company/C001/candidates/:username`, () =>
+      apiSuccess(mockCandidateDetail()),
     ),
   );
 }
@@ -175,6 +188,67 @@ describe("HrmApplicationsClient", () => {
       expect(
         screen.getByText(/no company associated with your account/i),
       ).toBeInTheDocument(),
+    );
+  });
+
+  it("renders job filter dropdown populated from the jobs API", async () => {
+    asHrManager();
+    const job = mockHRJobItem({ jobId: "job-001", title: "Senior React Dev" });
+    setupApplicationHandlers([mockCompanyApplication({ jobId: "job-001" })], [mockHRUser()], undefined, [job]);
+    render(<HrmApplicationsClient />);
+
+    // Wait for applications to load, then check the job filter dropdown
+    await waitFor(() => expect(screen.getByText("candidate1")).toBeInTheDocument());
+    const jobSelect = screen.getByDisplayValue("All jobs");
+    expect(jobSelect).toBeInTheDocument();
+    // The job title should appear as an option in the dropdown
+    expect(screen.getByRole("option", { name: "Senior React Dev" })).toBeInTheDocument();
+  });
+
+  it("client-side job filter hides applications for other jobs", async () => {
+    asHrManager();
+    const apps = [
+      mockCompanyApplication({ id: "app-001", username: "alice", jobId: "job-001" }),
+      mockCompanyApplication({ id: "app-002", username: "bob", jobId: "job-002" }),
+    ];
+    const jobs = [
+      mockHRJobItem({ jobId: "job-001", title: "Frontend Dev" }),
+      mockHRJobItem({ jobId: "job-002", title: "Backend Dev" }),
+    ];
+    setupApplicationHandlers(apps, [mockHRUser()], mockPaginationMeta({ totalElements: 2 }), jobs);
+    render(<HrmApplicationsClient />);
+
+    await waitFor(() => expect(screen.getByText("alice")).toBeInTheDocument());
+    expect(screen.getByText("bob")).toBeInTheDocument();
+
+    // Select "Frontend Dev" job filter
+    const jobSelect = screen.getByDisplayValue("All jobs");
+    await userEvent.selectOptions(jobSelect, "job-001");
+
+    // bob (job-002) should be hidden, alice (job-001) should remain
+    await waitFor(() =>
+      expect(screen.queryByText("bob")).not.toBeInTheDocument(),
+    );
+    expect(screen.getByText("alice")).toBeInTheDocument();
+  });
+
+  it("can switch to Candidates tab", async () => {
+    asHrManager();
+    setupApplicationHandlers();
+    render(<HrmApplicationsClient />);
+
+    // Wait for initial load
+    await waitFor(() =>
+      expect(screen.getByRole("heading", { name: /applications/i })).toBeInTheDocument(),
+    );
+
+    // Click the Candidates tab
+    const candidatesTab = screen.getByRole("button", { name: /candidates/i });
+    await userEvent.click(candidatesTab);
+
+    // Candidates tab should show a table with the candidate from the mock
+    await waitFor(() =>
+      expect(screen.getByText("Candidate One")).toBeInTheDocument(),
     );
   });
 });

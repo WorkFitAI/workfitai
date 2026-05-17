@@ -13,6 +13,9 @@ import {
   mockApplicationNote,
   mockPaginationMeta,
   mockCompanyApplication,
+  mockHRJobItem,
+  mockHRCandidateItem,
+  mockCandidateDetail,
 } from "../../mocks/handlers";
 import { applicationService } from "@/lib/application/application-service";
 
@@ -239,5 +242,233 @@ describe("deleteApplicationNote", () => {
     await applicationService.deleteApplicationNote("app-001", "note-001");
     expect(capturedMethod).toBe("DELETE");
     expect(capturedUrl).toContain("/application/app-001/notes/note-001");
+  });
+});
+
+// ── getHRJobs ─────────────────────────────────────────────────────────────────
+
+describe("getHRJobs", () => {
+  it("calls GET /application/hr/jobs with page and size params", async () => {
+    let capturedUrl = "";
+    server.use(
+      http.get(`${API}/application/hr/jobs`, ({ request }) => {
+        capturedUrl = request.url;
+        return apiSuccess({ items: [mockHRJobItem()], meta: mockPaginationMeta() });
+      }),
+    );
+    await applicationService.getHRJobs(0, 20);
+    expect(capturedUrl).toContain("/application/hr/jobs");
+    expect(capturedUrl).toContain("page=0");
+    expect(capturedUrl).toContain("size=20");
+  });
+
+  it("appends jobTitle param when provided", async () => {
+    let capturedUrl = "";
+    server.use(
+      http.get(`${API}/application/hr/jobs`, ({ request }) => {
+        capturedUrl = request.url;
+        return apiSuccess({ items: [], meta: mockPaginationMeta({ totalElements: 0 }) });
+      }),
+    );
+    await applicationService.getHRJobs(0, 20, "Engineer");
+    expect(capturedUrl).toContain("jobTitle=Engineer");
+  });
+
+  it("returns items and meta on success", async () => {
+    const job = mockHRJobItem({ title: "Backend Dev", totalApplicants: 10 });
+    server.use(
+      http.get(`${API}/application/hr/jobs`, () =>
+        apiSuccess({ items: [job], meta: mockPaginationMeta({ totalElements: 1 }) }),
+      ),
+    );
+    const res = await applicationService.getHRJobs(0, 20);
+    expect(res.data?.items[0].title).toBe("Backend Dev");
+    expect(res.data?.items[0].totalApplicants).toBe(10);
+  });
+});
+
+// ── getHRCandidates ───────────────────────────────────────────────────────────
+
+describe("getHRCandidates", () => {
+  it("calls GET /application/hr/candidates with page and size params", async () => {
+    let capturedUrl = "";
+    server.use(
+      http.get(`${API}/application/hr/candidates`, ({ request }) => {
+        capturedUrl = request.url;
+        return apiSuccess({ items: [mockHRCandidateItem()], meta: mockPaginationMeta() });
+      }),
+    );
+    await applicationService.getHRCandidates(0, 20);
+    expect(capturedUrl).toContain("/application/hr/candidates");
+    expect(capturedUrl).toContain("page=0");
+    expect(capturedUrl).toContain("size=20");
+  });
+
+  it("appends status param when provided", async () => {
+    let capturedUrl = "";
+    server.use(
+      http.get(`${API}/application/hr/candidates`, ({ request }) => {
+        capturedUrl = request.url;
+        return apiSuccess({ items: [], meta: mockPaginationMeta({ totalElements: 0 }) });
+      }),
+    );
+    await applicationService.getHRCandidates(0, 20, "REVIEWING");
+    expect(capturedUrl).toContain("status=REVIEWING");
+  });
+
+  it("returns candidate items on success", async () => {
+    const candidate = mockHRCandidateItem({ fullName: "Jane Doe", applicationCount: 3 });
+    server.use(
+      http.get(`${API}/application/hr/candidates`, () =>
+        apiSuccess({ items: [candidate], meta: mockPaginationMeta() }),
+      ),
+    );
+    const res = await applicationService.getHRCandidates(0, 20);
+    expect(res.data?.items[0].fullName).toBe("Jane Doe");
+    expect(res.data?.items[0].applicationCount).toBe(3);
+  });
+});
+
+// ── getHRCandidateDetail ──────────────────────────────────────────────────────
+
+describe("getHRCandidateDetail", () => {
+  it("calls GET /application/hr/candidates/:username", async () => {
+    let capturedUrl = "";
+    server.use(
+      http.get(`${API}/application/hr/candidates/:username`, ({ request }) => {
+        capturedUrl = request.url;
+        return apiSuccess(mockCandidateDetail());
+      }),
+    );
+    await applicationService.getHRCandidateDetail("candidate1");
+    expect(capturedUrl).toContain("/application/hr/candidates/candidate1");
+  });
+
+  it("returns full candidate detail with applications", async () => {
+    const detail = mockCandidateDetail({ username: "jdoe", totalApplications: 2 });
+    server.use(
+      http.get(`${API}/application/hr/candidates/:username`, () =>
+        apiSuccess(detail),
+      ),
+    );
+    const res = await applicationService.getHRCandidateDetail("jdoe");
+    expect(res.data?.username).toBe("jdoe");
+    expect(res.data?.totalApplications).toBe(2);
+  });
+});
+
+// ── getCompanyJobs ────────────────────────────────────────────────────────────
+
+describe("getCompanyJobs", () => {
+  it("calls GET /application/company/:companyNo/jobs with page and size params", async () => {
+    let capturedUrl = "";
+    server.use(
+      http.get(`${API}/application/company/:companyNo/jobs`, ({ request }) => {
+        capturedUrl = request.url;
+        return apiSuccess({ items: [mockHRJobItem()], meta: mockPaginationMeta() });
+      }),
+    );
+    await applicationService.getCompanyJobs("C001", 0, 20);
+    expect(capturedUrl).toContain("/application/company/C001/jobs");
+    expect(capturedUrl).toContain("page=0");
+    expect(capturedUrl).toContain("size=20");
+  });
+
+  it("appends jobTitle param when provided", async () => {
+    let capturedUrl = "";
+    server.use(
+      http.get(`${API}/application/company/:companyNo/jobs`, ({ request }) => {
+        capturedUrl = request.url;
+        return apiSuccess({ items: [], meta: mockPaginationMeta({ totalElements: 0 }) });
+      }),
+    );
+    await applicationService.getCompanyJobs("C001", 0, 20, "Developer");
+    expect(capturedUrl).toContain("jobTitle=Developer");
+  });
+
+  it("uses companyNo in the URL path", async () => {
+    let capturedUrl = "";
+    server.use(
+      http.get(`${API}/application/company/:companyNo/jobs`, ({ request }) => {
+        capturedUrl = request.url;
+        return apiSuccess({ items: [], meta: mockPaginationMeta({ totalElements: 0 }) });
+      }),
+    );
+    await applicationService.getCompanyJobs("ACME-99", 0, 20);
+    expect(capturedUrl).toContain("/application/company/ACME-99/jobs");
+  });
+});
+
+// ── getCompanyCandidates ──────────────────────────────────────────────────────
+
+describe("getCompanyCandidates", () => {
+  it("calls GET /application/company/:companyNo/candidates with page and size", async () => {
+    let capturedUrl = "";
+    server.use(
+      http.get(`${API}/application/company/:companyNo/candidates`, ({ request }) => {
+        capturedUrl = request.url;
+        return apiSuccess({ items: [mockHRCandidateItem()], meta: mockPaginationMeta() });
+      }),
+    );
+    await applicationService.getCompanyCandidates("C001", 0, 20);
+    expect(capturedUrl).toContain("/application/company/C001/candidates");
+    expect(capturedUrl).toContain("page=0");
+    expect(capturedUrl).toContain("size=20");
+  });
+
+  it("appends status param when provided", async () => {
+    let capturedUrl = "";
+    server.use(
+      http.get(`${API}/application/company/:companyNo/candidates`, ({ request }) => {
+        capturedUrl = request.url;
+        return apiSuccess({ items: [], meta: mockPaginationMeta({ totalElements: 0 }) });
+      }),
+    );
+    await applicationService.getCompanyCandidates("C001", 0, 20, "HIRED");
+    expect(capturedUrl).toContain("status=HIRED");
+  });
+
+  it("returns candidate items on success", async () => {
+    const candidate = mockHRCandidateItem({ username: "alice", latestStatus: "REVIEWING" });
+    server.use(
+      http.get(`${API}/application/company/:companyNo/candidates`, () =>
+        apiSuccess({ items: [candidate], meta: mockPaginationMeta() }),
+      ),
+    );
+    const res = await applicationService.getCompanyCandidates("C001", 0, 20);
+    expect(res.data?.items[0].username).toBe("alice");
+    expect(res.data?.items[0].latestStatus).toBe("REVIEWING");
+  });
+});
+
+// ── getCompanyCandidateDetail ─────────────────────────────────────────────────
+
+describe("getCompanyCandidateDetail", () => {
+  it("calls GET /application/company/:companyNo/candidates/:username", async () => {
+    let capturedUrl = "";
+    server.use(
+      http.get(
+        `${API}/application/company/:companyNo/candidates/:username`,
+        ({ request }) => {
+          capturedUrl = request.url;
+          return apiSuccess(mockCandidateDetail());
+        },
+      ),
+    );
+    await applicationService.getCompanyCandidateDetail("C001", "candidate1");
+    expect(capturedUrl).toContain("/application/company/C001/candidates/candidate1");
+  });
+
+  it("returns full candidate detail with applications", async () => {
+    const detail = mockCandidateDetail({ username: "bob", totalApplications: 5 });
+    server.use(
+      http.get(
+        `${API}/application/company/:companyNo/candidates/:username`,
+        () => apiSuccess(detail),
+      ),
+    );
+    const res = await applicationService.getCompanyCandidateDetail("C001", "bob");
+    expect(res.data?.username).toBe("bob");
+    expect(res.data?.totalApplications).toBe(5);
   });
 });

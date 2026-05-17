@@ -70,7 +70,7 @@ setup("create and publish test job as HRM1", async ({ page }) => {
   await expect(dialog).toBeVisible({ timeout: 8_000 });
 
   // ── Fill required fields ────────────────────────────────────────────────
-  await page.getByLabel("Job Title").fill("E2E Test Job - Frontend Engineer");
+  await page.getByLabel("Job Title").fill("E2E Test Job - Backend Engineer");
   await page
     .getByPlaceholder("Brief overview for job listing...")
     .fill("Automated test job created for E2E testing purposes only");
@@ -235,7 +235,7 @@ setup("create and publish test job as HRM1", async ({ page }) => {
     JSON.stringify(
       {
         jobId: createdJobId,
-        jobTitle: "E2E Test Job - Frontend Engineer",
+        jobTitle: "E2E Test Job - Backend Engineer",
         createdAt: new Date().toISOString(),
       },
       null,

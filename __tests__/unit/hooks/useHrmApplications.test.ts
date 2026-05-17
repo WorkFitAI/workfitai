@@ -1,6 +1,8 @@
 /**
  * Unit tests — useCompanyHRManagement, useApproveHR, useRejectHR hooks
  * from hooks/useHrManagement.ts
+ * Also covers: useHRJobs, useHRCandidates, useCompanyJobs, useCompanyCandidates
+ * from hooks/useHrmApplications.ts
  */
 import {
   describe,
@@ -14,12 +16,25 @@ import {
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { server } from "../../mocks/server";
-import { apiSuccess, apiError, mockHRUser } from "../../mocks/handlers";
+import {
+  apiSuccess,
+  apiError,
+  mockHRUser,
+  mockHRJobItem,
+  mockHRCandidateItem,
+  mockPaginationMeta,
+} from "../../mocks/handlers";
 import {
   useCompanyHRManagement,
   useApproveHR,
   useRejectHR,
 } from "@/hooks/useHrManagement";
+import {
+  useHRJobs,
+  useHRCandidates,
+  useCompanyJobs,
+  useCompanyCandidates,
+} from "@/hooks/useHrmApplications";
 
 const API = "https://be.workfitai.uk";
 
@@ -261,5 +276,218 @@ describe("useRejectHR", () => {
     });
     expect(result.current.rejectError).toBe("Reject failed");
     expect(mockToast.error).toHaveBeenCalledWith("Reject failed");
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// hooks/useHrmApplications.ts — new hooks
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── useHRJobs ─────────────────────────────────────────────────────────────────
+
+describe("useHRJobs", () => {
+  it("starts with loading=true then resolves with jobs", async () => {
+    const job = mockHRJobItem({ title: "Backend Dev" });
+    server.use(
+      http.get(`${API}/application/hr/jobs`, () =>
+        apiSuccess({ items: [job], meta: mockPaginationMeta() }),
+      ),
+    );
+    const { result } = renderHook(() => useHRJobs(1, 20));
+    expect(result.current.loading).toBe(true);
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.jobs).toHaveLength(1);
+    expect(result.current.jobs[0].title).toBe("Backend Dev");
+  });
+
+  it("sets error when API returns failure", async () => {
+    server.use(
+      http.get(`${API}/application/hr/jobs`, () => apiError("Server error", 500)),
+    );
+    const { result } = renderHook(() => useHRJobs(1, 20));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.error).toMatch(/Failed to load jobs/i);
+    expect(result.current.jobs).toHaveLength(0);
+  });
+
+  it("returns empty array when API data is null", async () => {
+    server.use(
+      http.get(`${API}/application/hr/jobs`, () =>
+        HttpResponse.json({ success: true, message: "OK", data: null }),
+      ),
+    );
+    const { result } = renderHook(() => useHRJobs(1, 20));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.jobs).toHaveLength(0);
+  });
+
+  it("refresh() re-triggers fetch and updates results", async () => {
+    let callCount = 0;
+    server.use(
+      http.get(`${API}/application/hr/jobs`, () => {
+        callCount++;
+        return apiSuccess({ items: [mockHRJobItem()], meta: mockPaginationMeta() });
+      }),
+    );
+    const { result } = renderHook(() => useHRJobs(1, 20));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(callCount).toBe(1);
+
+    act(() => { result.current.refresh(); });
+    await waitFor(() => expect(callCount).toBe(2));
+  });
+});
+
+// ── useHRCandidates ───────────────────────────────────────────────────────────
+
+describe("useHRCandidates", () => {
+  it("starts with loading=true then resolves with candidates", async () => {
+    const candidate = mockHRCandidateItem({ fullName: "Jane Doe" });
+    server.use(
+      http.get(`${API}/application/hr/candidates`, () =>
+        apiSuccess({ items: [candidate], meta: mockPaginationMeta() }),
+      ),
+    );
+    const { result } = renderHook(() => useHRCandidates(1, 20));
+    expect(result.current.loading).toBe(true);
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.candidates).toHaveLength(1);
+    expect(result.current.candidates[0].fullName).toBe("Jane Doe");
+  });
+
+  it("sets error when API returns failure", async () => {
+    server.use(
+      http.get(`${API}/application/hr/candidates`, () => apiError("Server error", 500)),
+    );
+    const { result } = renderHook(() => useHRCandidates(1, 20));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.error).toMatch(/Failed to load candidates/i);
+    expect(result.current.candidates).toHaveLength(0);
+  });
+
+  it("returns empty array when API data is null", async () => {
+    server.use(
+      http.get(`${API}/application/hr/candidates`, () =>
+        HttpResponse.json({ success: true, message: "OK", data: null }),
+      ),
+    );
+    const { result } = renderHook(() => useHRCandidates(1, 20));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.candidates).toHaveLength(0);
+  });
+});
+
+// ── useCompanyJobs ────────────────────────────────────────────────────────────
+
+describe("useCompanyJobs", () => {
+  it("starts with loading=true then resolves with jobs", async () => {
+    const job = mockHRJobItem({ title: "Frontend Dev", totalApplicants: 8 });
+    server.use(
+      http.get(`${API}/application/company/:companyNo/jobs`, () =>
+        apiSuccess({ items: [job], meta: mockPaginationMeta() }),
+      ),
+    );
+    const { result } = renderHook(() => useCompanyJobs("C001", 1, 20));
+    expect(result.current.loading).toBe(true);
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.jobs).toHaveLength(1);
+    expect(result.current.jobs[0].title).toBe("Frontend Dev");
+    expect(result.current.jobs[0].totalApplicants).toBe(8);
+  });
+
+  it("does not fetch when companyNo is empty", async () => {
+    let callCount = 0;
+    server.use(
+      http.get(`${API}/application/company/:companyNo/jobs`, () => {
+        callCount++;
+        return apiSuccess({ items: [mockHRJobItem()], meta: mockPaginationMeta() });
+      }),
+    );
+    renderHook(() => useCompanyJobs("", 1, 20));
+    await new Promise((r) => setTimeout(r, 50));
+    expect(callCount).toBe(0);
+  });
+
+  it("sets error when API returns failure", async () => {
+    server.use(
+      http.get(`${API}/application/company/:companyNo/jobs`, () =>
+        apiError("Server error", 500),
+      ),
+    );
+    const { result } = renderHook(() => useCompanyJobs("C001", 1, 20));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.error).toMatch(/Failed to load jobs/i);
+    expect(result.current.jobs).toHaveLength(0);
+  });
+
+  it("returns empty array when API data is null", async () => {
+    server.use(
+      http.get(`${API}/application/company/:companyNo/jobs`, () =>
+        HttpResponse.json({ success: true, message: "OK", data: null }),
+      ),
+    );
+    const { result } = renderHook(() => useCompanyJobs("C001", 1, 20));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.jobs).toHaveLength(0);
+  });
+});
+
+// ── useCompanyCandidates ──────────────────────────────────────────────────────
+
+describe("useCompanyCandidates", () => {
+  it("starts with loading=true then resolves with candidates", async () => {
+    const candidate = mockHRCandidateItem({ username: "alice", applicationCount: 3 });
+    server.use(
+      http.get(`${API}/application/company/:companyNo/candidates`, () =>
+        apiSuccess({ items: [candidate], meta: mockPaginationMeta() }),
+      ),
+    );
+    const { result } = renderHook(() => useCompanyCandidates("C001", 1, 20));
+    expect(result.current.loading).toBe(true);
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.candidates).toHaveLength(1);
+    expect(result.current.candidates[0].username).toBe("alice");
+    expect(result.current.candidates[0].applicationCount).toBe(3);
+  });
+
+  it("does not fetch when companyNo is empty", async () => {
+    let callCount = 0;
+    server.use(
+      http.get(`${API}/application/company/:companyNo/candidates`, () => {
+        callCount++;
+        return apiSuccess({ items: [], meta: mockPaginationMeta({ totalElements: 0 }) });
+      }),
+    );
+    renderHook(() => useCompanyCandidates("", 1, 20));
+    await new Promise((r) => setTimeout(r, 50));
+    expect(callCount).toBe(0);
+  });
+
+  it("sets error when API returns failure", async () => {
+    server.use(
+      http.get(`${API}/application/company/:companyNo/candidates`, () =>
+        apiError("Server error", 500),
+      ),
+    );
+    const { result } = renderHook(() => useCompanyCandidates("C001", 1, 20));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.error).toMatch(/Failed to load candidates/i);
+    expect(result.current.candidates).toHaveLength(0);
+  });
+
+  it("refresh() re-triggers fetch", async () => {
+    let callCount = 0;
+    server.use(
+      http.get(`${API}/application/company/:companyNo/candidates`, () => {
+        callCount++;
+        return apiSuccess({ items: [mockHRCandidateItem()], meta: mockPaginationMeta() });
+      }),
+    );
+    const { result } = renderHook(() => useCompanyCandidates("C001", 1, 20));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(callCount).toBe(1);
+
+    act(() => { result.current.refresh(); });
+    await waitFor(() => expect(callCount).toBe(2));
   });
 });

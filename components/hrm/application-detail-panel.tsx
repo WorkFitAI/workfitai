@@ -47,7 +47,7 @@ export function ApplicationDetailPanel({
         <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
 
         {/* Panel — extended wide to accommodate CV preview on the right */}
-        <div className="relative ml-auto flex h-full w-[60vw] flex-col bg-white shadow-2xl overflow-hidden">
+        <div className="relative ml-auto flex h-full w-[70vw] flex-col bg-white shadow-2xl overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 shrink-0">
             <div className="min-w-0">
@@ -72,7 +72,7 @@ export function ApplicationDetailPanel({
           {/* Two-column body: left = details, right = CV preview */}
           <div className="flex flex-1 overflow-hidden min-h-0">
             {/* Left pane — scrollable details */}
-            <div className="w-150 shrink-0 overflow-y-auto border-r border-gray-100 p-6 space-y-6">
+            <div className="w-100 shrink-0 overflow-y-auto border-r border-gray-100 p-6 space-y-6">
               {/* Job info */}
               <section>
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Job Details</h3>

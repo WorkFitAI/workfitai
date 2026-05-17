@@ -3,12 +3,20 @@
 import { type ApplicationStatus } from "@/types/application";
 import { STATUS_FLOW } from "./application-table";
 
+interface JobOption {
+  jobId: string;
+  title: string;
+}
+
 interface ApplicationFiltersProps {
   statusFilter: ApplicationStatus | "";
   onStatusChange: (s: ApplicationStatus | "") => void;
   searchQuery: string;
   onSearchChange: (q: string) => void;
   total: number;
+  jobs?: JobOption[];
+  jobFilter?: string;
+  onJobChange?: (jobId: string) => void;
 }
 
 export function ApplicationFilters({
@@ -17,9 +25,12 @@ export function ApplicationFilters({
   searchQuery,
   onSearchChange,
   total,
+  jobs,
+  jobFilter,
+  onJobChange,
 }: ApplicationFiltersProps) {
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 flex-wrap">
       {/* Search input */}
       <div className="relative flex-1 min-w-0">
         <svg
@@ -44,6 +55,22 @@ export function ApplicationFilters({
           className="w-full rounded-lg border border-gray-200 bg-white pl-9 pr-4 py-2 text-sm placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       </div>
+
+      {/* Job filter — shown only when jobs list is provided */}
+      {jobs && onJobChange && (
+        <select
+          value={jobFilter ?? ""}
+          onChange={(e) => onJobChange(e.target.value)}
+          className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 max-w-56 truncate"
+        >
+          <option value="">All jobs</option>
+          {jobs.map((j) => (
+            <option key={j.jobId} value={j.jobId}>
+              {j.title}
+            </option>
+          ))}
+        </select>
+      )}
 
       {/* Status filter */}
       <select

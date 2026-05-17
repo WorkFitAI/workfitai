@@ -205,3 +205,62 @@ export interface NoteUpsertRequest {
 export interface JobApplicationCount {
   count: number;
 }
+
+// ---------------------------------------------------------------------------
+// HR/HRM jobs & candidates views (new structured endpoints)
+// ---------------------------------------------------------------------------
+
+/** Single job item from GET /application/hr/jobs or /application/company/:no/jobs */
+export interface HRJobItem {
+  jobId: string;
+  title: string;
+  shortDescription: string;
+  location: string;
+  employmentType: string;
+  experienceLevel: string;
+  salaryMin: number;
+  salaryMax: number;
+  currency: string;
+  expiresAt: string;
+  jobStatus: string;
+  skillNames: string[];
+  totalApplicants: number;
+  statusBreakdown: Record<string, number>;
+}
+
+/** Candidate summary from GET /application/hr/candidates or /application/company/:no/candidates */
+export interface HRCandidateItem {
+  username: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  userStatus: string;
+  applicationCount: number;
+  latestStatus: ApplicationStatus;
+  latestApplicationDate: string;
+  appliedJobTitles: string[];
+}
+
+/** Candidate detail from GET /application/hr/candidates/:username or /application/company/:no/candidates/:username */
+export interface CandidateDetail {
+  username: string;
+  userId: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  userStatus: string;
+  applications: Application[];
+  totalApplications: number;
+}
+
+/** Paginated jobs list response */
+export interface HRJobListData {
+  items: HRJobItem[];
+  meta: PaginationMeta;
+}
+
+/** Paginated candidates list response */
+export interface CandidateListData {
+  items: HRCandidateItem[];
+  meta: PaginationMeta;
+}

@@ -6,6 +6,9 @@ import type {
   PaginationMeta,
   StatusHistoryItem,
   SubmitApplicationData,
+  HRJobItem,
+  HRCandidateItem,
+  CandidateDetail,
 } from "@/types/application";
 import type { CVMetadata, CVListResponse } from "@/types/cv";
 
@@ -208,6 +211,59 @@ export function mockApplicationNote(
     candidateVisible: false,
     createdAt: "2026-01-15T10:00:00Z",
     updatedAt: "2026-01-15T10:00:00Z",
+    ...overrides,
+  };
+}
+
+export function mockHRJobItem(overrides: Partial<HRJobItem> = {}): HRJobItem {
+  return {
+    jobId: "job-001",
+    title: "Frontend Engineer",
+    shortDescription: "Build great UIs",
+    location: "Ho Chi Minh City",
+    employmentType: "FULL_TIME",
+    experienceLevel: "Mid",
+    salaryMin: 2000,
+    salaryMax: 4000,
+    currency: "USD",
+    expiresAt: "2026-06-01T00:00:00Z",
+    jobStatus: "OPEN",
+    skillNames: ["React", "TypeScript"],
+    totalApplicants: 5,
+    statusBreakdown: { APPLIED: 3, REVIEWING: 2 },
+    ...overrides,
+  };
+}
+
+export function mockHRCandidateItem(
+  overrides: Partial<HRCandidateItem> = {},
+): HRCandidateItem {
+  return {
+    username: "candidate1",
+    fullName: "Candidate One",
+    email: "candidate1@example.com",
+    phoneNumber: "+84900000001",
+    userStatus: "ACTIVE",
+    applicationCount: 2,
+    latestStatus: "APPLIED" as ApplicationStatus,
+    latestApplicationDate: "2026-01-15T08:00:00Z",
+    appliedJobTitles: ["Frontend Engineer", "Backend Developer"],
+    ...overrides,
+  };
+}
+
+export function mockCandidateDetail(
+  overrides: Partial<CandidateDetail> = {},
+): CandidateDetail {
+  return {
+    username: "candidate1",
+    userId: "user-001",
+    fullName: "Candidate One",
+    email: "candidate1@example.com",
+    phoneNumber: "+84900000001",
+    userStatus: "ACTIVE",
+    applications: [mockApplication()],
+    totalApplications: 1,
     ...overrides,
   };
 }
@@ -431,9 +487,36 @@ export const handlers = [
     ),
   ),
 
+  // ── HR Jobs & Candidates ──────────────────────────────────────────────────
+  http.get(`${API}/application/hr/jobs`, () =>
+    apiSuccess({ items: [mockHRJobItem()], meta: mockPaginationMeta() }),
+  ),
+
+  // More-specific path registered before the wildcard variant
+  http.get(`${API}/application/hr/candidates/:username`, () =>
+    apiSuccess(mockCandidateDetail()),
+  ),
+
+  http.get(`${API}/application/hr/candidates`, () =>
+    apiSuccess({ items: [mockHRCandidateItem()], meta: mockPaginationMeta() }),
+  ),
+
   // ── HRM Company Applications ──────────────────────────────────────────
   http.get(`${API}/application/company/:companyNo/hr-users`, () =>
     apiSuccess([mockHRUser()]),
+  ),
+
+  http.get(`${API}/application/company/:companyNo/jobs`, () =>
+    apiSuccess({ items: [mockHRJobItem()], meta: mockPaginationMeta() }),
+  ),
+
+  // More-specific path registered before the wildcard variant
+  http.get(`${API}/application/company/:companyNo/candidates/:username`, () =>
+    apiSuccess(mockCandidateDetail()),
+  ),
+
+  http.get(`${API}/application/company/:companyNo/candidates`, () =>
+    apiSuccess({ items: [mockHRCandidateItem()], meta: mockPaginationMeta() }),
   ),
 
   http.get(`${API}/application/company/:companyNo`, () =>
