@@ -53,6 +53,69 @@ describe('middleware — route protection', () => {
   })
 })
 
+describe('middleware — admin routes (/users)', () => {
+  it('redirects unauthenticated user from /users to /login', () => {
+    const req = makeRequest('/users')
+    const res = middleware(req)
+    expect(res?.headers.get('location')).toContain('/login')
+  })
+
+  it('redirects authenticated non-admin (ROLE_HR) from /users to /dashboard', () => {
+    const req = makeRequest('/users', makeSession(['ROLE_HR']))
+    const res = middleware(req)
+    expect(res?.headers.get('location')).toContain('/dashboard')
+  })
+
+  it('allows ROLE_ADMIN to access /users', () => {
+    const req = makeRequest('/users', makeSession(['ROLE_ADMIN']))
+    const res = middleware(req)
+    expect(res?.headers.get('location')).toBeNull()
+  })
+})
+
+describe('middleware — HRM routes (/hr-management)', () => {
+  it('redirects unauthenticated user from /hr-management to /login', () => {
+    const req = makeRequest('/hr-management')
+    const res = middleware(req)
+    expect(res?.headers.get('location')).toContain('/login')
+  })
+
+  it('redirects ROLE_HR (not HRM/Admin) from /hr-management to /dashboard', () => {
+    const req = makeRequest('/hr-management', makeSession(['ROLE_HR']))
+    const res = middleware(req)
+    expect(res?.headers.get('location')).toContain('/dashboard')
+  })
+
+  it('allows ROLE_HR_MANAGER to access /hr-management', () => {
+    const req = makeRequest('/hr-management', makeSession(['ROLE_HR_MANAGER']))
+    const res = middleware(req)
+    expect(res?.headers.get('location')).toBeNull()
+  })
+
+  it('allows ROLE_ADMIN to access /hr-management', () => {
+    const req = makeRequest('/hr-management', makeSession(['ROLE_ADMIN']))
+    const res = middleware(req)
+    expect(res?.headers.get('location')).toBeNull()
+  })
+})
+
+describe('middleware — candidate routes (/applied-jobs)', () => {
+  it('redirects unauthenticated user from /applied-jobs to /login with callbackUrl', () => {
+    const req = makeRequest('/applied-jobs')
+    const res = middleware(req)
+    const location = res?.headers.get('location') ?? ''
+    expect(location).toContain('/login')
+    expect(location).toContain('callbackUrl')
+    expect(decodeURIComponent(location)).toContain('/applied-jobs')
+  })
+
+  it('allows authenticated user to access /applied-jobs', () => {
+    const req = makeRequest('/applied-jobs', makeSession(['ROLE_USER']))
+    const res = middleware(req)
+    expect(res?.headers.get('location')).toBeNull()
+  })
+})
+
 describe('middleware — auth page redirect', () => {
   it('redirects authenticated candidate from /login to /', () => {
     const req = makeRequest('/login', makeSession(['ROLE_USER']))

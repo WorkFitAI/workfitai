@@ -23,6 +23,12 @@ test.describe('Homepage', () => {
     await expect(page.getByRole('link', { name: 'Home' })).toBeVisible()
     await expect(page.getByRole('link', { name: 'Jobs List' })).toBeVisible()
   })
+})
+
+// Requires unauthenticated state — candidate storageState causes middleware to
+// redirect /login → / so the Sign in link is never visited.
+test.describe('Homepage unauthenticated', () => {
+  test.use({ storageState: { cookies: [], origins: [] } })
 
   test('Sign in button navigates to login', async ({ page }) => {
     await page.goto('/')

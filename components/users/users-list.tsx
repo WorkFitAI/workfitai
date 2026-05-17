@@ -15,6 +15,8 @@ import {
   ArrowUp,
   ArrowDown,
   ArrowUpDown,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react"
 import { useAdminUsers } from "@/hooks/useAdminUsers"
 import { adminUserService } from "@/lib/admin/admin-user-service"
@@ -22,6 +24,7 @@ import { UserStatusBadge } from "@/components/users/user-status-badge"
 import { UserRoleBadge } from "@/components/users/user-role-badge"
 import { ApprovalQueueButton } from "@/components/users/approval-queue"
 import { useAuth } from "@/contexts/auth-context"
+import { toast } from "sonner"
 import type { AdminUserRole, AdminUserStatus, EsUserHit } from "@/types/admin-user"
 
 /** Returns true for statuses that should show the Unblock action */
@@ -211,6 +214,8 @@ export function UsersList() {
   const [roleFilter, setRoleFilter] = useState<AdminUserRole | "">("")
   const [confirm, setConfirm] = useState<ConfirmState | null>(null)
   const [actionId, setActionId] = useState<string | null>(null)
+  const [approveId, setApproveId] = useState<string | null>(null)
+  const [rejectId, setRejectId] = useState<string | null>(null)
 
   // Sort state
   const [sortKey, setSortKey] = useState<SortKey | null>(null)
@@ -257,17 +262,54 @@ export function UsersList() {
       setActionId(confirm.user.userId)
       if (confirm.type === "block") {
         await adminUserService.setUserBlocked(confirm.user.userId, true)
+        toast.success(`${confirm.user.fullName} has been blocked`)
       } else if (confirm.type === "unblock") {
         await adminUserService.setUserBlocked(confirm.user.userId, false)
+        toast.success(`${confirm.user.fullName} has been unblocked`)
       } else if (confirm.type === "delete") {
         await adminUserService.deleteUser(confirm.user.userId)
+        toast.success(`${confirm.user.fullName} has been deleted`)
       }
       setConfirm(null)
       refresh()
     } catch {
-      // error shown via refresh
+      toast.error("Action failed. Please try again.")
     } finally {
       setActionId(null)
+    }
+  }
+
+  async function handleApprove(user: EsUserHit) {
+    try {
+      setApproveId(user.userId)
+      if (user.role === "HR_MANAGER") {
+        await adminUserService.approveManager(user.username)
+      } else {
+        await adminUserService.approveHR(user.username)
+      }
+      toast.success(`${user.fullName} approved successfully`)
+      refresh()
+    } catch {
+      toast.error(`Failed to approve ${user.fullName}`)
+    } finally {
+      setApproveId(null)
+    }
+  }
+
+  async function handleReject(user: EsUserHit) {
+    try {
+      setRejectId(user.userId)
+      if (user.role === "HR_MANAGER") {
+        await adminUserService.rejectManager(user.username)
+      } else {
+        await adminUserService.rejectHR(user.username)
+      }
+      toast.success(`${user.fullName} has been rejected`)
+      refresh()
+    } catch {
+      toast.error(`Failed to reject ${user.fullName}`)
+    } finally {
+      setRejectId(null)
     }
   }
 
@@ -439,6 +481,48 @@ export function UsersList() {
                             <ShieldOff className="h-4 w-4" />
                           )}
                         </button>
+
+                        {/* Approve / Reject — HR_MANAGER needs ADMIN approval; HR needs HR_MANAGER approval */}
+                        {u.status === "WAIT_APPROVED" && u.role === "HR_MANAGER" && authUser?.roles?.includes("ROLE_ADMIN") && (
+                          <>
+                            <button
+                              title="Approve HR Manager"
+                              onClick={(e) => { e.stopPropagation(); handleApprove(u) }}
+                              disabled={approveId === u.userId || rejectId === u.userId}
+                              className="flex h-7 w-7 items-center justify-center rounded-lg text-blue-600 hover:bg-blue-50 transition-colors disabled:opacity-40"
+                            >
+                              {approveId === u.userId ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+                            </button>
+                            <button
+                              title="Reject HR Manager"
+                              onClick={(e) => { e.stopPropagation(); handleReject(u) }}
+                              disabled={rejectId === u.userId || approveId === u.userId}
+                              className="flex h-7 w-7 items-center justify-center rounded-lg text-red-500 hover:bg-red-50 transition-colors disabled:opacity-40"
+                            >
+                              {rejectId === u.userId ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4" />}
+                            </button>
+                          </>
+                        )}
+                        {u.status === "WAIT_APPROVED" && u.role === "HR" && authUser?.roles?.includes("ROLE_HR_MANAGER") && (
+                          <>
+                            <button
+                              title="Approve HR"
+                              onClick={(e) => { e.stopPropagation(); handleApprove(u) }}
+                              disabled={approveId === u.userId || rejectId === u.userId}
+                              className="flex h-7 w-7 items-center justify-center rounded-lg text-blue-600 hover:bg-blue-50 transition-colors disabled:opacity-40"
+                            >
+                              {approveId === u.userId ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+                            </button>
+                            <button
+                              title="Reject HR"
+                              onClick={(e) => { e.stopPropagation(); handleReject(u) }}
+                              disabled={rejectId === u.userId || approveId === u.userId}
+                              className="flex h-7 w-7 items-center justify-center rounded-lg text-red-500 hover:bg-red-50 transition-colors disabled:opacity-40"
+                            >
+                              {rejectId === u.userId ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4" />}
+                            </button>
+                          </>
+                        )}
 
                         {/* Delete */}
                         <button

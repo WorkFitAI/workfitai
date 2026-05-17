@@ -1,17 +1,25 @@
-import { test, expect, Browser } from '@playwright/test'
+import { test, expect } from '@playwright/test'
+import { injectAuthToken } from './helpers/inject-auth-token'
 
 // ── A-1: Unauthenticated redirect ─────────────────────────────────────────
+// Kept in its own describe with empty storageState so the token injection
+// beforeEach below does NOT run for this test.
+test.describe('A-1 unauthenticated', () => {
+  test.use({ storageState: { cookies: [], origins: [] } })
 
-test('A-1: /applied-jobs redirects to /login when not authenticated', async ({ browser }) => {
-  // Fresh context with no saved auth state
-  const ctx = await browser.newContext()
-  const page = await ctx.newPage()
-  await page.goto('/applied-jobs')
-  await expect(page).toHaveURL(/\/login/, { timeout: 8_000 })
-  await ctx.close()
+  test('A-1: /applied-jobs redirects to /login when not authenticated', async ({ page }) => {
+    await page.goto('/applied-jobs')
+    await expect(page).toHaveURL(/\/login/, { timeout: 8_000 })
+  })
 })
 
-// ── Authenticated tests (use storageState from candidate-setup) ────────────
+// ── Authenticated tests ───────────────────────────────────────────────────
+// Wrapped in a describe so test.beforeEach applies only here (not to A-1).
+// Uses candidate1 credentials — works for both e2e-chromium and e2e-firefox projects.
+test.describe('Authenticated application flow', () => {
+  test.beforeEach(async ({ page }) => {
+    await injectAuthToken(page, 'candidate1@gmail.com', 'password@123', 'candidate.json')
+  })
 
 test('A-2: authenticated candidate sees My Applications page', async ({ page }) => {
   await page.goto('/applied-jobs')
@@ -24,11 +32,11 @@ test('A-3: status filter tabs are rendered and clickable', async ({ page }) => {
   await page.waitForLoadState('networkidle')
 
   for (const label of ['All', 'Applied', 'Reviewing', 'Interview', 'Offer', 'Hired', 'Rejected']) {
-    await expect(page.getByRole('button', { name: label })).toBeVisible()
+    await expect(page.getByRole('button', { name: label, exact: true })).toBeVisible()
   }
 
   // Click "Applied" tab — page should remain on /applied-jobs
-  await page.getByRole('button', { name: 'Applied' }).click()
+  await page.getByRole('button', { name: 'Applied', exact: true }).click()
   await expect(page).toHaveURL('/applied-jobs')
   await expect(page.getByText(/application.*total/i)).toBeVisible({ timeout: 8_000 })
 })
@@ -125,3 +133,4 @@ test('A-7: apply flow — find a job and open apply modal', async ({ page }) => 
     page.getByRole('dialog').or(page.getByLabel(/email/i)).first()
   ).toBeVisible({ timeout: 5_000 })
 })
+}) // end describe 'Authenticated application flow'

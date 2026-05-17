@@ -12,6 +12,14 @@ describe('token-store', () => {
     expect(getAccessToken()).toBeNull()
   })
 
+  it('getAccessToken loads from sessionStorage when in-memory cache is empty', async () => {
+    // Populate sessionStorage directly (simulates a page reload where memory is cleared)
+    sessionStorage.setItem('wfa_access_token', 'persisted_tok')
+    sessionStorage.setItem('wfa_token_expiry', String(Date.now() + 900_000))
+    const { getAccessToken } = await import('@/lib/auth/token-store')
+    expect(getAccessToken()).toBe('persisted_tok')
+  })
+
   it('setAccessToken stores token in sessionStorage', async () => {
     const { setAccessToken, getAccessToken } = await import('@/lib/auth/token-store')
     setAccessToken('tok_abc', 900_000)

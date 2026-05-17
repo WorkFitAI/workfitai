@@ -10,6 +10,7 @@ import {
   Mail,
   Phone,
   CheckCircle2,
+  XCircle,
   Clock,
   RefreshCw,
   ChevronDown,
@@ -80,10 +81,14 @@ function UserProfilePanel({
   esUser,
   onApprove,
   approvingId,
+  onReject,
+  rejectingId,
 }: {
   esUser: EsUserHit
   onApprove: (user: EsUserHit) => void
   approvingId: string | null
+  onReject: (user: EsUserHit) => void
+  rejectingId: string | null
 }) {
   const [detail, setDetail] = useState<AdminUserSummary | null>(null)
   const [loading, setLoading] = useState(false)
@@ -128,19 +133,33 @@ function UserProfilePanel({
             </div>
           )}
         </div>
-        {/* Approve button in header for convenience */}
-        <button
-          onClick={() => onApprove(esUser)}
-          disabled={isApproving}
-          className="flex items-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50 shrink-0"
-        >
-          {isApproving ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <CheckCircle2 className="h-3.5 w-3.5" />
-          )}
-          Approve
-        </button>
+        {/* Approve / Reject buttons in header */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          <button
+            onClick={() => onApprove(esUser)}
+            disabled={isApproving || rejectingId === esUser.userId}
+            className="flex items-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
+          >
+            {isApproving ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <CheckCircle2 className="h-3.5 w-3.5" />
+            )}
+            Approve
+          </button>
+          <button
+            onClick={() => onReject(esUser)}
+            disabled={rejectingId === esUser.userId || isApproving}
+            className="flex items-center gap-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
+          >
+            {rejectingId === esUser.userId ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <XCircle className="h-3.5 w-3.5" />
+            )}
+            Reject
+          </button>
+        </div>
       </div>
 
       {/* Details grid */}
@@ -177,11 +196,14 @@ interface QueueRowProps {
   user: EsUserHit
   approvingId: string | null
   onApprove: (user: EsUserHit) => void
+  rejectingId: string | null
+  onReject: (user: EsUserHit) => void
 }
 
-function QueueRow({ user, approvingId, onApprove }: QueueRowProps) {
+function QueueRow({ user, approvingId, onApprove, rejectingId, onReject }: QueueRowProps) {
   const [expanded, setExpanded] = useState(false)
   const isApproving = approvingId === user.userId
+  const isRejecting = rejectingId === user.userId
 
   return (
     <div className="border-b border-gray-100 last:border-0">
@@ -214,14 +236,14 @@ function QueueRow({ user, approvingId, onApprove }: QueueRowProps) {
           </p>
         </div>
 
-        {/* Right side: approve (stop propagation) + chevron */}
+        {/* Right side: approve + reject (stop propagation) + chevron */}
         <div className="flex items-center gap-1.5 shrink-0">
           <button
             onClick={(e) => {
               e.stopPropagation()
               onApprove(user)
             }}
-            disabled={isApproving}
+            disabled={isApproving || isRejecting}
             className="flex items-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
           >
             {isApproving ? (
@@ -230,6 +252,21 @@ function QueueRow({ user, approvingId, onApprove }: QueueRowProps) {
               <CheckCircle2 className="h-3.5 w-3.5" />
             )}
             Approve
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onReject(user)
+            }}
+            disabled={isRejecting || isApproving}
+            className="flex items-center gap-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
+          >
+            {isRejecting ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <XCircle className="h-3.5 w-3.5" />
+            )}
+            Reject
           </button>
           <div className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400">
             {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -243,6 +280,8 @@ function QueueRow({ user, approvingId, onApprove }: QueueRowProps) {
           esUser={user}
           onApprove={onApprove}
           approvingId={approvingId}
+          onReject={onReject}
+          rejectingId={rejectingId}
         />
       )}
     </div>
@@ -266,7 +305,7 @@ interface ApprovalQueueModalProps {
 function ApprovalQueueModal({ onClose }: ApprovalQueueModalProps) {
   const [roleFilter, setRoleFilter] = useState<"HR_MANAGER" | "HR" | undefined>(undefined)
 
-  const { queue, totalHits, roleAggregations, loading, error, approvingId, approve, refresh } =
+  const { queue, totalHits, roleAggregations, loading, error, approvingId, rejectingId, approve, reject, refresh } =
     useApprovalQueue({ role: roleFilter })
 
   return (
@@ -368,6 +407,8 @@ function ApprovalQueueModal({ onClose }: ApprovalQueueModalProps) {
                 user={u}
                 approvingId={approvingId}
                 onApprove={approve}
+                rejectingId={rejectingId}
+                onReject={reject}
               />
             ))
           )}

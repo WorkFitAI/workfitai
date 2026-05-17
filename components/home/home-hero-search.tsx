@@ -46,6 +46,7 @@ export function HomeHeroSearch() {
       <div className="flex flex-1 items-center gap-2 px-4 py-3">
         <Briefcase className="h-4 w-4 text-muted-foreground" />
         <select
+          aria-label="Filter by industry"
           value={industry}
           onChange={(e) => {
             const params = new URLSearchParams(searchParams.toString());
@@ -68,6 +69,7 @@ export function HomeHeroSearch() {
       <div className="flex flex-1 items-center gap-2 px-4 py-3">
         <MapPin className="h-4 w-4 text-muted-foreground" />
         <select
+          aria-label="Filter by location"
           value={location}
           onChange={(e) => {
             const params = new URLSearchParams(searchParams.toString());

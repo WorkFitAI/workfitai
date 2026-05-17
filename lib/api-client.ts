@@ -81,6 +81,7 @@ async function attemptRefresh(): Promise<boolean> {
 async function fetchWithAuth<T>(
   path: string,
   options: RequestInit = {},
+  _retried = false,
 ): Promise<T> {
   const token = getAccessToken();
   const deviceId = getDeviceId();
@@ -98,11 +99,14 @@ async function fetchWithAuth<T>(
     credentials: "include",
   });
 
-  // Silent refresh on 401
-  if (response.status === 401 && token) {
+  // Silent refresh on 401 — attempt even when sessionStorage token is absent
+  // (covers the case where the refresh cookie is valid but the in-memory token was lost,
+  // e.g. after a page reload or when Playwright restores only cookies + localStorage).
+  // The _retried flag prevents infinite retry loops if the re-issued token is also rejected.
+  if (response.status === 401 && !_retried) {
     const refreshed = await attemptRefresh();
     if (refreshed) {
-      return fetchWithAuth<T>(path, options);
+      return fetchWithAuth<T>(path, options, true);
     }
     throw new AuthError();
   }

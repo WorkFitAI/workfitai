@@ -11,6 +11,12 @@ import {
   CandidateNote,
   ApplicationStatus,
   SubmitApplicationData,
+  HRUser,
+  ApplicationNote,
+  JobApplicationCount,
+  HRJobListData,
+  CandidateListData,
+  CandidateDetail,
 } from "@/types/application";
 
 const API_BASE =
@@ -145,6 +151,30 @@ export const applicationService = {
   },
 
   /**
+   * GET /application/{applicationId}/cv/download → Blob URL (for inline preview).
+   * Caller must call URL.revokeObjectURL() when done to avoid memory leaks.
+   */
+  async fetchCvBlobUrl(applicationId: string): Promise<string> {
+    const token = getAccessToken();
+    const deviceId = getDeviceId();
+
+    const headers: Record<string, string> = { "X-Device-Id": deviceId };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const response = await fetch(
+      `${API_BASE}/application/${applicationId}/cv/download`,
+      { method: "GET", headers, credentials: "include" },
+    );
+
+    if (!response.ok) {
+      throw new Error(`CV fetch failed (${response.status})`);
+    }
+
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
+  },
+
+  /**
    * POST /application  (multipart/form-data)
    * Submit a new job application with CV upload.
    * Required: jobId (UUID), email (string), cvPdfFile (PDF ≤ 5 MB)
@@ -169,6 +199,260 @@ export const applicationService = {
     return apiClient.upload<ApiResponse<SubmitApplicationData>>(
       `/application`,
       formData,
+    );
+  },
+
+  // ─── HRM (HR Manager) methods ──────────────────────────────────────────────
+
+  /**
+   * GET /application/company/:companyNo?page=&size=
+   * List all applications submitted to a company (HRM only).
+   */
+  async getCompanyApplications(
+    companyNo: string,
+    page = 0,
+    size = 50,
+  ): Promise<ApiResponse<ApplicationListData>> {
+    return apiClient.get<ApiResponse<ApplicationListData>>(
+      `/application/company/${companyNo}?page=${page}&size=${size}`,
+    );
+  },
+
+  /**
+   * GET /application/company/:companyNo/hr-users
+   * List all HR users belonging to the company (for assignment dropdown).
+   */
+  async getCompanyHRUsers(companyNo: string): Promise<ApiResponse<HRUser[]>> {
+    return apiClient.get<ApiResponse<HRUser[]>>(
+      `/application/company/${companyNo}/hr-users`,
+    );
+  },
+
+  /**
+   * PUT /application/:id/assign
+   * Assign an application to a specific HR user by username.
+   */
+  async assignApplication(
+    applicationId: string,
+    assignedTo: string,
+  ): Promise<ApiResponse<ApplicationDetail>> {
+    return apiClient.put<ApiResponse<ApplicationDetail>>(
+      `/application/${applicationId}/assign`,
+      { assignedTo },
+    );
+  },
+
+  /**
+   * GET /application/assigned/:hrUsername?page=&size=
+   * Get applications assigned to a specific HR user.
+   */
+  async getAssignedApplications(
+    hrUsername: string,
+    page = 0,
+    size = 20,
+  ): Promise<ApiResponse<ApplicationListData>> {
+    return apiClient.get<ApiResponse<ApplicationListData>>(
+      `/application/assigned/${hrUsername}?page=${page}&size=${size}`,
+    );
+  },
+
+  /**
+   * GET /application/job/:jobId?page=&size=
+   * Get all applications for a specific job post.
+   */
+  async getApplicationsByJob(
+    jobId: string,
+    page = 0,
+    size = 20,
+  ): Promise<ApiResponse<ApplicationListData>> {
+    return apiClient.get<ApiResponse<ApplicationListData>>(
+      `/application/job/${jobId}?page=${page}&size=${size}`,
+    );
+  },
+
+  /**
+   * PATCH /application/:id/status?status=
+   * Update the status of an application. Backend validates transitions.
+   */
+  async updateApplicationStatus(
+    applicationId: string,
+    status: string,
+  ): Promise<ApiResponse<ApplicationDetail>> {
+    return apiClient.put<ApiResponse<ApplicationDetail>>(
+      `/application/${applicationId}/status?status=${status}`,
+    );
+  },
+
+  /**
+   * GET /application/job/:jobId/count
+   * Count total applications for a job.
+   */
+  async countApplicationsByJob(
+    jobId: string,
+  ): Promise<ApiResponse<JobApplicationCount>> {
+    return apiClient.get<ApiResponse<JobApplicationCount>>(
+      `/application/job/${jobId}/count`,
+    );
+  },
+
+  // ─── Notes (HRM & HR) ──────────────────────────────────────────────────────
+
+  /**
+   * GET /application/:id/notes
+   * Get all HR notes for an application.
+   */
+  async getApplicationNotes(
+    applicationId: string,
+  ): Promise<ApiResponse<ApplicationNote[]>> {
+    return apiClient.get<ApiResponse<ApplicationNote[]>>(
+      `/application/${applicationId}/notes`,
+    );
+  },
+
+  /**
+   * POST /application/:id/notes
+   * Add a note to an application. Returns 201 with created note.
+   */
+  async addApplicationNote(
+    applicationId: string,
+    content: string,
+    candidateVisible: boolean,
+  ): Promise<ApiResponse<ApplicationNote>> {
+    return apiClient.post<ApiResponse<ApplicationNote>>(
+      `/application/${applicationId}/notes`,
+      { content, candidateVisible },
+    );
+  },
+
+  /**
+   * PUT /application/:id/notes/:noteId
+   * Update a note on an application.
+   */
+  async updateApplicationNote(
+    applicationId: string,
+    noteId: string,
+    content: string,
+    candidateVisible: boolean,
+  ): Promise<ApiResponse<ApplicationNote>> {
+    return apiClient.put<ApiResponse<ApplicationNote>>(
+      `/application/${applicationId}/notes/${noteId}`,
+      { content, candidateVisible },
+    );
+  },
+
+  /**
+   * DELETE /application/:id/notes/:noteId
+   * Delete a note. Returns 204 No Content.
+   */
+  async deleteApplicationNote(
+    applicationId: string,
+    noteId: string,
+  ): Promise<void> {
+    await apiClient.delete<void>(
+      `/application/${applicationId}/notes/${noteId}`,
+    );
+  },
+
+  // ─── HR endpoints (assigned to this HR) ──────────────────────────────────
+
+  /**
+   * GET /application/hr/jobs?page=&size=&jobTitle=
+   * List jobs assigned to the current HR user with applicant counts.
+   */
+  async getHRJobs(
+    page = 0,
+    size = 20,
+    jobTitle?: string,
+  ): Promise<ApiResponse<HRJobListData>> {
+    const params = new URLSearchParams();
+    params.append("page", String(page));
+    params.append("size", String(size));
+    if (jobTitle) params.append("jobTitle", jobTitle);
+    return apiClient.get<ApiResponse<HRJobListData>>(
+      `/application/hr/jobs?${params.toString()}`,
+    );
+  },
+
+  /**
+   * GET /application/hr/candidates?page=&size=&status=
+   * List candidates assigned to the current HR user.
+   */
+  async getHRCandidates(
+    page = 0,
+    size = 20,
+    status?: ApplicationStatus,
+  ): Promise<ApiResponse<CandidateListData>> {
+    const params = new URLSearchParams();
+    params.append("page", String(page));
+    params.append("size", String(size));
+    if (status) params.append("status", status);
+    return apiClient.get<ApiResponse<CandidateListData>>(
+      `/application/hr/candidates?${params.toString()}`,
+    );
+  },
+
+  /**
+   * GET /application/hr/candidates/:username
+   * Get full candidate detail with all applications for the current HR.
+   */
+  async getHRCandidateDetail(
+    username: string,
+  ): Promise<ApiResponse<CandidateDetail>> {
+    return apiClient.get<ApiResponse<CandidateDetail>>(
+      `/application/hr/candidates/${username}`,
+    );
+  },
+
+  // ─── HRM (company-wide) endpoints ────────────────────────────────────────
+
+  /**
+   * GET /application/company/:companyNo/jobs?page=&size=&jobTitle=
+   * List all company jobs with applicant counts and status breakdown.
+   */
+  async getCompanyJobs(
+    companyNo: string,
+    page = 0,
+    size = 20,
+    jobTitle?: string,
+  ): Promise<ApiResponse<HRJobListData>> {
+    const params = new URLSearchParams();
+    params.append("page", String(page));
+    params.append("size", String(size));
+    if (jobTitle) params.append("jobTitle", jobTitle);
+    return apiClient.get<ApiResponse<HRJobListData>>(
+      `/application/company/${companyNo}/jobs?${params.toString()}`,
+    );
+  },
+
+  /**
+   * GET /application/company/:companyNo/candidates?page=&size=&status=
+   * List all candidates who applied to company jobs.
+   */
+  async getCompanyCandidates(
+    companyNo: string,
+    page = 0,
+    size = 20,
+    status?: ApplicationStatus,
+  ): Promise<ApiResponse<CandidateListData>> {
+    const params = new URLSearchParams();
+    params.append("page", String(page));
+    params.append("size", String(size));
+    if (status) params.append("status", status);
+    return apiClient.get<ApiResponse<CandidateListData>>(
+      `/application/company/${companyNo}/candidates?${params.toString()}`,
+    );
+  },
+
+  /**
+   * GET /application/company/:companyNo/candidates/:username
+   * Get full candidate detail with all applications for the company.
+   */
+  async getCompanyCandidateDetail(
+    companyNo: string,
+    username: string,
+  ): Promise<ApiResponse<CandidateDetail>> {
+    return apiClient.get<ApiResponse<CandidateDetail>>(
+      `/application/company/${companyNo}/candidates/${username}`,
     );
   },
 };

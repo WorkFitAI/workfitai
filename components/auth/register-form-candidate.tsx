@@ -149,7 +149,7 @@ export function RegisterFormCandidate() {
       <div className="space-y-1">
         <Label htmlFor="c-phone">Phone</Label>
         <div className="flex gap-2">
-          <select className="h-12 rounded-lg border border-border bg-white px-2 text-sm">
+          <select aria-label="Country code" className="h-12 rounded-lg border border-border bg-white px-2 text-sm">
             <option>🇻🇳 +84</option>
           </select>
           <Input

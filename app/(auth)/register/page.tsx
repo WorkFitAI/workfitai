@@ -37,9 +37,14 @@ function RegisterContent() {
   const router = useRouter();
 
   // Resolve the active tab from the ?type= param
+  // "employer" is an alias for "hr" (employers register as HR staff)
   const raw = searchParams.get("type") ?? "candidate";
   const activeType: RegisterType =
-    raw === "hr" ? "hr" : raw === "hr-manager" ? "hr-manager" : "candidate";
+    raw === "hr" || raw === "employer"
+      ? "hr"
+      : raw === "hr-manager"
+        ? "hr-manager"
+        : "candidate";
 
   const { title, subtitle } = headings[activeType];
 
@@ -98,6 +103,14 @@ function RegisterContent() {
               className="font-medium text-foreground underline"
             >
               Sign In
+            </Link>
+          </p>
+          <p>
+            <Link
+              href="/register?type=employer"
+              className="font-medium text-foreground underline"
+            >
+              Register as Employer
             </Link>
           </p>
         </div>
