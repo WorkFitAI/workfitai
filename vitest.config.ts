@@ -8,6 +8,9 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["__tests__/setup.ts"],
+    env: {
+      NEXT_PUBLIC_API_BASE_URL: "https://be.workfitai.uk",
+    },
     include: [
       // Unit tests — pure logic, no rendering
       "__tests__/unit/**/*.test.{ts,tsx}",
@@ -15,19 +18,28 @@ export default defineConfig({
       "__tests__/integration/auth-service.test.ts",
       "__tests__/integration/cv-service.test.ts",
       "__tests__/integration/forgot-password.test.tsx",
-      // Registration flow integration tests (MSW + RTL)
+      // Auth form integration tests (MSW + RTL)
+      "__tests__/integration/login.test.tsx",
       "__tests__/integration/register-candidate.test.tsx",
       "__tests__/integration/register-hr.test.tsx",
       "__tests__/integration/register-hr-manager.test.tsx",
-      // OTP verification page integration tests
       "__tests__/integration/verify-otp.test.tsx",
       // Toast behavior tests — vi.mock sonner + auth-context, renders LoginForm
       "__tests__/integration/toast.test.tsx",
-      // Kafka OTP tests — requires live backend + Kafka (self-skips when unavailable)
-      "__tests__/integration/kafka-otp.test.ts",
       // Application system integration tests (MSW + RTL)
       "__tests__/integration/applied-jobs-page.test.tsx",
       "__tests__/integration/application-detail.test.tsx",
+      // HRM integration tests (MSW + RTL)
+      "__tests__/integration/hr-management-page.test.tsx",
+      "__tests__/integration/hrm-application-list.test.tsx",
+      "__tests__/integration/hrm-notes-management.test.tsx",
+      // Report workflow integration tests (vi.mock'd api-client)
+      "__tests__/integration/report-workflow.test.ts",
+      // Jobs, CV, and apply-now integration tests (MSW + RTL)
+      "__tests__/integration/jobs-page.test.tsx",
+      "__tests__/integration/cv-management.test.tsx",
+      "__tests__/integration/apply-now-modal.test.tsx",
+      // kafka-otp.test.ts intentionally excluded — requires live backend + Kafka infra
     ],
     coverage: {
       provider: "v8",

@@ -1,18 +1,23 @@
 import { test, expect } from "@playwright/test";
 
+// Run all auth page tests unauthenticated — project storageState is candidate-authed
+// which the middleware redirects away from /login, /register, /forgot-password.
+test.use({ storageState: { cookies: [], origins: [] } });
+
 test.describe("Auth flows", () => {
   test("login page renders form fields", async ({ page }) => {
     await page.goto("/login");
     await expect(page.getByLabel(/email|username/i)).toBeVisible();
-    await expect(page.getByLabel(/password/i)).toBeVisible();
-    await expect(page.getByRole("button", { name: /sign in/i })).toBeVisible();
+    // Use role+name to avoid matching the "Show password" aria-label button
+    await expect(page.getByRole("textbox", { name: "Password" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /login/i })).toBeVisible();
   });
 
   test("login shows validation error for empty form submission", async ({
     page,
   }) => {
     await page.goto("/login");
-    await page.getByRole("button", { name: /sign in/i }).click();
+    await page.getByRole("button", { name: /login/i }).click();
     // Zod validation — required error should appear
     await expect(page.getByText(/required/i).first()).toBeVisible();
   });
@@ -20,8 +25,8 @@ test.describe("Auth flows", () => {
   test("login shows error for wrong credentials", async ({ page }) => {
     await page.goto("/login");
     await page.getByLabel(/email|username/i).fill("wrong@example.com");
-    await page.getByLabel(/password/i).fill("WrongPass123");
-    await page.getByRole("button", { name: /sign in/i }).click();
+    await page.getByRole("textbox", { name: "Password" }).fill("WrongPass123");
+    await page.getByRole("button", { name: /login/i }).click();
     // API error toast or inline error
     await expect(
       page

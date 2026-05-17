@@ -10,7 +10,7 @@ setup("authenticate as candidate", async ({ page }) => {
   await page.goto("/login");
   await page
     .getByRole("textbox", { name: "Email" })
-    .fill("vanphat15it@gmail.com");
+    .fill("candidate1@gmail.com");
   await page.getByRole("textbox", { name: "Email" }).press("Tab");
   await page.getByRole("textbox", { name: "Password" }).fill("password@123");
   await page.getByRole("button", { name: "Login →" }).click();

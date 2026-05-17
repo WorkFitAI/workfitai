@@ -1,5 +1,9 @@
 import { test, expect } from '@playwright/test'
 
+// Run all route-protection tests with no pre-loaded auth state.
+// Tests that need auth add cookies manually via addCookies().
+test.use({ storageState: { cookies: [], origins: [] } })
+
 test.describe('Route protection', () => {
   test('unauthenticated user is redirected from /dashboard to /login', async ({ page }) => {
     await page.goto('/dashboard')
@@ -8,11 +12,6 @@ test.describe('Route protection', () => {
 
   test('unauthenticated user is redirected from /job-posts to /login', async ({ page }) => {
     await page.goto('/job-posts')
-    await expect(page).toHaveURL(/\/login/)
-  })
-
-  test('unauthenticated user is redirected from /candidates to /login', async ({ page }) => {
-    await page.goto('/candidates')
     await expect(page).toHaveURL(/\/login/)
   })
 

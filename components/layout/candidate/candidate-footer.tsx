@@ -141,11 +141,11 @@ export function CandidateFooter() {
             &copy; {new Date().getFullYear()} WorkfitAI. All right reserved.
           </p>
           <div className="flex items-center gap-4">
-            <select className="bg-transparent text-sm text-muted-foreground outline-none">
+            <select aria-label="Language" className="bg-transparent text-sm text-muted-foreground outline-none">
               <option>🇺🇸 English</option>
               <option>🇻🇳 Vietnamese</option>
             </select>
-            <select className="bg-transparent text-sm text-muted-foreground outline-none">
+            <select aria-label="Currency" className="bg-transparent text-sm text-muted-foreground outline-none">
               <option>USD</option>
               <option>VND</option>
             </select>

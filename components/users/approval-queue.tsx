@@ -454,7 +454,7 @@ function ApprovalButtonInner() {
  */
 export function ApprovalQueueButton({ userRoles }: { userRoles?: string[] }) {
   const canApprove = userRoles?.some(
-    (r) => r === "ROLE_HR_MANAGER",
+    (r) => r === "ROLE_ADMIN" || r === "ROLE_HR_MANAGER",
   )
   if (!canApprove) return null
   return <ApprovalButtonInner />

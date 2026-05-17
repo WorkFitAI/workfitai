@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { useDebounce } from "@/hooks/useDebounce"
+import { toast } from "sonner"
 import { adminUserService } from "@/lib/admin/admin-user-service"
 import type {
   AdminUserFullProfile,
@@ -131,9 +132,15 @@ export function useApprovalQueue({
     async (user: EsUserHit) => {
       try {
         setApprovingId(user.userId)
-        await adminUserService.approveManager(user.username)
+        if (user.role === "HR_MANAGER") {
+          await adminUserService.approveManager(user.username)
+        } else {
+          await adminUserService.approveHR(user.username)
+        }
+        toast.success(`${user.fullName} approved successfully`)
         await fetchQueue()
       } catch {
+        toast.error(`Failed to approve ${user.fullName}`)
         setError(`Failed to approve ${user.fullName}.`)
       } finally {
         setApprovingId(null)
@@ -146,9 +153,15 @@ export function useApprovalQueue({
     async (user: EsUserHit) => {
       try {
         setRejectingId(user.userId)
-        await adminUserService.rejectManager(user.username)
+        if (user.role === "HR_MANAGER") {
+          await adminUserService.rejectManager(user.username)
+        } else {
+          await adminUserService.rejectHR(user.username)
+        }
+        toast.success(`${user.fullName} has been rejected`)
         await fetchQueue()
       } catch {
+        toast.error(`Failed to reject ${user.fullName}`)
         setError(`Failed to reject ${user.fullName}.`)
       } finally {
         setRejectingId(null)

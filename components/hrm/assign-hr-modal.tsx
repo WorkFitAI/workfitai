@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import type { HRUser } from "@/types/application";
 import { cn } from "@/lib/utils";
 
@@ -27,16 +27,14 @@ export function AssignHRModal({
   onAssign,
   onClose,
 }: AssignHRModalProps) {
-  const defaultSelected = useMemo(
-    () => (isOpen ? currentAssignee || "" : ""),
-    [isOpen, currentAssignee],
-  );
-  const [selected, setSelected] = useState(defaultSelected);
+  const [selected, setSelected] = useState(currentAssignee || "");
 
-  // Sync when modal re-opens with a different assignee
-  if (selected !== defaultSelected && !assigning) {
-    setSelected(defaultSelected);
-  }
+  // Reset selection to current assignee each time the modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setSelected(currentAssignee || "");
+    }
+  }, [isOpen, currentAssignee]);
 
   if (!isOpen) return null;
 

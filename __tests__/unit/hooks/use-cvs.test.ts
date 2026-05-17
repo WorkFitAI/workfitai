@@ -11,7 +11,7 @@ import { useCVs } from "@/hooks/useCVs";
 import { setSessionCookie } from "@/lib/auth/session-cookie";
 import type { CVMetadata, CVListResponse } from "@/types/cv";
 
-const API = "http://localhost:9085";
+const API = "https://be.workfitai.uk";
 
 function mockCVMetadata(overrides: Partial<CVMetadata> = {}): CVMetadata {
   return {
@@ -19,10 +19,17 @@ function mockCVMetadata(overrides: Partial<CVMetadata> = {}): CVMetadata {
     objectName: "dae8124e-9878-4582-9497-ac4ff22258b9-resume.pdf",
     headline: null,
     summary: "",
-    pdfUrl: "http://minio:9000/cvs-files/dae8124e-9878-4582-9497-ac4ff22258b9-resume.pdf",
+    pdfUrl:
+      "http://minio:9000/cvs-files/dae8124e-9878-4582-9497-ac4ff22258b9-resume.pdf",
     belongTo: "testuser",
     templateType: "UPLOAD",
-    sections: { skills: [], projects: [], education: [], languages: [], experience: [] },
+    sections: {
+      skills: [],
+      projects: [],
+      education: [],
+      languages: [],
+      experience: [],
+    },
     createdAt: "2026-01-15 08:00:00 AM",
     createdBy: "testuser@example.com",
     updatedAt: "2026-01-15 08:00:00 AM",
@@ -32,7 +39,9 @@ function mockCVMetadata(overrides: Partial<CVMetadata> = {}): CVMetadata {
   };
 }
 
-function mockCVListResponse(overrides: Partial<CVListResponse> = {}): CVListResponse {
+function mockCVListResponse(
+  overrides: Partial<CVListResponse> = {},
+): CVListResponse {
   return {
     meta: { page: 0, pageSize: 10, pages: 1, total: 1 },
     result: [mockCVMetadata()],
@@ -136,7 +145,9 @@ describe("useCVs", () => {
         http.get(`${API}/cv/candidate/testuser`, ({ request }) => {
           capturedUrl = request.url;
           return apiSuccess(
-            mockCVListResponse({ result: [mockCVMetadata({ cvId: "cv-011" })] }),
+            mockCVListResponse({
+              result: [mockCVMetadata({ cvId: "cv-011" })],
+            }),
           );
         }),
       );

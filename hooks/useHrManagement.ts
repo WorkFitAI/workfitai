@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { applicationService } from "@/lib/application/application-service";
 import { adminUserService } from "@/lib/admin/admin-user-service";
 import type { HRUser } from "@/types/application";
@@ -45,11 +46,12 @@ export function useApproveHR(onSuccess?: () => void) {
         setApprovingId(user.userId);
         setApproveError(null);
         await adminUserService.approveHR(user.username);
+        toast.success(`${user.fullName} approved successfully`);
         onSuccess?.();
       } catch (err) {
-        setApproveError(
-          err instanceof Error ? err.message : "Failed to approve HR user.",
-        );
+        const msg = err instanceof Error ? err.message : "Failed to approve HR user.";
+        toast.error(msg);
+        setApproveError(msg);
       } finally {
         setApprovingId(null);
       }
@@ -72,11 +74,12 @@ export function useRejectHR(onSuccess?: () => void) {
         setRejectingId(user.userId);
         setRejectError(null);
         await adminUserService.rejectHR(user.username);
+        toast.success(`${user.fullName} has been rejected`);
         onSuccess?.();
       } catch (err) {
-        setRejectError(
-          err instanceof Error ? err.message : "Failed to reject HR user.",
-        );
+        const msg = err instanceof Error ? err.message : "Failed to reject HR user.";
+        toast.error(msg);
+        setRejectError(msg);
       } finally {
         setRejectingId(null);
       }

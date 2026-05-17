@@ -202,9 +202,12 @@ describe("Report Management Integration Tests", () => {
       // Search for "spam" with PENDING status
       await reportService.getReports("spam", "PENDING", 1, 10);
 
-      expect(mockedApiClient.get).toHaveBeenCalledWith(
-        expect.stringContaining("filter=reportContent~~'spam' and status:'PENDING'")
-      );
+      // URLSearchParams encodes the filter value — verify the raw filter parts are present
+      const calledUrl: string = mockedApiClient.get.mock.calls[0][0] as string;
+      const urlParams = new URLSearchParams(calledUrl.split("?")[1]);
+      expect(urlParams.get("filter")).toBe("reportContent~~'spam' and status:'PENDING'");
+      expect(urlParams.get("page")).toBe("0");
+      expect(urlParams.get("size")).toBe("10");
     });
   });
 

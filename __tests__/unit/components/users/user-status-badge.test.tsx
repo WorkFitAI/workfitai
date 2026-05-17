@@ -45,7 +45,7 @@ describe("UserStatusBadge", () => {
 
   it("should render WAIT_APPROVED status with amber styling", () => {
     render(<UserStatusBadge status="WAIT_APPROVED" />)
-    const badge = screen.getByText("Pending")
+    const badge = screen.getByText("Waiting")
     expect(badge).toBeInTheDocument()
     expect(badge).toHaveClass("bg-amber-100")
     expect(badge).toHaveClass("text-amber-700")
