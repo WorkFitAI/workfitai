@@ -95,6 +95,8 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
     },
   });
 
+  const currency = form.watch("currency");
+
   useEffect(() => {
     const fetchSkills = async () => {
       try {
@@ -113,17 +115,17 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
 
   return (
     <Form {...form}>
-      <form className="p-8 bg-slate-50/50 min-h-screen" onSubmit={form.handleSubmit(onSubmit)}>
+      <form className="p-8 min-h-screen" onSubmit={form.handleSubmit(onSubmit)}>
         <div className="max-w-[1600px] mx-auto">
           
-          <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-1 xl:grid-cols-[2fr_1fr] gap-8">
             
             {/* CỘT TRÁI */}
             <div className="space-y-8">
               
               {/* 1. THÔNG TIN CHUNG */}
-              <Card className="shadow-sm border-none">
-                <CardHeader className="border-b bg-white">
+              <Card className="shadow-sm border-t-4 border-t-blue-600">
+                <CardHeader className="border-b bg-white ">
                   <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center gap-2 text-blue-600">
                       <Briefcase className="w-5 h-5" />
@@ -131,7 +133,7 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                     </CardTitle>
                     
                     {/* Toggle Status switch */}
-                    {!isDeleted && (
+                    {!isDeleted && initialData && (
                       <div className="flex items-center gap-3">
                         <span className="text-xs font-medium text-slate-500">{isPublished ? "PUBLISHED" : "DRAFT"}</span>
                         <div
@@ -144,14 +146,14 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                     )}
                     </div>
                 </CardHeader>
-                <CardContent className="p-6 space-y-6 bg-white">
+                <CardContent className="px-6 space-y-6 bg-white">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField
                       control={form.control}
                       name="title"
                       render={({ field }) => (
                         <FormItem className="md:col-span-2">
-                          <FormLabel className="font-semibold">Job Title</FormLabel>
+                          <FormLabel className="font-bold uppercase text-xs">Job Title</FormLabel>
                           <FormControl>
                             <Input placeholder="e.g. Senior React Developer" {...field} className="h-11" />
                           </FormControl>
@@ -159,33 +161,34 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                         </FormItem>
                       )}
                     />
-                    <FormField
-                      disabled={!initialData}
-                      control={form.control}
-                      name="companyNo"
-                      render={({ field }) => (
-                        <FormItem className="md:col-span-2">
-                          <FormLabel className="font-semibold flex items-center gap-2">
-                            <Hash className="w-4 h-4 text-slate-400" /> Company ID
-                          </FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter company reference number..." {...field} className="h-11" />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
+                    {initialData && (
+                      <FormField
+                        disabled={true}
+                        control={form.control}
+                        name="companyNo"
+                        render={({ field }) => (
+                          <FormItem className="md:col-span-2">
+                            <FormLabel className="font-bold uppercase text-xs">Company ID</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter company reference number..." {...field} className="h-11" />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    )}
+
                   </div>
 
-                  <div className="flex justify-between gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="employmentType"
                       render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="font-semibold">Employment Type</FormLabel>
+                        <FormItem className="w-full">
+                          <FormLabel className="font-bold uppercase text-xs">Employment Type</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl className="w-full md:w-[423px]">
-                              <SelectTrigger className="h-11">
+                            <FormControl className="w-full">
+                              <SelectTrigger className="h-12!">
                                 <SelectValue />
                               </SelectTrigger>
                             </FormControl>
@@ -204,11 +207,11 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                       control={form.control}
                       name="experienceLevel"
                       render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="font-semibold">Experience Level</FormLabel>
+                        <FormItem className="w-full">
+                          <FormLabel className="font-bold uppercase text-xs">Experience Level</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl className="w-full md:w-[423px]">
-                              <SelectTrigger className="h-11">
+                            <FormControl className="w-full">
+                              <SelectTrigger className="h-12!">
                                 <SelectValue />
                               </SelectTrigger>
                             </FormControl>
@@ -218,6 +221,7 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                               <SelectItem value="MID">Middle</SelectItem>
                               <SelectItem value="SENIOR">Senior</SelectItem>
                               <SelectItem value="LEAD">Leader</SelectItem>
+                              <SelectItem value="INTERN">Intern</SelectItem>
                             </SelectContent>
                           </Select>
                         </FormItem>
@@ -230,7 +234,7 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                     name="skillNames"
                     render={({ field }) => (
                       <FormItem className="relative">
-                        <FormLabel className="font-semibold">Required Skills (Tags)</FormLabel>
+                        <FormLabel className="font-bold uppercase text-xs">Required Skills (Tags)</FormLabel>
                         <div className="flex flex-wrap gap-2 p-2.5 border rounded-lg bg-slate-50/50 min-h-[44px]">
                           {field.value.map((skill: string) => (
                             <span key={skill} className="flex items-center gap-1.5 px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-full">
@@ -270,7 +274,7 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
               </Card>
 
               {/* 2. MÔ TẢ & YÊU CẦU */}
-              <Card className="shadow-sm border-none">
+              <Card className="shadow-sm border-t-4 border-t-blue-600">
                 <CardHeader className="border-b bg-white">
                   <CardTitle className="flex items-center gap-2 text-blue-600">
                     <FileText className="w-5 h-5" />
@@ -283,7 +287,7 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                     name="shortDescription"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-semibold">Short Description</FormLabel>
+                        <FormLabel className="font-bold uppercase text-xs">Short Description</FormLabel>
                         <Textarea placeholder="Brief overview for job listing..." rows={2} {...field} />
                       </FormItem>
                     )}
@@ -293,7 +297,7 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                     name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-semibold">Full Description</FormLabel>
+                        <FormLabel className="font-bold uppercase text-xs">Full Description</FormLabel>
                         <Textarea rows={6} {...field} />
                       </FormItem>
                     )}
@@ -304,8 +308,8 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                       control={form.control}
                       name="requirements"
                       render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="font-semibold text-amber-700">Other Requirements</FormLabel>
+                        <FormItem className="flex flex-col h-full">
+                          <FormLabel className="font-bold uppercase text-xs">Other Requirements</FormLabel>
                           <Textarea rows={4} {...field} />
                         </FormItem>
                       )}
@@ -314,8 +318,8 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                       control={form.control}
                       name="benefits"
                       render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="font-semibold text-emerald-700">Benefits</FormLabel>
+                        <FormItem className="flex flex-col h-full">
+                          <FormLabel className="font-bold uppercase text-xs">Benefits</FormLabel>
                           <Textarea rows={4} {...field} />
                         </FormItem>
                       )}
@@ -325,15 +329,13 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                   <Separator className="my-2" />
 
                   {/* EDUCATION & EXPERIENCE */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-2">
                     <FormField
                       control={form.control}
                       name="educationLevel"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="font-semibold flex items-center gap-2">
-                            <GraduationCap className="w-4 h-4" /> Education Level
-                          </FormLabel>
+                          <FormLabel className="font-bold uppercase text-xs">Education Level</FormLabel>
                           <Input placeholder="e.g. Bachelor in CS" {...field} className="h-11" />
                         </FormItem>
                       )}
@@ -343,8 +345,8 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                       name="requiredExperience"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="font-semibold flex items-center gap-2">
-                            <Award className="w-4 h-4" /> Required Experience
+                          <FormLabel className="font-bold uppercase text-xs">
+                            Required Experience
                           </FormLabel>
                           <Input placeholder="e.g. 3-5 years" {...field} className="h-11" />
                         </FormItem>
@@ -358,9 +360,13 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
             {/* CỘT PHẢI (SIDEBAR) */}
             <div className="space-y-6 lg:block lg:top-8 h-fit">
               <Card className="shadow-md border-t-4 border-t-blue-600">
-                <CardHeader>
-                  <CardTitle className="text-base uppercase tracking-wider text-slate-500 font-bold">Logistics & Budget</CardTitle>
+                <CardHeader className="border-b bg-white">
+                  <CardTitle className="flex items-center gap-2 text-blue-600 py-1">
+                    <FileText className="w-5 h-5" />
+                    3. Detailed Budget
+                  </CardTitle>
                 </CardHeader>
+
                 <CardContent className="space-y-6">
 
                      <FormField
@@ -368,10 +374,10 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                       name="currency"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="font-semibold">Currency</FormLabel>
+                          <FormLabel className="font-bold text-xs uppercase">Currency</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl className="w-full md:w-[423px]">
-                              <SelectTrigger className="h-11">
+                              <SelectTrigger className="h-11! w-full!">
                                 <SelectValue />
                               </SelectTrigger>
                             </FormControl>
@@ -384,7 +390,7 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                       )}
                     />
                   
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4 py-2">
                     <FormField
                       control={form.control}
                       name="salaryMin"
@@ -392,7 +398,7 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                         <FormItem>
                           <FormLabel className="text-xs font-bold uppercase">Min Salary</FormLabel>
                           <div className="relative">
-                            <DollarSign className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                            { currency === "USD" ? <DollarSign className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" /> : <span className="absolute left-3 top-2.5 w-4 h-4 text-slate-400 text-xs">₫</span>}
                             <Input type="number" {...field} className="pl-9 h-10" />
                           </div>
                         </FormItem>
@@ -405,7 +411,7 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                         <FormItem>
                           <FormLabel className="text-xs font-bold uppercase">Max Salary</FormLabel>
                           <div className="relative">
-                            <DollarSign className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                            { currency === "USD" ? <DollarSign className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" /> : <span className="absolute left-3 top-2.5 w-4 h-4 text-slate-400 text-xs">₫</span>}
                             <Input type="number" {...field} className="pl-9 h-10" />
                           </div>
                         </FormItem>
@@ -425,42 +431,43 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                       </FormItem>
                     )}
                   />
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="quantity"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs font-bold uppercase flex items-center gap-1">
+                            <Users className="w-3 h-3" /> Hiring Quantity
+                          </FormLabel>
+                          <Input type="number" {...field} className="h-10" />
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={form.control}
-                    name="quantity"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs font-bold uppercase flex items-center gap-1">
-                          <Users className="w-3 h-3" /> Hiring Quantity
-                        </FormLabel>
-                        <Input type="number" {...field} className="h-10" />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="expiresAt"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel className="text-xs font-bold uppercase flex items-center gap-1">
-                          <CalendarIcon className="w-3 h-3" /> Deadline <span className="text-red-500">(Date needs to be in future)</span>
-                        </FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button variant="outline" className="h-10 justify-start font-normal border-slate-200">
-                              <CalendarIcon className="mr-2 h-4 w-4 text-slate-400" />
-                              {field.value ? field.value.toLocaleDateString() : "Set expiration"}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="end">
-                            <Calendar mode="single" selected={field.value} onSelect={field.onChange} />
-                          </PopoverContent>
-                        </Popover>
-                      </FormItem>
-                    )}
-                  />
+                    <FormField
+                      control={form.control}
+                      name="expiresAt"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel className="text-xs font-bold flex items-center gap-1">
+                            <CalendarIcon className="w-3 h-3" />  <span className="uppercase">Deadline</span> <span className="text-red-500">(Date must be in future)</span>
+                          </FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button variant="outline" className="h-10 justify-start font-normal border-slate-200">
+                                <CalendarIcon className="mr-2 h-4 w-4 text-slate-400" />
+                                {field.value ? field.value.toLocaleDateString() : "Set expiration"}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="end">
+                              <Calendar mode="single" selected={field.value} onSelect={field.onChange} />
+                            </PopoverContent>
+                          </Popover>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
                   <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-md font-bold shadow-lg shadow-blue-200 transition-all active:scale-[0.98]">
                     <Save className="w-5 h-5 mr-2" />

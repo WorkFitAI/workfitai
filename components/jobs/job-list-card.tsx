@@ -72,7 +72,8 @@ const JobListCard = ({ job }: Props) => {
       {/* Bottom */}
       <div className="flex justify-between items-center mt-1">
         <p className="text-blue-600 font-semibold text-md">
-          ${job.salaryMin.toLocaleString("en-US")} - $
+          {job.currency === "USD" ? "$" : "₫"}
+          {job.salaryMin.toLocaleString("en-US")} - {job.currency === "USD" ? "$" : "₫"}
           {job.salaryMax.toLocaleString("en-US")}
         </p>
 
