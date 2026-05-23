@@ -15,6 +15,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { getPagination } from "@/lib/utils";
 
 export default function JobsPageClient() {
   const { page, pageSize, filters, buildUrl } = useJobFilters();
@@ -42,33 +43,34 @@ export default function JobsPageClient() {
 
           <div className="mt-5 flex justify-center items-center md:col-span-12">
             <Pagination>
-              <PaginationContent>
-                <PaginationItem>
+              <PaginationContent className="flex items-center gap-1 list-none">
+                <PaginationItem className="list-none">
                   <PaginationPrevious
                     href={buildUrl(page - 1)}
-                    className={
-                      page === 1 ? "pointer-events-none opacity-50" : ""
-                    }
+                    className={page === 1 ? "pointer-events-none opacity-50" : ""}
                   />
                 </PaginationItem>
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (p) => (
-                    <PaginationItem key={p}>
-                      <PaginationLink href={buildUrl(p)} isActive={p === page}>
+                {getPagination(page, totalPages).map((p, index) => (
+                  <PaginationItem key={index} className="list-none">
+                    {p === "..." ? (
+                      <span className="px-2 text-gray-400">…</span>
+                    ) : (
+                      <PaginationLink
+                        href={buildUrl(p as number)}
+                        isActive={p === page}
+                      >
                         {p}
                       </PaginationLink>
-                    </PaginationItem>
-                  ),
-                )}
+                    )}
+                  </PaginationItem>
+                ))}
 
-                <PaginationItem>
+                <PaginationItem className="list-none">
                   <PaginationNext
                     href={buildUrl(page + 1)}
                     className={
-                      page === totalPages
-                        ? "pointer-events-none opacity-50"
-                        : ""
+                      page === totalPages ? "pointer-events-none opacity-50" : ""
                     }
                   />
                 </PaginationItem>

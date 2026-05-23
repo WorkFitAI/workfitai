@@ -52,16 +52,29 @@ export default function FeaturedJobCard({
       </p>
 
       {/* tags */}
-      <div className="flex gap-2 mb-8">
-        {skills.map((skill, index) => (
-          <span key={index} className="bg-gray-100 text-xs px-2 py-1 rounded">
+      <div className="flex gap-2 mb-8 items-center">
+        {skills.slice(0, 3).map((skill, index) => (
+          <span
+            key={index}
+            className={`text-xs px-2 py-1 rounded ${
+              index === 0
+                ? "bg-green-100 text-green-700"
+                : "bg-gray-100 text-gray-700"
+            }`}
+          >
             {skill}
           </span>
         ))}
+
+        {skills.length > 3 && (
+          <span className="ml-1 inline-flex items-center justify-center w-5 h-5 text-[10px] rounded-full border text-gray-600">
+            +{skills.length - 3}
+          </span>
+        )}
       </div>
 
       {/* footer */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center gap-2">
         <span className="text-blue-600 font-semibold text-sm">
           {salary} 
         </span>

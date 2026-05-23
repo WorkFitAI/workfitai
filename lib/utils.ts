@@ -44,3 +44,31 @@ export const getCoordinates = async (address: string) => {
     lng: parseFloat(data[0].lon),
   };
 };
+
+export const getPagination = (page: number, totalPages: number) => {
+  const delta = 1; // số trang 2 bên current page
+  const range = [];
+
+  const left = Math.max(2, page - delta);
+  const right = Math.min(totalPages - 1, page + delta);
+
+  range.push(1);
+
+  if (left > 2) {
+    range.push("...");
+  }
+
+  for (let i = left; i <= right; i++) {
+    range.push(i);
+  }
+
+  if (right < totalPages - 1) {
+    range.push("...");
+  }
+
+  if (totalPages > 1) {
+    range.push(totalPages);
+  }
+
+  return range;
+};

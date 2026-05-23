@@ -22,7 +22,7 @@ const JobListCard = ({ job }: Props) => {
         <div className="flex gap-3 items-center">
           {/* Logo */}
           <Image
-            src={job?.company?.logoUrl || '/imgs/brands/brand-1.png'}
+            src={ job?.company?.logoUrl || '/imgs/brands/brand-1.png' }
             alt="company logo"
             width={48}
             height={48}
@@ -40,8 +40,13 @@ const JobListCard = ({ job }: Props) => {
         </div>
 
         <div className="flex gap-2">
-          {job.skillNames.map((skill, index) => (
-            <span key={index} className="text-xs bg-gray-100 px-2 py-1 rounded">
+          {job.skillNames.slice(0, 6).map((skill, index) => (
+            <span
+              key={index}
+              className={`text-xs px-2 py-1 rounded ${
+                index === 0 ? "text-green-700 bg-green-100 shadow-sm border border-green-200" : "bg-gray-100"
+              }`}
+            >
               {skill}
             </span>
           ))}
