@@ -13,7 +13,7 @@ import {
 } from "../../mocks/handlers";
 import { useApplications } from "@/hooks/useApplications";
 
-const API = "https://be.workfitai.uk";
+const API = "https://api.workfitai.uk";
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }));
 afterEach(() => server.resetHandlers());

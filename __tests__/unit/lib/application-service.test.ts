@@ -25,7 +25,7 @@ import {
 import { applicationService } from "@/lib/application/application-service";
 import { apiClient } from "@/lib/api-client";
 
-const API = "https://be.workfitai.uk";
+const API = "https://api.workfitai.uk";
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }));
 afterEach(() => {

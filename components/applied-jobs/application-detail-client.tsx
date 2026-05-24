@@ -22,8 +22,8 @@ import { ApplicationStatus } from "@/types/application";
 import { Skeleton } from "@/components/ui/skeleton";
 import { applicationService } from "@/lib/application/application-service";
 
-/** Statuses that allow withdrawal */
-const WITHDRAWABLE: ApplicationStatus[] = ["DRAFT", "APPLIED", "REVIEWING"];
+/** Only APPLIED status allows withdrawal */
+const WITHDRAWABLE: ApplicationStatus[] = ["APPLIED"];
 
 interface Props {
   applicationId: string;

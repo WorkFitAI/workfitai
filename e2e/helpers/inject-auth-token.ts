@@ -5,7 +5,7 @@
  * Problem: storageState persists cookies + localStorage but NOT sessionStorage.
  * The wfa_access_token lives in sessionStorage, so spec tests start without it.
  * Without it the first API call gets 401, the refresh fails (no refreshToken cookie
- * in the storageState from the backend domain be.workfitai.uk), and the page
+ * in the storageState from the backend domain api.workfitai.uk), and the page
  * redirects to /login.
  *
  * Fix: before each test, call page.request.post to get a fresh access token, then:

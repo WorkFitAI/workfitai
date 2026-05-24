@@ -9,7 +9,7 @@ export default defineConfig({
     globals: true,
     setupFiles: ["__tests__/setup.ts"],
     env: {
-      NEXT_PUBLIC_API_BASE_URL: "https://be.workfitai.uk",
+      NEXT_PUBLIC_API_BASE_URL: "https://api.workfitai.uk",
     },
     include: [
       // Unit tests — pure logic, no rendering

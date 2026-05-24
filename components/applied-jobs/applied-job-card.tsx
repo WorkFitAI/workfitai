@@ -6,8 +6,8 @@ import { Application, ApplicationStatus } from "@/types/application";
 import ApplicationStatusBadge from "./application-status-badge";
 import ApplicationWithdrawDialog from "./application-withdraw-dialog";
 
-/** Statuses that allow withdrawal */
-const WITHDRAWABLE: ApplicationStatus[] = ["DRAFT", "APPLIED", "REVIEWING"];
+/** Only APPLIED status allows withdrawal */
+const WITHDRAWABLE: ApplicationStatus[] = ["APPLIED"];
 
 interface Props {
   application: Application;

@@ -104,7 +104,7 @@ describe("[V] OTP Verification", () => {
   it("V3 — HR verifies valid OTP → success toast → redirect to /pending-approval?role=HR", async () => {
     mockSearchParamsRole = "HR";
     server.use(
-      http.post("https://be.workfitai.uk/auth/verify-otp", () =>
+      http.post("https://api.workfitai.uk/auth/verify-otp", () =>
         HttpResponse.json({ success: true, data: { status: "WAIT_APPROVED" } }),
       ),
     );
@@ -121,7 +121,7 @@ describe("[V] OTP Verification", () => {
   it("V4 — HR_MANAGER verifies valid OTP → redirect to /pending-approval?role=HR_MANAGER", async () => {
     mockSearchParamsRole = "HR_MANAGER";
     server.use(
-      http.post("https://be.workfitai.uk/auth/verify-otp", () =>
+      http.post("https://api.workfitai.uk/auth/verify-otp", () =>
         HttpResponse.json({ success: true, data: { status: "WAIT_APPROVED" } }),
       ),
     );
@@ -136,7 +136,7 @@ describe("[V] OTP Verification", () => {
 
   it("V5 — invalid OTP (400) → error toast", async () => {
     server.use(
-      http.post("https://be.workfitai.uk/auth/verify-otp", () =>
+      http.post("https://api.workfitai.uk/auth/verify-otp", () =>
         apiError("Invalid or expired OTP", 400),
       ),
     );
@@ -190,7 +190,7 @@ describe("[V] OTP Verification", () => {
 
   it("V8 — Resend OTP failure (500) → error toast", async () => {
     server.use(
-      http.post("https://be.workfitai.uk/auth/resend-otp", () =>
+      http.post("https://api.workfitai.uk/auth/resend-otp", () =>
         apiError("Failed to resend OTP", 500),
       ),
     );

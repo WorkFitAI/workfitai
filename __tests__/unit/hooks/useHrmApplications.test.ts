@@ -36,7 +36,7 @@ import {
   useCompanyCandidates,
 } from "@/hooks/useHrmApplications";
 
-const API = "https://be.workfitai.uk";
+const API = "https://api.workfitai.uk";
 
 // Mock adminUserService — approve/reject HR call it directly (not via HTTP)
 vi.mock("@/lib/admin/admin-user-service", () => ({
@@ -302,7 +302,9 @@ describe("useHRJobs", () => {
 
   it("sets error when API returns failure", async () => {
     server.use(
-      http.get(`${API}/application/hr/jobs`, () => apiError("Server error", 500)),
+      http.get(`${API}/application/hr/jobs`, () =>
+        apiError("Server error", 500),
+      ),
     );
     const { result } = renderHook(() => useHRJobs(1, 20));
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -326,14 +328,19 @@ describe("useHRJobs", () => {
     server.use(
       http.get(`${API}/application/hr/jobs`, () => {
         callCount++;
-        return apiSuccess({ items: [mockHRJobItem()], meta: mockPaginationMeta() });
+        return apiSuccess({
+          items: [mockHRJobItem()],
+          meta: mockPaginationMeta(),
+        });
       }),
     );
     const { result } = renderHook(() => useHRJobs(1, 20));
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(callCount).toBe(1);
 
-    act(() => { result.current.refresh(); });
+    act(() => {
+      result.current.refresh();
+    });
     await waitFor(() => expect(callCount).toBe(2));
   });
 });
@@ -357,7 +364,9 @@ describe("useHRCandidates", () => {
 
   it("sets error when API returns failure", async () => {
     server.use(
-      http.get(`${API}/application/hr/candidates`, () => apiError("Server error", 500)),
+      http.get(`${API}/application/hr/candidates`, () =>
+        apiError("Server error", 500),
+      ),
     );
     const { result } = renderHook(() => useHRCandidates(1, 20));
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -400,7 +409,10 @@ describe("useCompanyJobs", () => {
     server.use(
       http.get(`${API}/application/company/:companyNo/jobs`, () => {
         callCount++;
-        return apiSuccess({ items: [mockHRJobItem()], meta: mockPaginationMeta() });
+        return apiSuccess({
+          items: [mockHRJobItem()],
+          meta: mockPaginationMeta(),
+        });
       }),
     );
     renderHook(() => useCompanyJobs("", 1, 20));
@@ -436,7 +448,10 @@ describe("useCompanyJobs", () => {
 
 describe("useCompanyCandidates", () => {
   it("starts with loading=true then resolves with candidates", async () => {
-    const candidate = mockHRCandidateItem({ username: "alice", applicationCount: 3 });
+    const candidate = mockHRCandidateItem({
+      username: "alice",
+      applicationCount: 3,
+    });
     server.use(
       http.get(`${API}/application/company/:companyNo/candidates`, () =>
         apiSuccess({ items: [candidate], meta: mockPaginationMeta() }),
@@ -455,7 +470,10 @@ describe("useCompanyCandidates", () => {
     server.use(
       http.get(`${API}/application/company/:companyNo/candidates`, () => {
         callCount++;
-        return apiSuccess({ items: [], meta: mockPaginationMeta({ totalElements: 0 }) });
+        return apiSuccess({
+          items: [],
+          meta: mockPaginationMeta({ totalElements: 0 }),
+        });
       }),
     );
     renderHook(() => useCompanyCandidates("", 1, 20));
@@ -480,14 +498,19 @@ describe("useCompanyCandidates", () => {
     server.use(
       http.get(`${API}/application/company/:companyNo/candidates`, () => {
         callCount++;
-        return apiSuccess({ items: [mockHRCandidateItem()], meta: mockPaginationMeta() });
+        return apiSuccess({
+          items: [mockHRCandidateItem()],
+          meta: mockPaginationMeta(),
+        });
       }),
     );
     const { result } = renderHook(() => useCompanyCandidates("C001", 1, 20));
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(callCount).toBe(1);
 
-    act(() => { result.current.refresh(); });
+    act(() => {
+      result.current.refresh();
+    });
     await waitFor(() => expect(callCount).toBe(2));
   });
 });

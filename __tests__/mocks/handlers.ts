@@ -12,7 +12,7 @@ import type {
 } from "@/types/application";
 import type { CVMetadata, CVListResponse } from "@/types/cv";
 
-const API = "https://be.workfitai.uk";
+const API = "https://api.workfitai.uk";
 
 /** Like apiSuccess but with a `status` field — required by services that check res.status */
 export function apiStatusSuccess<T>(data: T, message = "OK") {

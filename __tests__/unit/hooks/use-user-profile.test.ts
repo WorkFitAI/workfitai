@@ -6,7 +6,7 @@ import { apiSuccess } from "../../mocks/handlers";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import type { CandidateProfile, AvatarData } from "@/types/user";
 
-const API = "https://be.workfitai.uk";
+const API = "https://api.workfitai.uk";
 
 function mockCandidateProfile(
   overrides: Partial<CandidateProfile> = {},

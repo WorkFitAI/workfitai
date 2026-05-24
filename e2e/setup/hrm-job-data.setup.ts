@@ -73,45 +73,76 @@ setup("create and publish test job as HRM1", async ({ page }) => {
   await page.getByLabel("Job Title").fill("E2E Test Job - Backend Engineer");
   await page
     .getByPlaceholder("Brief overview for job listing...")
-    .fill("Automated test job created for E2E testing purposes only");
+    .fill(
+      "We are looking for a skilled Backend Engineer to join our growing engineering team. " +
+      "You will design and build scalable REST APIs, own microservice infrastructure, and " +
+      "collaborate with frontend and data teams to deliver high-quality product features.",
+    );
   await page
     .locator("label:has-text('Full Description') ~ textarea")
-    .fill("This job was created by automated E2E tests and can be safely deleted after testing.");
+    .fill(
+      "Responsibilities:\n" +
+      "- Design, implement, and maintain high-performance REST APIs using Node.js / NestJS\n" +
+      "- Build and optimise relational database schemas (PostgreSQL)\n" +
+      "- Write clean, well-tested TypeScript code with >80% unit-test coverage\n" +
+      "- Participate in code reviews and mentor junior developers\n" +
+      "- Collaborate with DevOps to manage CI/CD pipelines on GitHub Actions\n\n" +
+      "Requirements:\n" +
+      "- 3-5 years of professional backend development experience\n" +
+      "- Proficiency in TypeScript / Node.js and RESTful API design\n" +
+      "- Experience with PostgreSQL, Redis, and message queues (RabbitMQ or Kafka)\n" +
+      "- Familiarity with Docker, Kubernetes, and cloud platforms (AWS / GCP)\n" +
+      "- Strong communication skills and ability to work in an Agile team\n\n" +
+      "Nice to have:\n" +
+      "- Experience with GraphQL or gRPC\n" +
+      "- Contributions to open-source projects",
+    );
   await page.getByPlaceholder("City, Country").fill("Ho Chi Minh City, Vietnam");
-  await page.getByPlaceholder("e.g. Bachelor in CS").fill("Bachelor in Computer Science");
-  await page.getByPlaceholder("e.g. 3-5 years").fill("3-5 years experience");
+  await page.getByPlaceholder("e.g. Bachelor in CS").fill("Bachelor in Computer Science or related field");
+  await page.getByPlaceholder("e.g. 3-5 years").fill("3-5 years of professional experience");
 
-  // ── Add at least one skill (backend requires skillIds to be non-empty) ──────
-  // Fetch a real skill name from the public API so the name matches job-post-client.tsx skills state
-  let firstSkillName = "JavaScript";
+  // ── Add skills (backend requires skillIds to be non-empty) ────────────────
+  // Fetch real skill names so they match what the job-post-client has in its dropdown state.
+  const skillFallbacks = ["JavaScript", "TypeScript", "Node.js", "PostgreSQL", "Docker"];
+  let availableSkills: string[] = skillFallbacks;
   try {
     const skillsRes = await page.request.get(`${API_BASE}/job/public/skills`);
     if (skillsRes.ok()) {
       const json = await skillsRes.json();
       const list: Array<{ name: string }> = json?.data?.result ?? json?.result ?? [];
-      if (list.length > 0) firstSkillName = list[0].name;
+      if (list.length > 0) availableSkills = list.map((s) => s.name);
     }
   } catch {
-    // use fallback skill name
-  }
-  console.log(`Using skill name: "${firstSkillName}"`);
-
-  const skillInput = page.getByPlaceholder("Type skill and press Enter...");
-  await skillInput.fill(firstSkillName);
-  await page.waitForTimeout(800); // allow dropdown to filter
-
-  // Skill dropdown renders inside a Card with absolute z-50 — scope to avoid hitting status toggle
-  const skillDropdown = dialog.locator('.absolute.z-50');
-  const skillSuggestion = skillDropdown.locator('.cursor-pointer').filter({ hasText: firstSkillName }).first();
-  if (await skillSuggestion.isVisible({ timeout: 3_000 }).catch(() => false)) {
-    await skillSuggestion.click();
-  } else {
-    // Dropdown not visible — press Enter to add typed text directly
-    await skillInput.press("Enter");
+    // use fallback skill names
   }
 
-  // Max Salary — number inputs order: [0]=salaryMin, [1]=salaryMax, [2]=quantity
+  // Helper: add one skill by name
+  async function addSkill(name: string): Promise<void> {
+    const skillInput = page.getByPlaceholder("Type skill and press Enter...");
+    await skillInput.fill(name);
+    await page.waitForTimeout(700);
+    const skillDropdown = dialog.locator('.absolute.z-50');
+    const suggestion = skillDropdown.locator('.cursor-pointer').filter({ hasText: name }).first();
+    if (await suggestion.isVisible({ timeout: 2_500 }).catch(() => false)) {
+      await suggestion.click();
+    } else {
+      await skillInput.press("Enter");
+    }
+    await page.waitForTimeout(300);
+  }
+
+  // Add up to 3 diverse skills from the available list
+  const skillsToAdd = availableSkills.slice(0, Math.min(3, availableSkills.length));
+  for (const skill of skillsToAdd) {
+    console.log(`Adding skill: "${skill}"`);
+    await addSkill(skill);
+  }
+
+  // Salary range — [0]=salaryMin, [1]=salaryMax, [2]=quantity
+  await page.locator('input[type="number"]').nth(0).fill("2000");
   await page.locator('input[type="number"]').nth(1).fill("5000");
+  // Quantity: 3 open positions
+  await page.locator('input[type="number"]').nth(2).fill("3").catch(() => {/* field may not exist */});
 
   // ── Set expiration date (must be in the future) ─────────────────────────
   const calTrigger = page

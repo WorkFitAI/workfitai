@@ -14,7 +14,7 @@ import type {
   AdminUserSummary,
 } from "@/types/admin-user";
 
-const API = "https://be.workfitai.uk";
+const API = "https://api.workfitai.uk";
 
 function mockEsResult(overrides: Partial<EsSearchResult> = {}): EsSearchResult {
   return {

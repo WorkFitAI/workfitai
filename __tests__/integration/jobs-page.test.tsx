@@ -17,7 +17,7 @@ import { server } from "../mocks/server";
 import { apiStatusSuccess, mockJobItem } from "../mocks/handlers";
 import JobsPageClient from "@/components/jobs/jobs-page-client";
 
-const API = "https://be.workfitai.uk";
+const API = "https://api.workfitai.uk";
 
 vi.mock("@/contexts/auth-context", () => ({
   useAuth: () => ({

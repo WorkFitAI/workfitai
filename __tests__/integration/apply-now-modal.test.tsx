@@ -19,7 +19,7 @@ import { server } from "../mocks/server";
 import { apiSuccess, apiError } from "../mocks/handlers";
 import ApplyNowModal from "@/components/applications/apply-now-modal";
 
-const API = "https://be.workfitai.uk";
+const API = "https://api.workfitai.uk";
 
 // Stable references — must be hoisted so vi.mock factory can close over them
 const { mockUser, mockToastSuccess, mockToastError, mockToastInfo } =

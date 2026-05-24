@@ -24,7 +24,7 @@ import {
 } from "../mocks/handlers";
 import AppliedJobsPageClient from "@/components/applied-jobs/applied-jobs-page-client";
 
-const API = "https://be.workfitai.uk";
+const API = "https://api.workfitai.uk";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),
