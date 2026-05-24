@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 // Routes accessible to any control role (HR, HRM, Admin)
 const CONTROL_ROUTES = ['/dashboard', '/job-posts', '/settings', '/applications']
 // Routes restricted to HR Manager and Admin only
-const HRM_ROUTES = ['/hr-management']
+const HRM_ROUTES = ['/hr-management', '/roles-permissions']
 // Routes restricted to Admin only
 const ADMIN_ROUTES = ['/users']
 // Routes that require any authenticated user
@@ -109,5 +109,7 @@ export const config = {
     '/applications/:path*',
     '/hr-management',
     '/hr-management/:path*',
+    '/roles-permissions',
+    '/roles-permissions/:path*',
   ],
 }
