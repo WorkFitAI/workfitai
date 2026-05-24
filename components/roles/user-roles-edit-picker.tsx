@@ -1,16 +1,34 @@
 "use client"
 
-// Lazy sub-component: only mounts (and fetches /auth/roles) when edit mode is active
+// Lazy sub-component: only mounts (and fetches /auth/roles) when edit modal is open
 import { useState } from "react"
-import { Loader2, AlertCircle } from "lucide-react"
+import { Loader2, AlertCircle, Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useRoles } from "@/hooks/useRoles"
 
-const HRM_RESTRICTED_ROLES = ["ADMIN", "HR_MANAGER", "CANDIDATE"]
+// Sorted longest-first so "HR_MANAGER" is tested before "HR"
+const BUILT_IN_ROLES = ["HR_MANAGER", "ADMIN", "CANDIDATE", "HR"]
+
+/**
+ * Resolves the built-in scope of any role name.
+ * "HR_MANAGER_SENIOR" → "HR_MANAGER"
+ * "HR_CUSTOM"         → "HR"
+ * "ADMIN"             → "ADMIN"
+ * Unknown prefix      → null
+ */
+function getRoleScope(roleName: string): string | null {
+  if (BUILT_IN_ROLES.includes(roleName)) return roleName
+  for (const bi of BUILT_IN_ROLES) {   // already longest-first
+    if (roleName.startsWith(bi + "_")) return bi
+  }
+  return null
+}
 
 interface UserRolesEditPickerProps {
   isAdmin: boolean
+  /** User's primary role — defines assignable scope + always locked, cannot be removed */
+  primaryRole: string
   currentRoles: string[]
   saving: boolean
   onSave: (localRoles: string[]) => void
@@ -19,28 +37,36 @@ interface UserRolesEditPickerProps {
 
 export function UserRolesEditPicker({
   isAdmin,
+  primaryRole,
   currentRoles,
   saving,
   onSave,
   onCancel,
 }: UserRolesEditPickerProps) {
   const { roles: allRoles, loading: rolesLoading } = useRoles()
-  const [localRoles, setLocalRoles] = useState<string[]>([...currentRoles])
 
-  // HR_MANAGER must not grant ADMIN/HR_MANAGER/CANDIDATE (privilege escalation guard;
-  // backend should also enforce this)
-  const editableRoles = isAdmin
-    ? allRoles
-    : allRoles.filter((r) => !HRM_RESTRICTED_ROLES.includes(r.name))
+  // Always seed primaryRole as checked — guards against it being absent from currentRoles
+  const [localRoles, setLocalRoles] = useState<string[]>(() => {
+    const base = [...currentRoles]
+    if (primaryRole && !base.includes(primaryRole)) base.push(primaryRole)
+    return base
+  })
+
+  // Scope-based filter: only roles whose scope matches the target user's primary role.
+  // This prevents cross-scope assignments (e.g. ADMIN roles on a CANDIDATE user).
+  // Backend must also enforce this — frontend is UX-only guard.
+  const editableRoles = allRoles.filter(r => getRoleScope(r.name) === primaryRole)
 
   const hasDiff =
-    JSON.stringify([...localRoles].sort()) !==
-    JSON.stringify([...currentRoles].sort())
+    JSON.stringify([...localRoles].sort()) !== JSON.stringify([...currentRoles].sort())
 
-  const toggleRole = (name: string) =>
-    setLocalRoles((prev) =>
-      prev.includes(name) ? prev.filter((r) => r !== name) : [...prev, name],
+  // Primary role is immutable — silently drop toggle attempts
+  const toggleRole = (name: string) => {
+    if (name === primaryRole) return
+    setLocalRoles(prev =>
+      prev.includes(name) ? prev.filter(r => r !== name) : [...prev, name],
     )
+  }
 
   return (
     <div className="space-y-3">
@@ -55,31 +81,45 @@ export function UserRolesEditPicker({
           <span className="text-sm text-gray-500">Loading available roles…</span>
         </div>
       ) : editableRoles.length === 0 ? (
-        <div className="flex items-center gap-2 py-2 text-sm text-gray-400">
-          <AlertCircle className="h-4 w-4" />
-          No roles available.
+        <div className="flex items-center gap-2 py-3 text-sm text-gray-400">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          No additional roles in the <span className="font-medium mx-1">{primaryRole}</span> scope.
         </div>
       ) : (
         <div className="divide-y divide-gray-100 border border-gray-200 rounded-lg overflow-hidden">
-          {editableRoles.map((role) => (
-            <label
-              key={role.name}
-              className="flex items-start gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer"
-            >
-              <Checkbox
-                checked={localRoles.includes(role.name)}
-                onCheckedChange={() => toggleRole(role.name)}
-                className="mt-0.5"
-                disabled={saving}
-              />
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-gray-900">{role.name}</p>
-                {role.description && (
-                  <p className="text-xs text-gray-400">{role.description}</p>
-                )}
-              </div>
-            </label>
-          ))}
+          {editableRoles.map(role => {
+            const isLocked  = role.name === primaryRole
+            const isChecked = localRoles.includes(role.name)
+            return (
+              <label key={role.name}
+                className={`flex items-start gap-3 px-4 py-2.5 transition-colors ${
+                  isLocked ? "bg-gray-50/80 cursor-default" : "hover:bg-gray-50 cursor-pointer"
+                }`}>
+                <Checkbox
+                  checked={isLocked || isChecked}
+                  onCheckedChange={() => toggleRole(role.name)}
+                  className="mt-0.5"
+                  disabled={saving || isLocked}
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <p className={`text-sm font-medium ${isLocked ? "text-gray-500" : "text-gray-900"}`}>
+                      {role.name}
+                    </p>
+                    {isLocked && (
+                      <span className="inline-flex items-center gap-0.5 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-400">
+                        <Lock className="h-2.5 w-2.5" />
+                        primary · locked
+                      </span>
+                    )}
+                  </div>
+                  {role.description && (
+                    <p className="text-xs text-gray-400 mt-0.5">{role.description}</p>
+                  )}
+                </div>
+              </label>
+            )
+          })}
         </div>
       )}
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { Loader2, AlertTriangle, X } from "lucide-react"
+import { Loader2, AlertTriangle } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -24,20 +24,11 @@ export function DeleteRoleConfirm({
     <Dialog open onOpenChange={(open) => !open && onCancel()}>
       <DialogContent className="max-w-sm p-0 gap-0 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100">
-              <AlertTriangle className="h-4 w-4 text-red-600" />
-            </div>
-            <h2 className="text-base font-semibold text-gray-900">Delete Role</h2>
+        <div className="flex items-center gap-2.5 px-5 py-4 border-b border-gray-200 pr-12">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100">
+            <AlertTriangle className="h-4 w-4 text-red-600" />
           </div>
-          <button
-            onClick={onCancel}
-            disabled={isDeleting}
-            className="rounded-lg p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-40 transition-colors"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          <h2 className="text-base font-semibold text-gray-900">Delete Role</h2>
         </div>
 
         {/* Body */}
