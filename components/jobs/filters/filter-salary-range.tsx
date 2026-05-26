@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
 
 type Props = {
   title: string;
@@ -21,13 +20,27 @@ const FilterSalaryRange = ({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const initial = Number(searchParams.get(queryKey) ?? min);
-  const [value, setValue] = useState(initial);
+  const currency = searchParams.get("currency") ?? "USD";
 
-  const updateQuery = () => {
+  const rawValue = Number(searchParams.get(queryKey) ?? min);
+
+  // convert URL -> UI
+  const value =
+    currency === "VND" ? rawValue / 10000 : rawValue;
+
+  const displayValue =
+    currency === "VND" ? value * 10000 : value;
+
+  const updateQuery = (newValue: number, newCurrency?: string) => {
     const params = new URLSearchParams(searchParams.toString());
 
-    params.set(queryKey, String(value));
+    const cur = newCurrency ?? currency;
+
+    const normalizedValue =
+      cur === "VND" ? newValue * 10000 : newValue;
+
+    params.set(queryKey, String(normalizedValue));
+    params.set("currency", cur);
     params.set("page", "1");
 
     router.push(`?${params.toString()}`);
@@ -37,21 +50,51 @@ const FilterSalaryRange = ({
     <div className="border-t pt-4 mt-4">
       <h4 className="font-medium mb-2">{title}</h4>
 
+      {/* currency */}
+      <div className="flex gap-4 mb-3 text-sm">
+        <label>
+          <input
+            type="radio"
+            checked={currency === "USD"}
+            onChange={() => updateQuery(value, "USD")}
+          />
+          {' '}USD
+        </label>
+
+        <label>
+          <input
+            type="radio"
+            checked={currency === "VND"}
+            onChange={() => updateQuery(value, "VND")}
+          />
+          {' '}VND
+        </label>
+      </div>
+
+      {/* slider */}
       <input
         type="range"
         min={min}
         max={max}
         step={step}
         value={value}
-        onChange={(e) => setValue(Number(e.target.value))}
-        onMouseUp={updateQuery}
-        onTouchEnd={updateQuery}
+        onChange={(e) => updateQuery(Number(e.target.value))}
         className="w-full cursor-pointer"
       />
 
-      <div className="flex justify-between text-sm font-semibold mt-2 text-gray-400">
-        <span className="text-blue-600">${Math.max(min, value)}+</span>
-        <span>${max}</span>
+      {/* display */}
+      <div className="flex justify-between text-sm mt-2 text-gray-400">
+        <span className="text-blue-600">
+          {currency === "VND"
+            ? `${displayValue.toLocaleString()} VND+`
+            : `$${value}+`}
+        </span>
+
+        <span>
+          {currency === "VND"
+            ? `${(max * 10000).toLocaleString()} VND`
+            : `$${max}`}
+        </span>
       </div>
     </div>
   );

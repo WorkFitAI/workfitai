@@ -29,21 +29,21 @@ export const JobDialog = ({ isOpen, onOpenChange, onSubmit, initialData, onSucce
           translate-x-0! translate-y-0!
         "
       >
-        <div className="h-full overflow-y-auto p-10">
-          <DialogHeader>
-            <DialogTitle>{initialData ? "Edit Job" : "Add New Job"}</DialogTitle>
-            <DialogDescription>
-              Fill in the details for the job position you want to post.
-            </DialogDescription>
-          </DialogHeader>
-          <JobForm 
-            initialData={initialData ?? undefined} 
-            onSubmit={(data) => {
-              onSubmit(data);
-              onOpenChange(false);
-            }} 
-            onSuccess={onSuccess}
-          />
+        <div className="h-full overflow-y-auto py-10 ">
+              <DialogHeader className="px-38">
+                <DialogTitle className="text-3xl">{initialData ? "Edit Job" : "Add New Job"}</DialogTitle>
+                <DialogDescription>
+                  Fill in the details for the job position you want to post.
+                </DialogDescription>
+              </DialogHeader>
+              <JobForm 
+                initialData={initialData ?? undefined} 
+                onSubmit={(data) => {
+                  onSubmit(data);
+                  onOpenChange(false);
+                }} 
+                onSuccess={onSuccess}
+              />
         </div>
       </DialogContent>
     </Dialog>
