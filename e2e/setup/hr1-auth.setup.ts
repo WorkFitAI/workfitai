@@ -4,12 +4,12 @@ import path from "path";
 export const HR1_AUTH_FILE = path.join(__dirname, "../.auth/hr1.json");
 
 setup("authenticate as hr1", async ({ page }) => {
+  const email = process.env.TEST_HR1_EMAIL!;
+  const password = process.env.TEST_HR1_PASSWORD!;
   await page.goto("/login");
-  await page
-    .getByRole("textbox", { name: "Email" })
-    .fill("hrtest1@gmail.com");
+  await page.getByRole("textbox", { name: "Email" }).fill(email);
   await page.getByRole("textbox", { name: "Email" }).press("Tab");
-  await page.getByRole("textbox", { name: "Password" }).fill("password@123");
+  await page.getByRole("textbox", { name: "Password" }).fill(password);
   await page.getByRole("button", { name: "Login →" }).click();
 
   await page.waitForURL((url) => !url.pathname.includes("/login"), {

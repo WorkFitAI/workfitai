@@ -90,7 +90,7 @@ describe("[A] Candidate Registration", () => {
 
   it("A2 — duplicate email (409) → error toast", async () => {
     server.use(
-      http.post("https://api.workfitai.uk/auth/register", () =>
+      http.post("https://be.workfitai.uk/auth/register", () =>
         HttpResponse.json(
           { success: false, message: "Email already registered" },
           { status: 409 },
@@ -109,7 +109,7 @@ describe("[A] Candidate Registration", () => {
   it("A3 — password < 8 chars → inline Zod error, no API call", async () => {
     const registerSpy = vi.fn();
     server.use(
-      http.post("https://api.workfitai.uk/auth/register", () => {
+      http.post("https://be.workfitai.uk/auth/register", () => {
         registerSpy();
         return HttpResponse.json({});
       }),
@@ -155,7 +155,7 @@ describe("[A] Candidate Registration", () => {
   it("A8 — submit without terms → toast error, no API call", async () => {
     const spy = vi.fn();
     server.use(
-      http.post("https://api.workfitai.uk/auth/register", () => {
+      http.post("https://be.workfitai.uk/auth/register", () => {
         spy();
         return HttpResponse.json({});
       }),
@@ -186,7 +186,7 @@ describe("[A] Candidate Registration", () => {
 
   it("A9 — network error → error toast", async () => {
     server.use(
-      http.post("https://api.workfitai.uk/auth/register", () =>
+      http.post("https://be.workfitai.uk/auth/register", () =>
         HttpResponse.error(),
       ),
     );

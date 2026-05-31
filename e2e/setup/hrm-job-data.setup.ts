@@ -12,13 +12,9 @@ setup("create and publish test job as HRM1", async ({ page }) => {
   // (wfa_access_token). Do a fresh login using the same device ID as stored in localStorage
   // (backend binds access tokens to device IDs via X-Device-Id header), then inject the
   // access token into sessionStorage via addInitScript so page API calls are authenticated.
-  // Resolve API base from .env.local (Next.js bakes NEXT_PUBLIC_* at build time; read here for test API calls)
-  const envPath = path.join(__dirname, "../../.env.local");
-  let API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:9085";
-  if (!process.env.NEXT_PUBLIC_API_BASE_URL && fs.existsSync(envPath)) {
-    const envMatch = fs.readFileSync(envPath, "utf-8").match(/^NEXT_PUBLIC_API_BASE_URL=(.+)$/m);
-    if (envMatch) API_BASE = envMatch[1].trim();
-  }
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:9085";
+  const hrmanager1Email = process.env.TEST_HRMANAGER1_EMAIL!;
+  const hrmanager1Password = process.env.TEST_HRMANAGER1_PASSWORD!;
 
   const AUTH_FILE = path.join(__dirname, "../.auth/hrmanager1.json");
   let accessToken: string | null = null;
@@ -34,7 +30,7 @@ setup("create and publish test job as HRM1", async ({ page }) => {
         ?.value ?? "playwright-e2e-hrm1";
 
     const loginRes = await page.request.post(`${API_BASE}/auth/login`, {
-      data: { usernameOrEmail: "hrmanager1@gmail.com", password: "password@123" },
+      data: { usernameOrEmail: hrmanager1Email, password: hrmanager1Password },
       headers: { "Content-Type": "application/json", "X-Device-Id": deviceId },
     });
     if (loginRes.ok()) {

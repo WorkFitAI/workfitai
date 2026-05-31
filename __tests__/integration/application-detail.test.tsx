@@ -26,7 +26,7 @@ import {
 import { applicationService } from "@/lib/application/application-service";
 import ApplicationDetailClient from "@/components/applied-jobs/application-detail-client";
 
-const API = "https://api.workfitai.uk";
+const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://be.workfitai.uk";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),

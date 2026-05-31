@@ -48,18 +48,17 @@ function makeLoginSuccess(roles: string[] = ["CANDIDATE"]) {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  sessionStorage.clear();
   localStorage.clear();
 });
 
 describe("[D] Login — success paths", () => {
-  it("D1 — CANDIDATE login → accessToken stored in sessionStorage", async () => {
+  it("D1 — CANDIDATE login → accessToken stored in localStorage", async () => {
     mockPost.mockResolvedValueOnce(makeLoginSuccess(["CANDIDATE"]));
     await authService.login({
       usernameOrEmail: "candidate@test.com",
       password: "Password1",
     });
-    expect(sessionStorage.getItem("wfa_access_token")).toBe("test-token");
+    expect(localStorage.getItem("wfa_access_token")).toBe("test-token");
   });
 
   it("D2 — ADMIN login → response contains ADMIN role", async () => {
@@ -128,19 +127,19 @@ describe("[D] Login — error paths", () => {
 });
 
 describe("[F] Logout", () => {
-  it("F1 — logout clears sessionStorage token", async () => {
+  it("F1 — logout clears localStorage token", async () => {
     mockPost.mockResolvedValueOnce(makeLoginSuccess());
     await authService.login({
       usernameOrEmail: "user@test.com",
       password: "Password1",
     });
-    expect(sessionStorage.getItem("wfa_access_token")).toBeTruthy();
+    expect(localStorage.getItem("wfa_access_token")).toBeTruthy();
     mockPost.mockResolvedValueOnce({
       success: true,
       message: "Logout successful",
     });
     await authService.logout();
-    expect(sessionStorage.getItem("wfa_access_token")).toBeNull();
+    expect(localStorage.getItem("wfa_access_token")).toBeNull();
   });
 });
 

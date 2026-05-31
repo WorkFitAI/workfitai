@@ -1,19 +1,30 @@
-// Manages the non-HttpOnly `auth_session` cookie for Next.js middleware auth checks
+// Manages the non-HttpOnly `auth_session` cookie for Next.js middleware auth checks.
+// Domain is configured via NEXT_PUBLIC_COOKIE_DOMAIN (e.g. ".workfitai.uk" in production,
+// empty in dev so cookies scope to localhost only).
 import type { UserSession } from '@/types/auth'
 
 const COOKIE_NAME = 'auth_session'
+
+function buildCookieAttrs(maxAge: number): string {
+  const isHttps = typeof location !== 'undefined' && location.protocol === 'https:'
+  const secure = isHttps ? '; Secure' : ''
+  const cookieDomain = process.env.NEXT_PUBLIC_COOKIE_DOMAIN
+  const domain = cookieDomain ? `; Domain=${cookieDomain}` : ''
+  return `path=/; max-age=${maxAge}; SameSite=Lax${domain}${secure}`
+}
 
 /** Sets the auth_session cookie readable by middleware and JS */
 export function setSessionCookie(session: UserSession): void {
   const maxAge = Math.floor((session.expiresAt - Date.now()) / 1000)
   const value = encodeURIComponent(JSON.stringify(session))
-  const secure = typeof location !== 'undefined' && location.protocol === 'https:' ? '; Secure' : ''
-  document.cookie = `${COOKIE_NAME}=${value}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`
+  document.cookie = `${COOKIE_NAME}=${value}; ${buildCookieAttrs(maxAge)}`
 }
 
-/** Clears the auth_session cookie */
+/** Clears the auth_session cookie — must use same Domain as setSessionCookie */
 export function clearSessionCookie(): void {
-  document.cookie = `${COOKIE_NAME}=; path=/; max-age=0; SameSite=Lax`
+  const cookieDomain = process.env.NEXT_PUBLIC_COOKIE_DOMAIN
+  const domain = cookieDomain ? `; Domain=${cookieDomain}` : ''
+  document.cookie = `${COOKIE_NAME}=; path=/; max-age=0; SameSite=Lax${domain}`
 }
 
 /** Reads and parses the auth_session cookie, returns null if missing or invalid */

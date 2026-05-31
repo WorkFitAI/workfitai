@@ -7,12 +7,12 @@ export const CANDIDATE_AUTH_FILE = path.join(
 );
 
 setup("authenticate as candidate", async ({ page }) => {
+  const email = process.env.TEST_CANDIDATE1_EMAIL!;
+  const password = process.env.TEST_CANDIDATE1_PASSWORD!;
   await page.goto("/login");
-  await page
-    .getByRole("textbox", { name: "Email" })
-    .fill("candidate1@gmail.com");
+  await page.getByRole("textbox", { name: "Email" }).fill(email);
   await page.getByRole("textbox", { name: "Email" }).press("Tab");
-  await page.getByRole("textbox", { name: "Password" }).fill("password@123");
+  await page.getByRole("textbox", { name: "Password" }).fill(password);
   await page.getByRole("button", { name: "Login →" }).click();
 
   // Wait for redirect to home or dashboard after successful login

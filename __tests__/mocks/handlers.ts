@@ -11,8 +11,9 @@ import type {
   CandidateDetail,
 } from "@/types/application";
 import type { CVMetadata, CVListResponse } from "@/types/cv";
+import type { Permission, Role } from "@/types/role-permission";
 
-const API = "https://api.workfitai.uk";
+const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://be.workfitai.uk";
 
 /** Like apiSuccess but with a `status` field — required by services that check res.status */
 export function apiStatusSuccess<T>(data: T, message = "OK") {
@@ -334,6 +335,25 @@ export function mockCVListResponse(
   };
 }
 
+// ── Role / Permission fixtures ────────────────────────────────────────────────
+
+export function mockPermission(overrides: Partial<Permission> = {}): Permission {
+  return {
+    name: "application:read",
+    description: "Read applications",
+    ...overrides,
+  };
+}
+
+export function mockRole(overrides: Partial<Role> = {}): Role {
+  return {
+    name: "HR_CUSTOM",
+    description: "Custom HR role",
+    permissions: ["application:read"],
+    ...overrides,
+  };
+}
+
 // ── Job fixtures ──────────────────────────────────────────────────────────────
 
 export function mockJobItem(
@@ -588,4 +608,55 @@ export const handlers = [
   http.delete(`${API}/cv/candidate/:cvId`, () =>
     HttpResponse.json({ success: true, message: "CV deleted" }),
   ),
+
+  // ── Permissions ───────────────────────────────────────────────────────────
+  http.get(`${API}/auth/permissions`, () => apiSuccess([mockPermission()])),
+
+  http.get(`${API}/auth/permissions/:name`, () => apiSuccess(mockPermission())),
+
+  // ── Roles ─────────────────────────────────────────────────────────────────
+  http.get(`${API}/auth/roles`, () => apiSuccess([mockRole()])),
+
+  http.get(`${API}/auth/roles/:name`, () => apiSuccess(mockRole())),
+
+  http.post(`${API}/auth/roles/:sourceName/clone`, () =>
+    apiSuccess(mockRole({ name: "HR_CUSTOM_CLONE" })),
+  ),
+
+  http.delete(`${API}/auth/roles/:roleName`, () =>
+    HttpResponse.json({ success: true, message: "Role deleted" }),
+  ),
+
+  // ── Role permissions — batch paths BEFORE single-item paths ───────────────
+  http.post(`${API}/auth/roles/:roleName/permissions/batch`, () =>
+    apiSuccess(mockRole()),
+  ),
+
+  http.post(`${API}/auth/roles/:roleName/permissions`, () =>
+    apiSuccess(mockRole()),
+  ),
+
+  // DELETE /auth/roles/:roleName/permissions/batch (body)
+  // DELETE /auth/roles/:roleName/permissions?permission=... (query param)
+  // Both match the same path pattern — batch must be first.
+  http.delete(`${API}/auth/roles/:roleName/permissions/batch`, () =>
+    apiSuccess(mockRole()),
+  ),
+
+  http.delete(`${API}/auth/roles/:roleName/permissions`, () =>
+    apiSuccess(mockRole()),
+  ),
+
+  // ── User roles — batch paths BEFORE single-item paths ────────────────────
+  http.get(`${API}/auth/users/:username/roles`, () => apiSuccess(["HR"])),
+
+  http.post(`${API}/auth/users/:username/roles/batch`, () => apiSuccess({})),
+
+  // POST /auth/users/:username/roles?role=... (query param)
+  http.post(`${API}/auth/users/:username/roles`, () => apiSuccess({})),
+
+  http.delete(`${API}/auth/users/:username/roles/batch`, () => apiSuccess({})),
+
+  // DELETE /auth/users/:username/roles?role=... (query param)
+  http.delete(`${API}/auth/users/:username/roles`, () => apiSuccess({})),
 ];

@@ -85,7 +85,7 @@ describe("[D] Login Form", () => {
   it("D4 — empty form → Zod inline errors, no API call", async () => {
     const spy = vi.fn();
     server.use(
-      http.post("https://api.workfitai.uk/auth/login", () => {
+      http.post("https://be.workfitai.uk/auth/login", () => {
         spy();
         return HttpResponse.json({});
       }),

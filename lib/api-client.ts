@@ -8,8 +8,17 @@ import { getDeviceId } from "@/lib/auth/device-fingerprint";
 import { setSessionCookie } from "@/lib/auth/session-cookie";
 import type { UserSession } from "@/types/auth";
 
-const API_BASE =
+// In dev with NEXT_PUBLIC_USE_API_PROXY=true, route all fetch calls through the
+// Next.js API proxy (/api/proxy/*) so the browser treats them as same-origin.
+// This makes the HttpOnly refresh cookie work even when FE and BE are on different
+// hosts/domains (e.g. localhost:3000 ↔ be.workfitai.uk in local dev).
+const USE_PROXY = process.env.NEXT_PUBLIC_USE_API_PROXY === "true";
+const RAW_API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:9085";
+
+function apiUrl(path: string): string {
+  return USE_PROXY ? `/api/proxy${path}` : `${RAW_API_BASE}${path}`;
+}
 
 /** Error for non-2xx API responses */
 export class ApiError extends Error {
@@ -41,7 +50,7 @@ async function attemptRefresh(): Promise<boolean> {
   refreshPromise = (async () => {
     try {
       const deviceId = getDeviceId();
-      const response = await fetch(`${API_BASE}/auth/refresh`, {
+      const response = await fetch(apiUrl("/auth/refresh"), {
         method: "POST",
         credentials: "include",
         headers: { "X-Device-Id": deviceId },
@@ -93,13 +102,13 @@ async function fetchWithAuth<T>(
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const response = await fetch(`${API_BASE}${path}`, {
+  const response = await fetch(apiUrl(path), {
     ...options,
     headers,
     credentials: "include",
   });
 
-  // Silent refresh on 401 — attempt even when sessionStorage token is absent
+  // Silent refresh on 401 — attempt even when localStorage token is absent
   // (covers the case where the refresh cookie is valid but the in-memory token was lost,
   // e.g. after a page reload or when Playwright restores only cookies + localStorage).
   // The _retried flag prevents infinite retry loops if the re-issued token is also rejected.
@@ -171,7 +180,7 @@ export const apiClient = {
     const headers: Record<string, string> = { "X-Device-Id": deviceId };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    return fetch(`${API_BASE}${path}`, {
+    return fetch(apiUrl(path), {
       method: "POST",
       body: formData,
       headers,

@@ -7,12 +7,12 @@ export const HRMANAGER1_AUTH_FILE = path.join(
 );
 
 setup("authenticate as hrmanager1", async ({ page }) => {
+  const email = process.env.TEST_HRMANAGER1_EMAIL!;
+  const password = process.env.TEST_HRMANAGER1_PASSWORD!;
   await page.goto("/login");
-  await page
-    .getByRole("textbox", { name: "Email" })
-    .fill("hrmanager1@gmail.com");
+  await page.getByRole("textbox", { name: "Email" }).fill(email);
   await page.getByRole("textbox", { name: "Email" }).press("Tab");
-  await page.getByRole("textbox", { name: "Password" }).fill("password@123");
+  await page.getByRole("textbox", { name: "Password" }).fill(password);
   await page.getByRole("button", { name: "Login →" }).click();
 
   await page.waitForURL((url) => !url.pathname.includes("/login"), {

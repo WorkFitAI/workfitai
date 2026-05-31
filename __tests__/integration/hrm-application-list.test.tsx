@@ -28,7 +28,7 @@ import {
 } from "../mocks/handlers";
 import HrmApplicationsClient from "@/app/(control)/applications/hrm-applications-client";
 
-const API = "https://api.workfitai.uk";
+const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://be.workfitai.uk";
 
 // Auth context mock — must match AuthContextValue shape from contexts/auth-context.tsx
 const mockAuthFn = vi.fn();

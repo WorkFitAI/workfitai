@@ -19,7 +19,7 @@ import {
 } from "../../mocks/handlers";
 import { applicationService } from "@/lib/application/application-service";
 
-const API = "https://api.workfitai.uk";
+const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://be.workfitai.uk";
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }));
 afterEach(() => server.resetHandlers());

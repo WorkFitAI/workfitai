@@ -11,7 +11,7 @@ import { useCVs } from "@/hooks/useCVs";
 import { setSessionCookie } from "@/lib/auth/session-cookie";
 import type { CVMetadata, CVListResponse } from "@/types/cv";
 
-const API = "https://api.workfitai.uk";
+const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://be.workfitai.uk";
 
 function mockCVMetadata(overrides: Partial<CVMetadata> = {}): CVMetadata {
   return {

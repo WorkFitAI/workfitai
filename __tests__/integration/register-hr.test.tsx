@@ -83,7 +83,7 @@ describe("[B] HR Registration", () => {
     let capturedBody: unknown;
     server.use(
       http.post(
-        "https://api.workfitai.uk/auth/register",
+        "https://be.workfitai.uk/auth/register",
         async ({ request }) => {
           capturedBody = await request.json();
           return HttpResponse.json({
@@ -112,7 +112,7 @@ describe("[B] HR Registration", () => {
 
   it("B2 — duplicate email (409) → error toast", async () => {
     server.use(
-      http.post("https://api.workfitai.uk/auth/register", () =>
+      http.post("https://be.workfitai.uk/auth/register", () =>
         apiError("Email already registered", 409),
       ),
     );
@@ -128,7 +128,7 @@ describe("[B] HR Registration", () => {
   it("B3 — missing hrManagerEmail → inline Zod error, no API call", async () => {
     const spy = vi.fn();
     server.use(
-      http.post("https://api.workfitai.uk/auth/register", () => {
+      http.post("https://be.workfitai.uk/auth/register", () => {
         spy();
         return HttpResponse.json({});
       }),
@@ -143,7 +143,7 @@ describe("[B] HR Registration", () => {
   it("B4 — password mismatch → inline error, no API call", async () => {
     const spy = vi.fn();
     server.use(
-      http.post("https://api.workfitai.uk/auth/register", () => {
+      http.post("https://be.workfitai.uk/auth/register", () => {
         spy();
         return HttpResponse.json({});
       }),
@@ -158,7 +158,7 @@ describe("[B] HR Registration", () => {
 
   it("B5 — network error → error toast", async () => {
     server.use(
-      http.post("https://api.workfitai.uk/auth/register", () =>
+      http.post("https://be.workfitai.uk/auth/register", () =>
         HttpResponse.error(),
       ),
     );

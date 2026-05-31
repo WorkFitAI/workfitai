@@ -1,4 +1,8 @@
 import { defineConfig, devices } from '@playwright/test'
+import dotenv from 'dotenv'
+import path from 'path'
+
+dotenv.config({ path: path.join(__dirname, '.env.local') })
 
 export default defineConfig({
   testDir: './e2e',
@@ -11,6 +15,7 @@ export default defineConfig({
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
+    channel: 'chrome',
   },
   projects: [
     // ── Auth setups ─────────────────────────────────────────────────────────

@@ -18,7 +18,7 @@ import { mockCVMetadata, mockCVListResponse } from "../mocks/handlers";
 import { setSessionCookie } from "@/lib/auth/session-cookie";
 import MyCVsPageClient from "@/components/my-cvs/my-cvs-page-client";
 
-const API = "https://api.workfitai.uk";
+const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://be.workfitai.uk";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn(), prefetch: vi.fn() }),

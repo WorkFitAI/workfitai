@@ -30,7 +30,7 @@ These accounts are pre-seeded for automated and manual testing. **Do not use in 
 
 | Account | Email | Password | Playwright Auth File |
 |---------|-------|----------|----------------------|
-| HR Manager 1 | `hrmanager1@gmail.com` | `password@123` | `e2e/.auth/hrmanager1.json` |
+| HR Manager 1 | `hrmanager1@gmail.com` | `Password@123` | `e2e/.auth/hrmanager1.json` |
 | HR Manager 2 | `hrmanager2@gmail.com` | `password@123` | `e2e/.auth/hrmanager2.json` |
 
 **Capabilities**: Create/publish/close job posts, review all company applications, update application status, assign applications to HR users, approve/reject HR registrations (`/hr-management`), add/edit/delete notes.
@@ -39,12 +39,14 @@ These accounts are pre-seeded for automated and manual testing. **Do not use in 
 
 ### HR Users
 
-| Account | Email | Password | Playwright Auth File |
-|---------|-------|----------|----------------------|
-| HR 1 | `hrtest1@gmail.com` | `password@123` | `e2e/.auth/hr1.json` |
-| HR 2 | `hrtest2@gmail.com` | `password@123` | `e2e/.auth/hr2.json` |
-| HR 4 | `hrtest4@gmail.com` | `password@123` | `e2e/.auth/hr4.json` |
-| HR 5 | `hrtest5@gmail.com` | `password@123` | `e2e/.auth/hr5.json` |
+| Account | Email | Password | Playwright Auth File | HR Manager |
+|---------|-------|----------|----------------------|------------|
+| HR 1 | `hrtest1@gmail.com` | `password@123` | `e2e/.auth/hr1.json` | `hrmanager1` |
+| HR 2 | `hrtest2@gmail.com` | `password@123` | `e2e/.auth/hr2.json` | `hrmanager1` |
+| HR 3 | `hrtest3@gmail.com` | `password@123` | `e2e/.auth/hr3.json` | `hrmanager1` |
+| HR 4 | `hrtest4@gmail.com` | `password@123` | `e2e/.auth/hr4.json` | `hrmanager2` |
+| HR 5 | `hrtest5@gmail.com` | `password@123` | `e2e/.auth/hr5.json` | `hrmanager2` |
+| HR 6 | `hrtest6@gmail.com` | `password@123` | `e2e/.auth/hr6.json` | `hrmanager2` |
 
 **Capabilities**: View applications assigned to them (`/applications/my`), add/edit/delete notes on assigned applications. Cannot change application status or assign applications.
 

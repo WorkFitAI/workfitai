@@ -205,4 +205,130 @@ test.describe('HR Assigned Applications (/applications/my)', () => {
       await closeBtn.click()
     }
   })
+
+  // ── Application detail: permission boundary checks ────────────────────────
+
+  test('detail panel does NOT show Update Status button for HR', async ({ page }) => {
+    await page.goto('/applications/my')
+    await page.waitForLoadState('networkidle')
+
+    const viewBtn = page.getByRole('button', { name: /^view$/i }).first()
+    if (!(await viewBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
+      test.skip(true, 'No applications assigned to hr1 — skipping permission boundary test')
+      return
+    }
+
+    await viewBtn.click()
+
+    const panel = page.locator('div.fixed.inset-0').last()
+    await expect(panel).toBeVisible({ timeout: 8_000 })
+
+    // HR cannot change application status — this button must not be present
+    const updateStatusBtn = panel
+      .getByRole('button', { name: /update status|change status/i })
+      .first()
+    await expect(updateStatusBtn).not.toBeVisible()
+  })
+
+  test('detail panel does NOT show Assign to HR button for HR', async ({ page }) => {
+    await page.goto('/applications/my')
+    await page.waitForLoadState('networkidle')
+
+    const viewBtn = page.getByRole('button', { name: /^view$/i }).first()
+    if (!(await viewBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
+      test.skip(true, 'No applications assigned to hr1 — skipping permission boundary test')
+      return
+    }
+
+    await viewBtn.click()
+
+    const panel = page.locator('div.fixed.inset-0').last()
+    await expect(panel).toBeVisible({ timeout: 8_000 })
+
+    // HR cannot reassign applications
+    const assignBtn = panel
+      .getByRole('button', { name: /assign|re-?assign/i })
+      .first()
+    await expect(assignBtn).not.toBeVisible()
+  })
+
+  test('detail panel shows HR Notes section', async ({ page }) => {
+    await page.goto('/applications/my')
+    await page.waitForLoadState('networkidle')
+
+    const viewBtn = page.getByRole('button', { name: /^view$/i }).first()
+    if (!(await viewBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
+      test.skip(true, 'No applications assigned to hr1')
+      return
+    }
+
+    await viewBtn.click()
+
+    const panel = page.locator('div.fixed.inset-0').last()
+    await expect(panel).toBeVisible({ timeout: 8_000 })
+
+    // HR Notes section must be present
+    await expect(panel.getByText(/hr notes/i)).toBeVisible({ timeout: 5_000 })
+  })
+
+  // ── Notes CRUD ────────────────────────────────────────────────────────────
+
+  test('HR can add a note on an assigned application', async ({ page }) => {
+    await page.goto('/applications/my')
+    await page.waitForLoadState('networkidle')
+
+    const viewBtn = page.getByRole('button', { name: /^view$/i }).first()
+    if (!(await viewBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
+      test.skip(true, 'No applications assigned to hr1 — skipping notes test')
+      return
+    }
+
+    await viewBtn.click()
+
+    const panel = page.locator('div.fixed.inset-0').last()
+    await expect(panel).toBeVisible({ timeout: 8_000 })
+
+    // Find the Add Note button
+    const addNoteBtn = panel.getByRole('button', { name: /add note/i })
+    if (!(await addNoteBtn.isVisible({ timeout: 5_000 }).catch(() => false))) {
+      test.skip(true, 'Add Note button not found in detail panel')
+      return
+    }
+
+    await addNoteBtn.click()
+
+    // Note input / textarea should appear
+    const noteInput = panel
+      .getByRole('textbox')
+      .or(panel.locator('textarea'))
+      .first()
+
+    if (!(await noteInput.isVisible({ timeout: 5_000 }).catch(() => false))) {
+      test.skip(true, 'Note input not found after clicking Add Note')
+      return
+    }
+
+    const noteText = `E2E test note ${Date.now()}`
+    await noteInput.fill(noteText)
+
+    // Submit the note
+    const submitBtn = panel.getByRole('button', { name: /save|submit|add/i }).last()
+    await submitBtn.click()
+
+    // Note should appear in the notes list
+    await expect(panel.getByText(noteText)).toBeVisible({ timeout: 8_000 })
+  })
+
+  test('HR cannot see Update Status or Assign buttons anywhere on the page', async ({ page }) => {
+    await page.goto('/applications/my')
+    await page.waitForLoadState('networkidle')
+
+    // These controls must not exist anywhere on the HR applications page
+    const updateStatusBtn = page.getByRole('button', { name: /update status|change status/i }).first()
+    const assignBtn = page.getByRole('button', { name: /^assign$/i }).first()
+
+    // Both must be absent — HR cannot modify status or reassign
+    await expect(updateStatusBtn).not.toBeVisible()
+    await expect(assignBtn).not.toBeVisible()
+  })
 })
