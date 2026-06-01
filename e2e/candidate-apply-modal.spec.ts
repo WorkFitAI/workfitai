@@ -36,9 +36,10 @@ async function openApplyModal(page: import('@playwright/test').Page): Promise<bo
   if (!job) return false
 
   await page.goto(`/jobs/${job.jobId}`)
-  await page.waitForLoadState('networkidle')
+  await page.waitForLoadState('load')
 
-  const applyBtn = page.getByRole('button', { name: /apply now/i })
+  // Use .first() to avoid strict-mode violation when multiple Apply Now buttons exist
+  const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
   if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
     return false
   }
@@ -74,9 +75,9 @@ test.describe('Apply Now Modal', () => {
     }
 
     await page.goto(`/jobs/${job.jobId}`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
-    const applyBtn = page.getByRole('button', { name: /apply now/i })
+    const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
     if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
       test.skip(true, 'Apply Now button not visible — candidate may have already applied')
       return
@@ -94,10 +95,10 @@ test.describe('Apply Now Modal', () => {
     }
 
     await page.goto(`/jobs/${job.jobId}`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
-    const alreadyAppliedBtn = page.getByRole('button', { name: /applied/i })
-    const applyBtn = page.getByRole('button', { name: /apply now/i })
+    const alreadyAppliedBtn = page.getByRole('button', { name: /applied/i }).first()
+    const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
 
     const isApplyVisible = await applyBtn.isVisible({ timeout: 5_000 }).catch(() => false)
     const isAlreadyApplied = await alreadyAppliedBtn.isVisible({ timeout: 3_000 }).catch(() => false)
@@ -134,9 +135,9 @@ test.describe('Apply Now Modal', () => {
     }
 
     await page.goto(`/jobs/${job.jobId}`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
-    const applyBtn = page.getByRole('button', { name: /apply now/i })
+    const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
     if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
       test.skip(true, 'Apply Now button not visible')
       return
@@ -168,9 +169,9 @@ test.describe('Apply Now Modal', () => {
     }
 
     await page.goto(`/jobs/${job.jobId}`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
-    const applyBtn = page.getByRole('button', { name: /apply now/i })
+    const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
     if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
       test.skip(true, 'Apply Now button not visible')
       return
@@ -200,9 +201,9 @@ test.describe('Apply Now Modal', () => {
     }
 
     await page.goto(`/jobs/${job.jobId}`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
-    const applyBtn = page.getByRole('button', { name: /apply now/i })
+    const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
     if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
       test.skip(true, 'Apply Now button not visible')
       return
@@ -237,9 +238,9 @@ test.describe('Apply Now Modal', () => {
     }
 
     await page.goto(`/jobs/${job.jobId}`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
-    const applyBtn = page.getByRole('button', { name: /apply now/i })
+    const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
     if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
       test.skip(true, 'Apply Now button not visible')
       return
@@ -274,9 +275,9 @@ test.describe('Apply Now Modal', () => {
     }
 
     await page.goto(`/jobs/${job.jobId}`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
-    const applyBtn = page.getByRole('button', { name: /apply now/i })
+    const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
     if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
       test.skip(true, 'Apply Now button not visible')
       return
@@ -313,9 +314,9 @@ test.describe('Apply Now Modal', () => {
     }
 
     await page.goto(`/jobs/${job.jobId}`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
-    const applyBtn = page.getByRole('button', { name: /apply now/i })
+    const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
     if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
       test.skip(true, 'Apply Now button not visible')
       return
@@ -340,9 +341,9 @@ test.describe('Apply Now Modal', () => {
     }
 
     await page.goto(`/jobs/${job.jobId}`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
-    const applyBtn = page.getByRole('button', { name: /apply now/i })
+    const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
     if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
       test.skip(true, 'Apply Now button not visible')
       return
@@ -369,9 +370,9 @@ test.describe('Apply Now Modal', () => {
     }
 
     await page.goto(`/jobs/${job.jobId}`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
-    const applyBtn = page.getByRole('button', { name: /apply now/i })
+    const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
     if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
       test.skip(true, 'Apply Now button not visible')
       return
@@ -413,9 +414,9 @@ test.describe('Apply Now Modal', () => {
     }
 
     await page.goto(`/jobs/${job.jobId}`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
-    const applyBtn = page.getByRole('button', { name: /apply now/i })
+    const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
     if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
       test.skip(true, 'Apply Now button not visible')
       return
@@ -451,9 +452,9 @@ test.describe('Apply Now Modal', () => {
     }
 
     await page.goto(`/jobs/${job.jobId}`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
-    const applyBtn = page.getByRole('button', { name: /apply now/i })
+    const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
     if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
       test.skip(true, 'Apply Now button not visible')
       return

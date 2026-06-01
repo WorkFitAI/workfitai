@@ -35,7 +35,7 @@ test.describe('Jobs Browsing — Candidate', () => {
 
   test('job cards or empty state is visible after load', async ({ page }) => {
     await page.goto('/jobs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     const hasCards = await page
       .locator('main h2')
@@ -60,7 +60,7 @@ test.describe('Jobs Browsing — Candidate', () => {
 
   test('search / keyword input accepts text', async ({ page }) => {
     await page.goto('/jobs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     const searchInput = page
       .getByPlaceholder(/search|keyword|job title/i)
@@ -78,7 +78,7 @@ test.describe('Jobs Browsing — Candidate', () => {
 
   test('search works with diverse technical role keywords', async ({ page }) => {
     await page.goto('/jobs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     const searchInput = page
       .getByPlaceholder(/search|keyword|job title/i)
@@ -104,7 +104,7 @@ test.describe('Jobs Browsing — Candidate', () => {
 
   test('search with partial match returns results or empty state (not an error)', async ({ page }) => {
     await page.goto('/jobs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     const searchInput = page
       .getByPlaceholder(/search|keyword|job title/i)
@@ -127,7 +127,7 @@ test.describe('Jobs Browsing — Candidate', () => {
 
   test('search with non-existent keyword shows empty state gracefully', async ({ page }) => {
     await page.goto('/jobs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     const searchInput = page
       .getByPlaceholder(/search|keyword|job title/i)
@@ -158,7 +158,7 @@ test.describe('Jobs Browsing — Candidate', () => {
 
   test('filter sidebar or filter controls are rendered', async ({ page }) => {
     await page.goto('/jobs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     const hasFilterSection = await page
       .getByRole('heading', { name: /advance filter/i })
@@ -177,7 +177,7 @@ test.describe('Jobs Browsing — Candidate', () => {
 
   test('filter sidebar has employment type or skill checkboxes', async ({ page }) => {
     await page.goto('/jobs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     // Filter section should have checkboxes or filter group labels
     const hasCheckboxes = await page
@@ -197,7 +197,7 @@ test.describe('Jobs Browsing — Candidate', () => {
 
   test('clicking a job card navigates to the job detail page', async ({ page }) => {
     await page.goto('/jobs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     const jobLink = page.locator('a[href*="/jobs/"]').first()
     if (!(await jobLink.isVisible({ timeout: 8_000 }).catch(() => false))) {
@@ -211,7 +211,7 @@ test.describe('Jobs Browsing — Candidate', () => {
 
   test('job detail page shows the job title heading', async ({ page }) => {
     await page.goto('/jobs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     const jobLink = page.locator('a[href*="/jobs/"]').first()
     if (!(await jobLink.isVisible({ timeout: 8_000 }).catch(() => false))) {
@@ -226,14 +226,14 @@ test.describe('Jobs Browsing — Candidate', () => {
     }
 
     await page.goto(href)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     await expect(page.getByRole('heading').first()).toBeVisible({ timeout: 10_000 })
   })
 
   test('job detail page shows key sections (description, requirements or overview)', async ({ page }) => {
     await page.goto('/jobs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     const jobLink = page.locator('a[href*="/jobs/"]').first()
     if (!(await jobLink.isVisible({ timeout: 8_000 }).catch(() => false))) {
@@ -245,7 +245,7 @@ test.describe('Jobs Browsing — Candidate', () => {
     if (!href) return
 
     await page.goto(href)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     const hasDescription = await page
       .getByText(/job description|description|about this role/i)
@@ -264,7 +264,7 @@ test.describe('Jobs Browsing — Candidate', () => {
 
   test('job detail page shows location information', async ({ page }) => {
     await page.goto('/jobs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     const jobLink = page.locator('a[href*="/jobs/"]').first()
     if (!(await jobLink.isVisible({ timeout: 8_000 }).catch(() => false))) {
@@ -276,7 +276,7 @@ test.describe('Jobs Browsing — Candidate', () => {
     if (!href) return
 
     await page.goto(href)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     // Detail page should show location or at minimum key metadata
     const hasLocation = await page
@@ -302,7 +302,7 @@ test.describe('Jobs Browsing — Candidate', () => {
     }
 
     await page.goto(`/jobs/${job.jobId}`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     const hasSalary = await page
       .getByText(/salary|compensation|\$|usd|vnd|\d+,\d+/i)
@@ -324,9 +324,9 @@ test.describe('Jobs Browsing — Candidate', () => {
     }
 
     await page.goto(`/jobs/${job.jobId}`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
-    const applyBtn = page.getByRole('button', { name: /apply now/i })
+    const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
     const alreadyApplied = page
       .getByRole('button', { name: /applied/i })
       .or(page.getByText(/already applied/i))
@@ -345,7 +345,7 @@ test.describe('Jobs Browsing — Candidate', () => {
     }
 
     await page.goto(`/jobs/${job.jobId}`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     // Page should show the job title text somewhere prominent
     await expect(
@@ -355,7 +355,7 @@ test.describe('Jobs Browsing — Candidate', () => {
 
   test('back navigation from job detail returns to jobs list', async ({ page }) => {
     await page.goto('/jobs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     const jobLink = page.locator('a[href*="/jobs/"]').first()
     if (!(await jobLink.isVisible({ timeout: 8_000 }).catch(() => false))) {
@@ -378,7 +378,7 @@ test.describe('Jobs Browsing — unauthenticated', () => {
 
   test('unauthenticated user visiting /jobs can browse but Apply redirects to login', async ({ page }) => {
     await page.goto('/jobs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     await expect(page.locator('main')).toBeVisible({ timeout: 10_000 })
 
@@ -390,9 +390,9 @@ test.describe('Jobs Browsing — unauthenticated', () => {
     const href = await jobLink.getAttribute('href')
     if (!href) return
     await page.goto(href)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
-    const applyBtn = page.getByRole('button', { name: /apply now/i })
+    const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
     if (!(await applyBtn.isVisible({ timeout: 5_000 }).catch(() => false))) {
       return
     }
@@ -403,7 +403,7 @@ test.describe('Jobs Browsing — unauthenticated', () => {
 
   test('unauthenticated user can view job details without logging in', async ({ page }) => {
     await page.goto('/jobs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     const jobLink = page.locator('a[href*="/jobs/"]').first()
     if (!(await jobLink.isVisible({ timeout: 5_000 }).catch(() => false))) {
@@ -414,7 +414,7 @@ test.describe('Jobs Browsing — unauthenticated', () => {
     if (!href) return
 
     await page.goto(href)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     // Job detail should load without redirecting to login
     await expect(page).toHaveURL(/\/jobs\/.+/, { timeout: 10_000 })

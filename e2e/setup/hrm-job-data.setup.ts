@@ -8,10 +8,9 @@ const TEST_JOB_FILE = path.join(DATA_DIR, "test-job.json");
 setup("create and publish test job as HRM1", async ({ page }) => {
   setup.setTimeout(60_000);
 
-  // storageState restores cookies (auth_session) and localStorage but NOT sessionStorage
-  // (wfa_access_token). Do a fresh login using the same device ID as stored in localStorage
-  // (backend binds access tokens to device IDs via X-Device-Id header), then inject the
-  // access token into sessionStorage via addInitScript so page API calls are authenticated.
+  // storageState restores cookies (auth_session) and localStorage (including wfa_access_token).
+  // Do a fresh login to guarantee a non-expired token — backend binds tokens to device IDs
+  // via X-Device-Id header, so we read the persisted device ID from the auth storageState.
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:9085";
   const hrmanager1Email = process.env.TEST_HRMANAGER1_EMAIL!;
   const hrmanager1Password = process.env.TEST_HRMANAGER1_PASSWORD!;
@@ -41,8 +40,8 @@ setup("create and publish test job as HRM1", async ({ page }) => {
         const expiresAt = String(Date.now() + (expiryInMs ?? 900_000));
         await page.addInitScript(
           ({ t, expiry }: { t: string; expiry: string }) => {
-            sessionStorage.setItem("wfa_access_token", t);
-            sessionStorage.setItem("wfa_token_expiry", expiry);
+            localStorage.setItem("wfa_access_token", t);
+            localStorage.setItem("wfa_token_expiry", expiry);
           },
           { t: token, expiry: expiresAt },
         );

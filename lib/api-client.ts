@@ -8,16 +8,22 @@ import { getDeviceId } from "@/lib/auth/device-fingerprint";
 import { setSessionCookie } from "@/lib/auth/session-cookie";
 import type { UserSession } from "@/types/auth";
 
-// In dev with NEXT_PUBLIC_USE_API_PROXY=true, route all fetch calls through the
+// In dev with NEXT_PUBLIC_USE_API_PROXY=true, route browser fetch calls through the
 // Next.js API proxy (/api/proxy/*) so the browser treats them as same-origin.
 // This makes the HttpOnly refresh cookie work even when FE and BE are on different
 // hosts/domains (e.g. localhost:3000 ↔ be.workfitai.uk in local dev).
+// Server components skip the proxy and call the backend directly — Node.js fetch
+// requires absolute URLs so a relative /api/proxy path would throw ERR_INVALID_URL.
 const USE_PROXY = process.env.NEXT_PUBLIC_USE_API_PROXY === "true";
 const RAW_API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:9085";
+const IS_SERVER = typeof window === "undefined";
 
 function apiUrl(path: string): string {
-  return USE_PROXY ? `/api/proxy${path}` : `${RAW_API_BASE}${path}`;
+  if (USE_PROXY && !IS_SERVER) {
+    return `/api/proxy${path}`;
+  }
+  return `${RAW_API_BASE}${path}`;
 }
 
 /** Error for non-2xx API responses */

@@ -33,7 +33,7 @@ test.describe('Candidate Application Flow', () => {
 
   test('applied jobs list shows applications with status badges or empty state', async ({ page }) => {
     await page.goto('/applied-jobs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     await expect(
       page.getByText(/\d+ applications? total/i)
@@ -57,7 +57,7 @@ test.describe('Candidate Application Flow', () => {
 
   test('status filter tabs are rendered and clickable', async ({ page }) => {
     await page.goto('/applied-jobs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     for (const label of ['All', 'Applied', 'Reviewing', 'Interview', 'Offer', 'Hired', 'Rejected']) {
       await expect(page.getByRole('button', { name: label, exact: true })).toBeVisible({ timeout: 8_000 })
@@ -71,7 +71,7 @@ test.describe('Candidate Application Flow', () => {
 
   test('clicking each status filter tab updates the total count display', async ({ page }) => {
     await page.goto('/applied-jobs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     const tabs = ['All', 'Applied', 'Reviewing', 'Interview', 'Offer', 'Hired', 'Rejected']
     for (const label of tabs) {
@@ -87,7 +87,7 @@ test.describe('Candidate Application Flow', () => {
 
   test('Withdrawn tab is present or gracefully absent', async ({ page }) => {
     await page.goto('/applied-jobs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     const withdrawnTab = page.getByRole('button', { name: /withdrawn/i, exact: true })
     const isVisible = await withdrawnTab.isVisible({ timeout: 3_000 }).catch(() => false)
@@ -108,9 +108,9 @@ test.describe('Candidate Application Flow', () => {
     }
 
     await page.goto(`/jobs/${job.jobId}`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
-    const applyBtn = page.getByRole('button', { name: /apply now/i })
+    const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
     const alreadyApplied = page.getByRole('button', { name: /applied/i })
       .or(page.getByText(/already applied/i))
 
@@ -128,7 +128,7 @@ test.describe('Candidate Application Flow', () => {
     }
 
     await page.goto(`/jobs/${job.jobId}`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     // Job title heading must be visible
     await expect(page.getByRole('heading').first()).toBeVisible({ timeout: 10_000 })
@@ -151,7 +151,7 @@ test.describe('Candidate Application Flow', () => {
 
   test('applied-jobs page shows correct subtitle with application count', async ({ page }) => {
     await page.goto('/applied-jobs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     // Subtitle always shows "N application(s) total"
     const countText = page.getByText(/\d+ applications? total/i)
@@ -166,7 +166,7 @@ test.describe('Candidate Application Flow', () => {
 
   test('job application card shows status badge when applications exist', async ({ page }) => {
     await page.goto('/applied-jobs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     // Check if there are any application cards
     const card = page.locator('article, [data-testid="job-card"]').first()
