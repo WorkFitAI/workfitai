@@ -1,4 +1,4 @@
-import { Home, Briefcase, LayoutDashboard, Users2, Settings, FileText, ClipboardList, UserCog, ShieldCheck, type LucideIcon } from "lucide-react"
+import { Home, Briefcase, LayoutDashboard, Users2, Settings, FileText, ClipboardList, UserCog, ShieldCheck, ClipboardCheck, type LucideIcon } from "lucide-react"
 import type { UserRole } from "@/types/auth"
 
 export interface NavItem {
@@ -29,5 +29,6 @@ export const controlNavItems: NavItem[] = [
   { title: "Applications", href: "/applications", icon: ClipboardList, roles: ["ROLE_ADMIN", "ROLE_HR_MANAGER", "ROLE_HR"] },
   { title: "HR Management", href: "/hr-management", icon: UserCog, roles: ["ROLE_ADMIN", "ROLE_HR_MANAGER"] },
   { title: "Roles & Permissions", href: "/roles-permissions", icon: ShieldCheck, roles: ["ROLE_ADMIN", "ROLE_HR_MANAGER"] },
+  { title: "Audit Logs", href: "/audit-logs", icon: ClipboardCheck, roles: ["ROLE_ADMIN"] },
   { title: "Settings", href: "/settings", icon: Settings },
 ]
