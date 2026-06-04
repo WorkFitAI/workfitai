@@ -9,6 +9,9 @@ export interface AuditLogsParams {
   action?: string
   from?: string
   to?: string
+  actorUsername?: string
+  entityType?: string
+  actorRole?: string
 }
 
 function buildQuery(params: AuditLogsParams): string {
@@ -19,6 +22,9 @@ function buildQuery(params: AuditLogsParams): string {
   if (params.action) sp.set("action", params.action)
   if (params.from) sp.set("from", params.from)
   if (params.to) sp.set("to", params.to)
+  if (params.actorUsername) sp.set("actorUsername", params.actorUsername)
+  if (params.entityType) sp.set("entityType", params.entityType)
+  if (params.actorRole) sp.set("actorRole", params.actorRole)
   return sp.toString()
 }
 

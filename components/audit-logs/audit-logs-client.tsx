@@ -8,7 +8,7 @@ import { AuditLogTable } from "@/components/audit-logs/audit-log-table"
 import { Button } from "@/components/ui/button"
 
 const PAGE_SIZE = 50
-const EMPTY_FILTERS: AuditFilters = { action: "", companyId: "", from: "", to: "" }
+const EMPTY_FILTERS: AuditFilters = { companyId: "", from: "", to: "", actorUsername: "", entityType: "", actorRole: "" }
 
 function toIso(local: string) {
   return local ? new Date(local).toISOString() : undefined
@@ -23,9 +23,11 @@ export function AuditLogsClient() {
     page: page - 1,
     size: PAGE_SIZE,
     companyId: applied.companyId || undefined,
-    action: applied.action || undefined,
     from: toIso(applied.from),
     to: toIso(applied.to),
+    actorUsername: applied.actorUsername || undefined,
+    entityType: applied.entityType || undefined,
+    actorRole: applied.actorRole || undefined,
   })
 
   function applyFilters() {

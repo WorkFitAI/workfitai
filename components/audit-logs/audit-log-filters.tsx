@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button"
 import { Search, RotateCcw } from "lucide-react"
 
 export interface AuditFilters {
-  action: string
   companyId: string
   from: string
   to: string
+  actorUsername: string
+  entityType: string
+  actorRole: string
 }
 
 interface AuditLogFiltersProps {
@@ -21,13 +23,33 @@ interface AuditLogFiltersProps {
 export function AuditLogFilters({ pending, onChange, onApply, onReset }: AuditLogFiltersProps) {
   return (
     <div className="flex flex-wrap items-end gap-3 p-4 bg-muted/30 border border-border rounded-lg">
-      <div className="flex flex-col gap-1 min-w-[160px]">
-        <label className="text-xs font-medium text-muted-foreground">Action</label>
+      <div className="flex flex-col gap-1 min-w-[130px]">
+        <label className="text-xs font-medium text-muted-foreground">Actor Username</label>
         <Input
-          placeholder="e.g. AUTH_LOGIN_SUCCESS"
-          value={pending.action}
-          onChange={(e) => onChange({ action: e.target.value })}
-          className="h-8 text-sm font-mono"
+          placeholder="e.g. john.doe"
+          value={pending.actorUsername}
+          onChange={(e) => onChange({ actorUsername: e.target.value })}
+          className="h-8 text-sm"
+        />
+      </div>
+
+      <div className="flex flex-col gap-1 min-w-[120px]">
+        <label className="text-xs font-medium text-muted-foreground">Actor Role</label>
+        <Input
+          placeholder="e.g. ADMIN"
+          value={pending.actorRole}
+          onChange={(e) => onChange({ actorRole: e.target.value })}
+          className="h-8 text-sm"
+        />
+      </div>
+
+      <div className="flex flex-col gap-1 min-w-[120px]">
+        <label className="text-xs font-medium text-muted-foreground">Entity Type</label>
+        <Input
+          placeholder="e.g. USER"
+          value={pending.entityType}
+          onChange={(e) => onChange({ entityType: e.target.value })}
+          className="h-8 text-sm"
         />
       </div>
 

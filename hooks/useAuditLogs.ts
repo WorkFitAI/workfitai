@@ -31,9 +31,11 @@ export function useAuditLogs(params: AuditLogsParams) {
     params.page,
     params.size,
     params.companyId,
-    params.action,
     params.from,
     params.to,
+    params.actorUsername,
+    params.entityType,
+    params.actorRole,
   ])
 
   useEffect(() => {

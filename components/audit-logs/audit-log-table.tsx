@@ -17,15 +17,22 @@ function actionBadgeClass(action: string): string {
   return "bg-muted text-muted-foreground border-border"
 }
 
-function formatTime(iso: string) {
-  return new Date(iso).toLocaleString("en-GB", {
-    day: "2-digit", month: "short",
-    hour: "2-digit", minute: "2-digit", second: "2-digit",
-  })
+function formatTimeParts(iso: string) {
+  const d = new Date(iso)
+  return {
+    date: d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
+    time: d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
+  }
 }
 
-function shortService(service: string) {
-  return service.replace(/-service$/, "")
+function Timestamp({ iso }: { iso: string }) {
+  const { date, time } = formatTimeParts(iso)
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="text-foreground">{date}</span>
+      <span className="text-muted-foreground">{time}</span>
+    </div>
+  )
 }
 
 function ExpandedDetail({ log }: { log: AuditLog }) {
@@ -88,8 +95,8 @@ function AuditLogTableRow({ log }: { log: AuditLog }) {
             : <ChevronRight size={14} className="text-muted-foreground" />
           }
         </TableCell>
-        <TableCell className="font-mono text-xs text-muted-foreground whitespace-nowrap">
-          {formatTime(log.occurredAt)}
+        <TableCell className="font-mono text-xs whitespace-nowrap">
+          <Timestamp iso={log.occurredAt} />
         </TableCell>
         <TableCell>
           {log.success
@@ -111,16 +118,13 @@ function AuditLogTableRow({ log }: { log: AuditLog }) {
         <TableCell className="max-w-xs">
           <span className="text-sm truncate block text-muted-foreground">{log.displayMessage}</span>
         </TableCell>
-        <TableCell className="text-xs text-muted-foreground">
-          {shortService(log.sourceService)}
-        </TableCell>
         <TableCell className="text-xs font-mono text-muted-foreground">
           {log.companyId ?? "—"}
         </TableCell>
       </TableRow>
       {expanded && (
         <tr>
-          <td colSpan={8} className="p-0">
+          <td colSpan={7} className="p-0">
             <ExpandedDetail log={log} />
           </td>
         </tr>
@@ -141,7 +145,6 @@ export function AuditLogTable({ logs }: { logs: AuditLog[] }) {
             <TableHead>Actor</TableHead>
             <TableHead>Action</TableHead>
             <TableHead>Description</TableHead>
-            <TableHead>Service</TableHead>
             <TableHead>Company</TableHead>
           </TableRow>
         </TableHeader>
