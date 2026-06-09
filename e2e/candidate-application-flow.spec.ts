@@ -2,7 +2,7 @@
  * E2E spec — Candidate Application Flow
  * Runs under the e2e-candidate project (storageState: candidate1.json).
  * Playwright config matches: testMatch: 'e2e/candidate-*.spec.ts'
- * Depends on: candidate1-setup, hrm-job-data-setup
+ * Depends on: candidate1-setup, hrm-job-data-setup, multi-candidate-apply-data-setup
  */
 import { test, expect } from '@playwright/test'
 import * as fs from 'fs'
@@ -15,6 +15,16 @@ function getTestJob(): { jobId: string; jobTitle: string } | null {
     return JSON.parse(fs.readFileSync(jobFile, 'utf-8'))
   } catch {
     return null
+  }
+}
+
+function getMultiJobs(): Array<{ jobId: string; jobTitle: string; hrmKey: string }> {
+  const jobsFile = path.join(__dirname, '.data/test-jobs.json')
+  try {
+    const { jobs } = JSON.parse(fs.readFileSync(jobsFile, 'utf-8'))
+    return jobs ?? []
+  } catch {
+    return []
   }
 }
 
@@ -190,3 +200,84 @@ test.describe('Candidate Application Flow', () => {
     expect(hasBadge).toBeTruthy()
   })
 })
+
+// ── Additional candidates — verify applied-jobs page renders for each ──────
+
+for (const { num, email, password } of [
+  { num: 2, email: 'candidate2@gmail.com', password: 'password@123' },
+  { num: 3, email: 'candidate3@gmail.com', password: 'password@123' },
+  { num: 4, email: 'candidate4@gmail.com', password: 'password@123' },
+  { num: 5, email: 'candidate5@gmail.com', password: 'password@123' },
+]) {
+  test.describe(`Candidate ${num} — Applied Jobs Page`, () => {
+    test.beforeEach(async ({ page }) => {
+      await injectAuthToken(page, email, password, 'candidate1.json')
+    })
+
+    test(`candidate${num} applied-jobs page loads and shows heading`, async ({ page }) => {
+      await page.goto('/applied-jobs')
+      await expect(page).toHaveURL(/applied-jobs/, { timeout: 15_000 })
+      await expect(page.getByRole('heading', { name: /my applications/i })).toBeVisible({ timeout: 10_000 })
+    })
+
+    test(`candidate${num} sees application count display`, async ({ page }) => {
+      await page.goto('/applied-jobs')
+      await page.waitForLoadState('load')
+      await expect(page.getByText(/\d+ applications? total/i)).toBeVisible({ timeout: 10_000 })
+    })
+
+    test(`candidate${num} status filter tabs are rendered`, async ({ page }) => {
+      await page.goto('/applied-jobs')
+      await page.waitForLoadState('load')
+      for (const label of ['All', 'Applied', 'Reviewing']) {
+        await expect(page.getByRole('button', { name: label, exact: true })).toBeVisible({ timeout: 8_000 })
+      }
+    })
+
+    test(`candidate${num} can navigate to a job from the jobs list`, async ({ page }) => {
+      const jobs = getMultiJobs().filter((j) => j.hrmKey === 'hrm1')
+      if (!jobs.length) {
+        test.skip(true, 'No HRM1 jobs in test-jobs.json')
+        return
+      }
+      await page.goto(`/jobs/${jobs[0].jobId}`)
+      await page.waitForLoadState('load')
+      await expect(page.getByRole('heading').first()).toBeVisible({ timeout: 10_000 })
+    })
+  })
+}
+
+// ── HRM2 candidates (8-10) — verify applied-jobs and HRM2 job access ────────
+
+for (const { num, email, password } of [
+  { num: 8, email: 'candidate8@gmail.com', password: 'password@123' },
+  { num: 9, email: 'candidate9@gmail.com', password: 'password@123' },
+  { num: 10, email: 'candidate10@gmail.com', password: 'password@123' },
+]) {
+  test.describe(`Candidate ${num} — HRM2 Company Applications`, () => {
+    test.beforeEach(async ({ page }) => {
+      await injectAuthToken(page, email, password, 'candidate1.json')
+    })
+
+    test(`candidate${num} applied-jobs page shows application count`, async ({ page }) => {
+      await page.goto('/applied-jobs')
+      await expect(page).toHaveURL(/applied-jobs/, { timeout: 15_000 })
+      await expect(page.getByText(/\d+ applications? total/i)).toBeVisible({ timeout: 10_000 })
+    })
+
+    test(`candidate${num} can view an HRM2 job detail page`, async ({ page }) => {
+      const jobs = getMultiJobs().filter((j) => j.hrmKey === 'hrm2')
+      if (!jobs.length) {
+        test.skip(true, 'No HRM2 jobs in test-jobs.json')
+        return
+      }
+      await page.goto(`/jobs/${jobs[0].jobId}`)
+      await page.waitForLoadState('load')
+      await expect(page.getByRole('heading').first()).toBeVisible({ timeout: 10_000 })
+      // Apply Now or Already Applied must be present
+      const hasApply = await page.getByRole('button', { name: /apply now/i }).first().isVisible({ timeout: 8_000 }).catch(() => false)
+      const hasApplied = await page.getByRole('button', { name: /applied/i }).first().isVisible({ timeout: 3_000 }).catch(() => false)
+      expect(hasApply || hasApplied).toBeTruthy()
+    })
+  })
+}

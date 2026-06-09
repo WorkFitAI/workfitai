@@ -58,6 +58,14 @@ These accounts are pre-seeded for automated and manual testing. **Do not use in 
 |---------|-------|----------|----------------------|
 | Candidate 1 | `candidate1@gmail.com` | `password@123` | `e2e/.auth/candidate1.json` |
 | Candidate 2 | `candidate2@gmail.com` | `password@123` | `e2e/.auth/candidate2.json` |
+| Candidate 3 | `candidate3@gmail.com` | `password@123` | `e2e/.auth/candidate3.json` |
+| Candidate 4 | `candidate4@gmail.com` | `password@123` | `e2e/.auth/candidate4.json` |
+| Candidate 5 | `candidate5@gmail.com` | `password@123` | `e2e/.auth/candidate5.json` |
+| Candidate 6 | `candidate6@gmail.com` | `password@123` | `e2e/.auth/candidate6.json` |
+| Candidate 7 | `candidate7@gmail.com` | `password@123` | `e2e/.auth/candidate7.json` |
+| Candidate 8 | `candidate8@gmail.com` | `password@123` | `e2e/.auth/candidate8.json` |
+| Candidate 9 | `candidate9@gmail.com` | `password@123` | `e2e/.auth/candidate9.json` |
+| Candidate 10 | `candidate10@gmail.com` | `password@123` | `e2e/.auth/candidate10.json` |
 
 **Capabilities**: Browse published job listings, apply for jobs (CV upload + cover letter), view own applications (`/applied-jobs`), withdraw pending applications.
 

@@ -64,11 +64,47 @@ export default defineConfig({
         storageState: 'e2e/.auth/candidate1.json',
       },
     },
+    // ── Multi-job data setup (HRM1 + HRM2 create diverse published jobs) ────
+    {
+      name: 'hrm-multi-job-data-setup',
+      testMatch: 'e2e/setup/hrm-multi-job-data.setup.ts',
+      dependencies: ['hrmanager1-setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'e2e/.auth/hrmanager1.json',
+      },
+    },
+    // ── Multi-candidate apply setup (candidates 2-10 apply to diverse jobs) ─
+    {
+      name: 'multi-candidate-apply-data-setup',
+      testMatch: 'e2e/setup/multi-candidate-apply-data.setup.ts',
+      dependencies: ['candidate1-setup', 'hrm-job-data-setup', 'hrm-multi-job-data-setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'e2e/.auth/candidate1.json',
+      },
+    },
+    // ── HRM assigns applications to HR staff (ensures HR tests have data) ───
+    {
+      name: 'hrm-assign-applications-setup',
+      testMatch: 'e2e/setup/hrm-assign-applications.setup.ts',
+      dependencies: ['hrmanager1-setup', 'multi-candidate-apply-data-setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'e2e/.auth/hrmanager1.json',
+      },
+    },
     // ── Functional E2E projects (role-based) ─────────────────────────────────
     {
       name: 'e2e-candidate',
       testMatch: 'e2e/candidate-*.spec.ts',
-      dependencies: ['candidate1-setup', 'hrm-job-data-setup', 'candidate1-apply-data-setup'],
+      dependencies: [
+        'candidate1-setup',
+        'hrm-job-data-setup',
+        'candidate1-apply-data-setup',
+        'hrm-multi-job-data-setup',
+        'multi-candidate-apply-data-setup',
+      ],
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'e2e/.auth/candidate1.json',
@@ -77,7 +113,12 @@ export default defineConfig({
     {
       name: 'e2e-hrm',
       testMatch: 'e2e/hrm-*.spec.ts',
-      dependencies: ['hrm-job-data-setup', 'candidate1-apply-data-setup'],
+      dependencies: [
+        'hrm-job-data-setup',
+        'candidate1-apply-data-setup',
+        'hrm-multi-job-data-setup',
+        'multi-candidate-apply-data-setup',
+      ],
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'e2e/.auth/hrmanager1.json',
@@ -86,7 +127,7 @@ export default defineConfig({
     {
       name: 'e2e-hr',
       testMatch: 'e2e/hr-*.spec.ts',
-      dependencies: ['hr1-setup', 'hrm-job-data-setup'],
+      dependencies: ['hr1-setup', 'hrm-job-data-setup', 'hrm-assign-applications-setup'],
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'e2e/.auth/hr1.json',

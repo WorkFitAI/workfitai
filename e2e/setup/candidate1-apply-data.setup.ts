@@ -114,7 +114,7 @@ setup('candidate1 applies to test job', async ({ page }) => {
   }
 
   const submitJson = await submitRes.json()
-  const applicationId: string | null = submitJson?.data?.applicationId ?? submitJson?.applicationId ?? null
+  const applicationId: string | null = submitJson?.data?.id ?? submitJson?.data?.applicationId ?? submitJson?.applicationId ?? null
 
   fs.writeFileSync(TEST_APPLICATION_FILE, JSON.stringify({ jobId, applicationId, createdAt: new Date().toISOString() }, null, 2))
   console.log(`Application submitted via API. applicationId=${applicationId ?? 'unknown'}`)

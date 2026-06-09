@@ -2,7 +2,7 @@
  * E2E spec — HRM Application Detail Panel
  * Runs under the e2e-hrm project (storageState: hrmanager1.json).
  * Playwright config matches: testMatch: 'e2e/hrm-*.spec.ts'
- * Depends on: hrm-job-data-setup, candidate1-apply-data-setup
+ * Depends on: hrm-job-data-setup, candidate1-apply-data-setup, multi-candidate-apply-data-setup
  */
 import { test, expect } from '@playwright/test'
 import { injectAuthToken } from './helpers/inject-auth-token'
@@ -158,5 +158,72 @@ test.describe('HRM Application Detail Panel', () => {
 
     // Panel should disappear
     await expect(panel).not.toBeVisible({ timeout: 5_000 })
+  })
+})
+
+// ── HRM2 application detail panel — same assertions from HRM2's perspective ──
+
+/** Opens /applications as HRM2, clicks View on the first row, returns the panel or null. */
+async function openFirstDetailPanelAsHrm2(page: import('@playwright/test').Page) {
+  await page.goto('/applications')
+  await page.waitForLoadState('load')
+  const viewBtn = page.getByRole('button', { name: /^view$/i }).first()
+  if (!(await viewBtn.isVisible({ timeout: 8_000 }).catch(() => false))) return null
+  await viewBtn.click()
+  const panel = page.locator('div.fixed.inset-0').last()
+  await expect(panel).toBeVisible({ timeout: 8_000 })
+  return panel
+}
+
+test.describe('HRM2 Application Detail Panel', () => {
+  test.beforeEach(async ({ page }) => {
+    await injectAuthToken(page, 'hrmanager2@gmail.com', 'password@123', 'hrmanager1.json')
+  })
+
+  test('hrm2 View button opens detail panel with candidate info', async ({ page }) => {
+    const panel = await openFirstDetailPanelAsHrm2(page)
+    if (!panel) {
+      test.skip(true, 'No HRM2 applications — skipping')
+      return
+    }
+    await expect(panel.locator('h2').first()).toBeVisible({ timeout: 8_000 })
+    await expect(panel.getByText(/@/).first()).toBeVisible({ timeout: 5_000 })
+  })
+
+  test('hrm2 detail panel shows Job Details section', async ({ page }) => {
+    const panel = await openFirstDetailPanelAsHrm2(page)
+    if (!panel) {
+      test.skip(true, 'No HRM2 applications')
+      return
+    }
+    await expect(panel.getByText(/job details/i)).toBeVisible({ timeout: 8_000 })
+  })
+
+  test('hrm2 detail panel shows HR Notes section', async ({ page }) => {
+    const panel = await openFirstDetailPanelAsHrm2(page)
+    if (!panel) {
+      test.skip(true, 'No HRM2 applications')
+      return
+    }
+    await expect(panel.getByText(/hr notes/i)).toBeVisible({ timeout: 8_000 })
+  })
+
+  test('hrm2 Update Status button opens the status update modal', async ({ page }) => {
+    const panel = await openFirstDetailPanelAsHrm2(page)
+    if (!panel) {
+      test.skip(true, 'No HRM2 applications')
+      return
+    }
+    const updateStatusBtn = page.getByRole('button', { name: /update status/i })
+    await expect(updateStatusBtn).toBeVisible({ timeout: 8_000 })
+    await updateStatusBtn.click()
+    const statusModal = page.getByRole('dialog')
+    await expect(statusModal).toBeVisible({ timeout: 5_000 })
+    const cancelBtn = statusModal.getByRole('button', { name: /cancel|close/i }).first()
+    if (await cancelBtn.isVisible({ timeout: 2_000 }).catch(() => false)) {
+      await cancelBtn.click()
+    } else {
+      await page.keyboard.press('Escape')
+    }
   })
 })

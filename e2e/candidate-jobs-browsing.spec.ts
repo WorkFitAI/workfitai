@@ -2,7 +2,7 @@
  * E2E spec — Jobs Browsing (Candidate)
  * Runs under the e2e-candidate project (storageState: candidate1.json).
  * Playwright config matches: testMatch: 'e2e/candidate-*.spec.ts'
- * Depends on: candidate1-setup, hrm-job-data-setup
+ * Depends on: candidate1-setup, hrm-job-data-setup, hrm-multi-job-data-setup
  */
 import { test, expect } from '@playwright/test'
 import * as fs from 'fs'
@@ -429,3 +429,71 @@ test.describe('Jobs Browsing — unauthenticated', () => {
     await expect(page.locator('main')).toBeVisible({ timeout: 10_000 })
   })
 })
+
+// ── Additional candidates browsing the multi-job dataset ─────────────────────
+
+function getMultiJobs(): Array<{ jobId: string; jobTitle: string; hrmKey: string }> {
+  const jobsFile = path.join(__dirname, '.data/test-jobs.json')
+  try {
+    const { jobs } = JSON.parse(fs.readFileSync(jobsFile, 'utf-8'))
+    return jobs ?? []
+  } catch {
+    return []
+  }
+}
+
+for (const { num, email, password } of [
+  { num: 6, email: 'candidate6@gmail.com', password: 'password@123' },
+  { num: 7, email: 'candidate7@gmail.com', password: 'password@123' },
+]) {
+  test.describe(`Candidate ${num} — Jobs Browsing`, () => {
+    test.beforeEach(async ({ page }) => {
+      await injectAuthToken(page, email, password, 'candidate1.json')
+    })
+
+    test(`candidate${num} can browse the jobs listing page`, async ({ page }) => {
+      await page.goto('/jobs')
+      await expect(page).toHaveURL(/\/jobs/, { timeout: 15_000 })
+      await expect(page.locator('main')).toBeVisible({ timeout: 10_000 })
+    })
+
+    test(`candidate${num} can search for a job by keyword`, async ({ page }) => {
+      await page.goto('/jobs')
+      await page.waitForLoadState('load')
+      const searchInput = page
+        .getByPlaceholder(/search|keyword|job title/i)
+        .or(page.getByRole('searchbox'))
+        .first()
+      if (!(await searchInput.isVisible({ timeout: 5_000 }).catch(() => false))) {
+        test.skip(true, 'No search input found')
+        return
+      }
+      await searchInput.fill('developer')
+      await expect(searchInput).toHaveValue('developer')
+    })
+
+    test(`candidate${num} can navigate to an HRM1 job detail`, async ({ page }) => {
+      const hrm1Jobs = getMultiJobs().filter((j) => j.hrmKey === 'hrm1')
+      if (!hrm1Jobs.length) {
+        test.skip(true, 'No HRM1 jobs available')
+        return
+      }
+      await page.goto(`/jobs/${hrm1Jobs[0].jobId}`)
+      await page.waitForLoadState('load')
+      await expect(page.getByRole('heading').first()).toBeVisible({ timeout: 10_000 })
+    })
+
+    test(`candidate${num} sees Apply Now or Already Applied on a job detail`, async ({ page }) => {
+      const jobs = getMultiJobs()
+      if (!jobs.length) {
+        test.skip(true, 'No multi-jobs available')
+        return
+      }
+      await page.goto(`/jobs/${jobs[0].jobId}`)
+      await page.waitForLoadState('load')
+      const hasApply = await page.getByRole('button', { name: /apply now/i }).first().isVisible({ timeout: 8_000 }).catch(() => false)
+      const hasApplied = await page.getByRole('button', { name: /applied/i }).first().isVisible({ timeout: 3_000 }).catch(() => false)
+      expect(hasApply || hasApplied).toBeTruthy()
+    })
+  })
+}

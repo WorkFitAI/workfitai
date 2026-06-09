@@ -1,0 +1,94 @@
+{
+  "applications": [
+    {
+      "applicationId": "6a25a8fa68ce3859dd9bcb03",
+      "jobId": "1eb4c0d6-6bad-4656-b846-5a0f977c014e",
+      "jobTitle": "Frontend Developer - React/TypeScript",
+      "candidateEmail": "candidate2@gmail.com",
+      "candidateNum": 2,
+      "hrmKey": "hrm1",
+      "createdAt": "2026-06-07T17:23:07.801Z"
+    },
+    {
+      "applicationId": "6a25a8fc68ce3859dd9bcb05",
+      "jobId": "1eb4c0d6-6bad-4656-b846-5a0f977c014e",
+      "jobTitle": "Frontend Developer - React/TypeScript",
+      "candidateEmail": "candidate3@gmail.com",
+      "candidateNum": 3,
+      "hrmKey": "hrm1",
+      "createdAt": "2026-06-07T17:23:08.446Z"
+    },
+    {
+      "applicationId": "6a25a8fd68ce3859dd9bcb06",
+      "jobId": "1eb4c0d6-6bad-4656-b846-5a0f977c014e",
+      "jobTitle": "Frontend Developer - React/TypeScript",
+      "candidateEmail": "candidate4@gmail.com",
+      "candidateNum": 4,
+      "hrmKey": "hrm1",
+      "createdAt": "2026-06-07T17:23:09.984Z"
+    },
+    {
+      "applicationId": "6a25a8fe68ce3859dd9bcb07",
+      "jobId": "0565b56d-2a3e-4115-8abc-9051e833c4b6",
+      "jobTitle": "Data Analyst / Business Intelligence",
+      "candidateEmail": "candidate5@gmail.com",
+      "candidateNum": 5,
+      "hrmKey": "hrm1",
+      "createdAt": "2026-06-07T17:23:10.599Z"
+    },
+    {
+      "applicationId": "6a25a8ff68ce3859dd9bcb08",
+      "jobId": "0565b56d-2a3e-4115-8abc-9051e833c4b6",
+      "jobTitle": "Data Analyst / Business Intelligence",
+      "candidateEmail": "candidate6@gmail.com",
+      "candidateNum": 6,
+      "hrmKey": "hrm1",
+      "createdAt": "2026-06-07T17:23:11.224Z"
+    },
+    {
+      "applicationId": "6a25a8ff68ce3859dd9bcb09",
+      "jobId": "0565b56d-2a3e-4115-8abc-9051e833c4b6",
+      "jobTitle": "Data Analyst / Business Intelligence",
+      "candidateEmail": "candidate7@gmail.com",
+      "candidateNum": 7,
+      "hrmKey": "hrm1",
+      "createdAt": "2026-06-07T17:23:11.863Z"
+    },
+    {
+      "applicationId": "6a25a90068ce3859dd9bcb0a",
+      "jobId": "d2e78b5a-d4a2-4cc3-9a44-248da146e84a",
+      "jobTitle": "Product Manager - Mobile Apps",
+      "candidateEmail": "candidate8@gmail.com",
+      "candidateNum": 8,
+      "hrmKey": "hrm2",
+      "createdAt": "2026-06-07T17:23:12.490Z"
+    },
+    {
+      "applicationId": "6a25a90168ce3859dd9bcb0b",
+      "jobId": "d2e78b5a-d4a2-4cc3-9a44-248da146e84a",
+      "jobTitle": "Product Manager - Mobile Apps",
+      "candidateEmail": "candidate9@gmail.com",
+      "candidateNum": 9,
+      "hrmKey": "hrm2",
+      "createdAt": "2026-06-07T17:23:13.112Z"
+    },
+    {
+      "applicationId": "6a25a90168ce3859dd9bcb0c",
+      "jobId": "489750a8-5a0f-4f6c-bb51-4c3318c898d7",
+      "jobTitle": "Mobile Developer - React Native / Flutter",
+      "candidateEmail": "candidate8@gmail.com",
+      "candidateNum": 8,
+      "hrmKey": "hrm2",
+      "createdAt": "2026-06-07T17:23:13.742Z"
+    },
+    {
+      "applicationId": "6a25a90268ce3859dd9bcb0d",
+      "jobId": "489750a8-5a0f-4f6c-bb51-4c3318c898d7",
+      "jobTitle": "Mobile Developer - React Native / Flutter",
+      "candidateEmail": "candidate10@gmail.com",
+      "candidateNum": 10,
+      "hrmKey": "hrm2",
+      "createdAt": "2026-06-07T17:23:14.393Z"
+    }
+  ]
+}

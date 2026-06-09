@@ -2,6 +2,7 @@
  * E2E spec — HRM Application Management
  * Runs under the e2e-hrm project (storageState: hrmanager1.json).
  * Playwright config matches: testMatch: 'e2e/hrm-*.spec.ts'
+ * Depends on: hrm-job-data-setup, multi-candidate-apply-data-setup
  */
 import { test, expect } from '@playwright/test'
 import * as fs from 'fs'
@@ -240,5 +241,84 @@ test.describe('HRM Application Management', () => {
     const hasMain = await page.locator('main').isVisible().catch(() => false)
     expect(hasMain).toBeTruthy()
     if (hasPagination) expect(hasPagination).toBeTruthy()
+  })
+})
+
+// ── HRM2 — verify the same application management surface ────────────────────
+
+test.describe('HRM2 Application Management', () => {
+  test.beforeEach(async ({ page }) => {
+    await injectAuthToken(page, 'hrmanager2@gmail.com', 'password@123', 'hrmanager1.json')
+  })
+
+  test('hrm2 applications page loads and shows heading', async ({ page }) => {
+    await page.goto('/applications')
+    await expect(page).toHaveURL(/applications/, { timeout: 15_000 })
+    await expect(page.getByRole('heading', { name: /applications/i })).toBeVisible({ timeout: 10_000 })
+  })
+
+  test('hrm2 applications table or empty state is visible', async ({ page }) => {
+    await page.goto('/applications')
+    await page.waitForLoadState('networkidle')
+    const hasTable = await page.locator('table').first().isVisible({ timeout: 8_000 }).catch(() => false)
+    const hasEmpty = await page.getByText(/no applications found/i).first().isVisible({ timeout: 3_000 }).catch(() => false)
+    expect(hasTable || hasEmpty).toBeTruthy()
+  })
+
+  test('hrm2 search input accepts text', async ({ page }) => {
+    await page.goto('/applications')
+    await page.waitForLoadState('networkidle')
+    const searchInput = page.getByPlaceholder(/search candidate or job/i)
+    if (!(await searchInput.isVisible({ timeout: 8_000 }).catch(() => false))) {
+      test.skip(true, 'Search input not found')
+      return
+    }
+    await searchInput.fill('product manager')
+    await expect(searchInput).toHaveValue('product manager')
+  })
+
+  test('hrm2 status filter dropdown is present', async ({ page }) => {
+    await page.goto('/applications')
+    await page.waitForLoadState('networkidle')
+    const statusSelect = page.locator('#hrm-status-filter')
+    if (!(await statusSelect.isVisible({ timeout: 8_000 }).catch(() => false))) {
+      test.skip(true, 'Status filter not found')
+      return
+    }
+    await statusSelect.selectOption('REVIEWING')
+    await expect(statusSelect).toHaveValue('REVIEWING')
+  })
+
+  test('hrm2 can view application detail panel when applications exist', async ({ page }) => {
+    await page.goto('/applications')
+    await page.waitForLoadState('networkidle')
+    const viewBtn = page.getByRole('button', { name: /^view$/i }).first()
+    if (!(await viewBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
+      test.skip(true, 'No applications for HRM2 — skipping detail panel test')
+      return
+    }
+    await viewBtn.click()
+    const panel = page.locator('.fixed.inset-0.z-40').or(
+      page.getByRole('heading', { name: /job details/i }),
+    ).first()
+    await expect(panel).toBeVisible({ timeout: 8_000 })
+  })
+
+  test('hrm2 search with diverse keywords from HRM2 jobs does not crash the page', async ({ page }) => {
+    await page.goto('/applications')
+    await page.waitForLoadState('networkidle')
+    const searchInput = page.getByPlaceholder(/search candidate or job/i)
+    if (!(await searchInput.isVisible({ timeout: 8_000 }).catch(() => false))) {
+      test.skip(true, 'Search input not found')
+      return
+    }
+    for (const term of ['product', 'mobile', 'flutter', 'react native', 'manager']) {
+      await searchInput.fill(term)
+      await expect(searchInput).toHaveValue(term)
+      await page.waitForTimeout(150)
+    }
+    await searchInput.fill('')
+    const hasMain = await page.locator('main').isVisible().catch(() => false)
+    expect(hasMain).toBeTruthy()
   })
 })

@@ -1,0 +1,28 @@
+{
+  "jobs": [
+    {
+      "jobId": "1eb4c0d6-6bad-4656-b846-5a0f977c014e",
+      "jobTitle": "Frontend Developer - React/TypeScript",
+      "hrmKey": "hrm1",
+      "createdAt": "2026-06-07T17:22:13.402Z"
+    },
+    {
+      "jobId": "0565b56d-2a3e-4115-8abc-9051e833c4b6",
+      "jobTitle": "Data Analyst / Business Intelligence",
+      "hrmKey": "hrm1",
+      "createdAt": "2026-06-07T17:22:28.814Z"
+    },
+    {
+      "jobId": "d2e78b5a-d4a2-4cc3-9a44-248da146e84a",
+      "jobTitle": "Product Manager - Mobile Apps",
+      "hrmKey": "hrm2",
+      "createdAt": "2026-06-07T17:22:43.188Z"
+    },
+    {
+      "jobId": "489750a8-5a0f-4f6c-bb51-4c3318c898d7",
+      "jobTitle": "Mobile Developer - React Native / Flutter",
+      "hrmKey": "hrm2",
+      "createdAt": "2026-06-07T17:22:57.493Z"
+    }
+  ]
+}

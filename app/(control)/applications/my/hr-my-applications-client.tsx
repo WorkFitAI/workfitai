@@ -170,6 +170,7 @@ export default function HrMyApplicationsClient() {
         <ApplicationDetailPanel
           application={selectedApp}
           currentUsername={user.username}
+          canUpdateStatus={false}
           onClose={() => setSelectedApp(null)}
           onRefresh={() => { setSelectedApp(null); refresh(); }}
         />

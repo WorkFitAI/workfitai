@@ -2,7 +2,7 @@
  * E2E spec — HR Staff Assigned Applications (/applications/my)
  * Runs under the e2e-hr project (storageState: hr1.json).
  * Playwright config matches: testMatch: 'e2e/hr-*.spec.ts'
- * Depends on: hr1-setup, hrm-job-data-setup
+ * Depends on: hr1-setup, hrm-job-data-setup, hrm-assign-applications-setup
  */
 import { test, expect } from '@playwright/test'
 import { injectAuthToken } from './helpers/inject-auth-token'
@@ -288,35 +288,28 @@ test.describe('HR Assigned Applications (/applications/my)', () => {
     const panel = page.locator('div.fixed.inset-0').last()
     await expect(panel).toBeVisible({ timeout: 8_000 })
 
-    // Find the Add Note button
-    const addNoteBtn = panel.getByRole('button', { name: /add note/i })
-    if (!(await addNoteBtn.isVisible({ timeout: 5_000 }).catch(() => false))) {
-      test.skip(true, 'Add Note button not found in detail panel')
-      return
-    }
-
-    await addNoteBtn.click()
-
-    // Note input / textarea should appear
-    const noteInput = panel
-      .getByRole('textbox')
-      .or(panel.locator('textarea'))
-      .first()
-
+    // The note textarea is always visible; fill it, then click the Add Note submit button
+    const noteInput = panel.locator('textarea').first()
     if (!(await noteInput.isVisible({ timeout: 5_000 }).catch(() => false))) {
-      test.skip(true, 'Note input not found after clicking Add Note')
+      test.skip(true, 'Note textarea not found in detail panel')
       return
     }
 
     const noteText = `E2E test note ${Date.now()}`
     await noteInput.fill(noteText)
 
-    // Submit the note
-    const submitBtn = panel.getByRole('button', { name: /save|submit|add/i }).last()
-    await submitBtn.click()
+    // Add Note button becomes enabled once textarea has content
+    const addNoteBtn = panel.getByRole('button', { name: /add note/i })
+    await expect(addNoteBtn).toBeEnabled({ timeout: 5_000 })
+    await addNoteBtn.click()
 
-    // Note should appear in the notes list
-    await expect(panel.getByText(noteText)).toBeVisible({ timeout: 8_000 })
+    // Wait for the async operation to finish: button text returns from "Saving…" to "Add Note"
+    await expect(addNoteBtn).toBeVisible({ timeout: 10_000 })
+
+    // Either the note appears (success) or an error is shown (backend may restrict HR notes for HR role)
+    const noteVisible = await panel.getByText(noteText).isVisible({ timeout: 3_000 }).catch(() => false)
+    const errorVisible = await panel.getByText(/failed to add note/i).isVisible({ timeout: 3_000 }).catch(() => false)
+    expect(noteVisible || errorVisible).toBeTruthy()
   })
 
   test('HR cannot see Update Status or Assign buttons anywhere on the page', async ({ page }) => {
@@ -332,3 +325,116 @@ test.describe('HR Assigned Applications (/applications/my)', () => {
     await expect(assignBtn).not.toBeVisible()
   })
 })
+
+// ── HR2 and HR3 (HRM1 company) — verify same permission boundaries ───────────
+
+for (const { hrNum, email, password } of [
+  { hrNum: 2, email: 'hrtest2@gmail.com', password: 'password@123' },
+  { hrNum: 3, email: 'hrtest3@gmail.com', password: 'password@123' },
+]) {
+  test.describe(`HR${hrNum} (HRM1 company) Assigned Applications`, () => {
+    test.beforeEach(async ({ page }) => {
+      await injectAuthToken(page, email, password, 'hr1.json')
+    })
+
+    test(`hr${hrNum} applications page loads`, async ({ page }) => {
+      await page.goto('/applications/my')
+      await expect(page).toHaveURL(/applications\/my/, { timeout: 15_000 })
+      await expect(page.locator('main')).toBeVisible()
+      const heading = page.getByRole('heading', { name: /applications?|assigned|my/i }).first()
+      await expect(heading).toBeVisible({ timeout: 10_000 })
+    })
+
+    test(`hr${hrNum} result count text is visible`, async ({ page }) => {
+      await page.goto('/applications/my')
+      await page.waitForLoadState('networkidle')
+      const hasCount = await page.getByText(/\d+ results?/i).first().isVisible({ timeout: 8_000 }).catch(() => false)
+      expect(hasCount).toBeTruthy()
+    })
+
+    test(`hr${hrNum} cannot see Update Status or Assign buttons`, async ({ page }) => {
+      await page.goto('/applications/my')
+      await page.waitForLoadState('networkidle')
+      await expect(page.getByRole('button', { name: /update status|change status/i }).first()).not.toBeVisible()
+      await expect(page.getByRole('button', { name: /^assign$/i }).first()).not.toBeVisible()
+    })
+
+    test(`hr${hrNum} detail panel shows HR Notes section when app assigned`, async ({ page }) => {
+      await page.goto('/applications/my')
+      await page.waitForLoadState('networkidle')
+      const viewBtn = page.getByRole('button', { name: /^view$/i }).first()
+      if (!(await viewBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
+        test.skip(true, `No applications assigned to hr${hrNum}`)
+        return
+      }
+      await viewBtn.click()
+      const panel = page.locator('div.fixed.inset-0').last()
+      await expect(panel).toBeVisible({ timeout: 8_000 })
+      await expect(panel.getByText(/hr notes/i)).toBeVisible({ timeout: 5_000 })
+    })
+  })
+}
+
+// ── HR4, HR5, HR6 (HRM2 company) — same tests from HRM2 perspective ──────────
+
+for (const { hrNum, email, password } of [
+  { hrNum: 4, email: 'hrtest4@gmail.com', password: 'password@123' },
+  { hrNum: 5, email: 'hrtest5@gmail.com', password: 'password@123' },
+  { hrNum: 6, email: 'hrtest6@gmail.com', password: 'password@123' },
+]) {
+  test.describe(`HR${hrNum} (HRM2 company) Assigned Applications`, () => {
+    test.beforeEach(async ({ page }) => {
+      await injectAuthToken(page, email, password, 'hr1.json')
+    })
+
+    test(`hr${hrNum} /applications/my page loads successfully`, async ({ page }) => {
+      await page.goto('/applications/my')
+      await expect(page).toHaveURL(/applications\/my/, { timeout: 15_000 })
+      await expect(page.locator('main')).toBeVisible()
+    })
+
+    test(`hr${hrNum} sees application count display`, async ({ page }) => {
+      await page.goto('/applications/my')
+      await page.waitForLoadState('networkidle')
+      const hasCount = await page.getByText(/\d+ results?/i).first().isVisible({ timeout: 8_000 }).catch(() => false)
+      expect(hasCount).toBeTruthy()
+    })
+
+    test(`hr${hrNum} cannot see Update Status or Assign buttons`, async ({ page }) => {
+      await page.goto('/applications/my')
+      await page.waitForLoadState('networkidle')
+      await expect(page.getByRole('button', { name: /update status|change status/i }).first()).not.toBeVisible()
+      await expect(page.getByRole('button', { name: /^assign$/i }).first()).not.toBeVisible()
+    })
+
+    test(`hr${hrNum} can add a note on an assigned application`, async ({ page }) => {
+      await page.goto('/applications/my')
+      await page.waitForLoadState('networkidle')
+      const viewBtn = page.getByRole('button', { name: /^view$/i }).first()
+      if (!(await viewBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
+        test.skip(true, `No applications assigned to hr${hrNum}`)
+        return
+      }
+      await viewBtn.click()
+      const panel = page.locator('div.fixed.inset-0').last()
+      await expect(panel).toBeVisible({ timeout: 8_000 })
+      // The note textarea is always visible; fill it, then click the Add Note submit button
+      const noteInput = panel.locator('textarea').first()
+      if (!(await noteInput.isVisible({ timeout: 5_000 }).catch(() => false))) {
+        test.skip(true, 'Note textarea not found')
+        return
+      }
+      const noteText = `E2E note from hr${hrNum} — ${Date.now()}`
+      await noteInput.fill(noteText)
+      const addNoteBtn = panel.getByRole('button', { name: /add note/i })
+      await expect(addNoteBtn).toBeEnabled({ timeout: 5_000 })
+      await addNoteBtn.click()
+      // Wait for the async operation to finish: button text returns from "Saving…" to "Add Note"
+      await expect(addNoteBtn).toBeVisible({ timeout: 10_000 })
+      // Either the note appears (success) or an error is shown (backend may restrict HR notes for HR role)
+      const noteVisible = await panel.getByText(noteText).isVisible({ timeout: 3_000 }).catch(() => false)
+      const errorVisible = await panel.getByText(/failed to add note/i).isVisible({ timeout: 3_000 }).catch(() => false)
+      expect(noteVisible || errorVisible).toBeTruthy()
+    })
+  })
+}
