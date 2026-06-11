@@ -1,4 +1,4 @@
-import { Report, ReportDetail, ReportData } from "@/types/report";
+import { Report, ReportDetail, ReportData, Snapshot } from "@/types/report";
 import { ApiResponse } from "@/types/response";
 
 export const createMockReportDetail = (overrides?: Partial<ReportDetail>): ReportDetail => ({
@@ -12,6 +12,28 @@ export const createMockReportDetail = (overrides?: Partial<ReportDetail>): Repor
   ...overrides,
 });
 
+export const createMockSnapshot = (overrides?: Partial<Snapshot>): Snapshot => ({
+  snapshotId: "snapshot1",
+  title: "Senior Developer",
+  description: "A challenging role for experienced developers",
+  shortDescription: "Full-time Senior Developer position",
+  location: "San Francisco, CA",
+  currency: "USD",
+  salaryMin: 120000,
+  salaryMax: 180000,
+  requirements: "5+ years experience with React and Node.js",
+  benefits: "Health insurance, 401k, remote work",
+  responsibilities: "Lead development of new features",
+  educationLevel: "Bachelor's",
+  experienceLevel: "Senior",
+  requiredExperience: "5 years",
+  employmentType: "Full-time",
+  skills: "React, Node.js, TypeScript, PostgreSQL",
+  companyName: "Tech Corp",
+  reportedAt: new Date().toISOString(),
+  ...overrides,
+});
+
 export const createMockReport = (overrides?: Partial<Report>): Report => ({
   jobId: "job1",
   reportCount: 1,
@@ -19,6 +41,7 @@ export const createMockReport = (overrides?: Partial<Report>): Report => ({
   status: "PENDING",
   isDeleted: false,
   reports: [createMockReportDetail()],
+  snapshot: createMockSnapshot(),
   ...overrides,
 });
 
