@@ -21,6 +21,7 @@ export const jobSchema = z.object({
   companyNo: z.string(),
   skillNames: z.array(z.string()).default([]),
   status: z.string(),
+  jobCategoryName: z.string(),
 });
 
 export type JobFormValues = z.infer<typeof jobSchema>;

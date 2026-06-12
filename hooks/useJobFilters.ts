@@ -24,6 +24,8 @@ export const useJobFilters = () => {
 
     const title = searchParams.get("title") || undefined;
 
+    const jobCategoryName = searchParams.get("categoryName") || undefined;
+
     const location = searchParams.get("location") || undefined;
 
     const status = searchParams.get("status") || undefined;
@@ -43,6 +45,7 @@ export const useJobFilters = () => {
       status,
       sort,
       hrName,
+      jobCategoryName,
     };
   }, [searchParams]);
 

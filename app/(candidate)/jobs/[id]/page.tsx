@@ -60,6 +60,7 @@ export default async function JobDetail({ params }: Props) {
               location={job.location}
               requiredExperience={job.requiredExperience}
               educationLevel={job.educationLevel}
+              jobCategoryName={job.jobCategoryName}
               expiresAt={job.expiresAt}
             />
 
