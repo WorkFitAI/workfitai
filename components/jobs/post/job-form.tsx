@@ -9,11 +9,8 @@ import {
   MapPin, 
   Calendar as CalendarIcon, 
   DollarSign, 
-  GraduationCap, 
   Users, 
   Save, 
-  Hash,
-  Award
 } from "lucide-react";
 
 import {
@@ -48,6 +45,7 @@ import { Separator } from "@/components/ui/separator";
 import { useEffect, useMemo, useState } from "react";
 import { Skill } from "@/types/skill";
 import { jobService } from "@/lib/job/job-service";
+import JobCategorySelect from "@/components/jobs/post/job-category-select";
 
 type Props = {
   initialData?: JobFormValues;
@@ -82,15 +80,16 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
       currency: "USD",
       location: "",
       quantity: 1,
-      requirements: "",
-      responsibilities: "",
-      benefits: "",
-      educationLevel: "",
-      requiredExperience: "",
+      requirements: " ",
+      responsibilities: " ",
+      benefits: " ",
+      educationLevel: " ",
+      requiredExperience: " ",
       companyNo: "",
       skillNames: [],
       expiresAt: new Date(),
       status: isPublished ? "PUBLISHED" : "DRAFT",
+      jobCategoryName: "",
       ...initialData,
     },
   });
@@ -229,47 +228,51 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                     />
                   </div>
 
-                  <FormField
-                    control={form.control}
-                    name="skillNames"
-                    render={({ field }) => (
-                      <FormItem className="relative">
-                        <FormLabel className="font-bold uppercase text-xs">Required Skills (Tags)</FormLabel>
-                        <div className="flex flex-wrap gap-2 p-2.5 border rounded-lg bg-slate-50/50 min-h-[44px]">
-                          {field.value.map((skill: string) => (
-                            <span key={skill} className="flex items-center gap-1.5 px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-full">
-                              {skill}
-                              <button type="button" onClick={() => field.onChange(field.value.filter((s: string) => s !== skill))} className="hover:text-red-200">✕</button>
-                            </span>
-                          ))}
-                          <input
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            placeholder="Type skill and press Enter..."
-                            className="flex-1 outline-none bg-transparent text-sm ml-2"
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" && query.trim()) {
-                                e.preventDefault();
-                                if (!field.value.includes(query)) field.onChange([...field.value, query]);
-                                setQuery("");
-                              }
-                              if (e.key === "Backspace" && !query) field.onChange(field.value.slice(0, -1));
-                            }}
-                          />
-                        </div>
-                        {query && (
-                          <Card className="absolute z-50 w-full mt-1 shadow-xl max-h-48 overflow-y-auto">
-                            {filtered.map((skill) => (
-                              <div key={skill.skillId} className="p-3 hover:bg-blue-50 cursor-pointer text-sm border-b last:border-none" onClick={() => {
-                                if (!field.value.includes(skill.name)) field.onChange([...field.value, skill.name]);
-                                setQuery("");
-                              }}>{skill.name}</div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="skillNames"
+                      render={({ field }) => (
+                        <FormItem className="relative">
+                          <FormLabel className="font-bold uppercase text-xs">Required Skills (Tags)</FormLabel>
+                          <div className="flex flex-wrap gap-2 p-2.5 border rounded-lg bg-slate-50/50 min-h-[44px]">
+                            {field.value.map((skill: string) => (
+                              <span key={skill} className="flex items-center gap-1.5 px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-full">
+                                {skill}
+                                <button type="button" onClick={() => field.onChange(field.value.filter((s: string) => s !== skill))} className="hover:text-red-200">✕</button>
+                              </span>
                             ))}
-                          </Card>
-                        )}
-                      </FormItem>
-                    )}
-                  />
+                            <input
+                              value={query}
+                              onChange={(e) => setQuery(e.target.value)}
+                              placeholder="Type skill and press Enter..."
+                              className="flex-1 outline-none bg-transparent text-sm ml-2"
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" && query.trim()) {
+                                  e.preventDefault();
+                                  if (!field.value.includes(query)) field.onChange([...field.value, query]);
+                                  setQuery("");
+                                }
+                                if (e.key === "Backspace" && !query) field.onChange(field.value.slice(0, -1));
+                              }}
+                            />
+                          </div>
+                          {query && (
+                            <Card className="absolute z-50 w-full mt-1 shadow-xl max-h-48 overflow-y-auto">
+                              {filtered.map((skill) => (
+                                <div key={skill.skillId} className="p-3 hover:bg-blue-50 cursor-pointer text-sm border-b last:border-none" onClick={() => {
+                                  if (!field.value.includes(skill.name)) field.onChange([...field.value, skill.name]);
+                                  setQuery("");
+                                }}>{skill.name}</div>
+                              ))}
+                            </Card>
+                          )}
+                        </FormItem>
+                      )}
+                    />
+
+                    <JobCategorySelect form={form} job={initialData} />
+                  </div>
                 </CardContent>
               </Card>
 
@@ -302,6 +305,20 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                       </FormItem>
                     )}
                   />
+
+                  <Separator className="my-2" />
+
+                  <FormField
+                      control={form.control}
+                      name="responsibilities"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col h-full">
+                          <FormLabel className="font-bold uppercase text-xs">Responsibilities</FormLabel>
+                          <Textarea rows={4} {...field} />
+                        </FormItem>
+                      )}
+                  />
+                  <Separator className="my-2" />
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField
@@ -353,6 +370,7 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                       )}
                     />
                   </div>
+
                 </CardContent>
               </Card>
             </div>

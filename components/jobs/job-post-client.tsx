@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { JobDialog } from "@/components/jobs/post/job-dialog";
 import { toast } from "sonner";
-import { Job } from "@/types/job";
+import { Job, JobCategory } from "@/types/job";
 import { JobFormValues } from "@/lib/schemas/job-schemas";
 import { Badge } from "@/components/ui/badge";
 
@@ -55,6 +55,7 @@ export default function JobAdminPage({ roles, companyId }: { roles: string[]; co
   });
 
   const [skills, setSkills] = useState<Skill[]>([]);
+  const [categories, setCategories] = useState<JobCategory[]>([]);
 
  const [hrNameToFullName, setHrNameToFullName] = useState<Record<string, string>>({});
 
@@ -113,6 +114,7 @@ export default function JobAdminPage({ roles, companyId }: { roles: string[]; co
         companyNo: companyId,
         skillNames: detail.data.skillNames.map(s => s.trim()),
         status: detail.data.status,
+        jobCategoryName: detail.data.jobCategoryName,
       };
 
       setDialogState({ isOpen: true, editingJob: normalizedData });
@@ -127,16 +129,46 @@ export default function JobAdminPage({ roles, companyId }: { roles: string[]; co
         .map((name) => skills.find((s) => s.name === name)?.skillId)
         .filter((id): id is number => id !== undefined);
 
+      const categoryRes = await jobService.getAllCategories();
+
+      const category = categoryRes.data.result.find(
+        (c: JobCategory) =>
+          c.name.trim().toLowerCase() ===
+          data.jobCategoryName.trim().toLowerCase()
+      );
+
+      if (!category) {
+        toast.error("Category not found");
+        return;
+      }
+
       if (dialogState.editingJob) {
-        const newData = { ...data, jobId: dialogState.editingJob.postId, skillIds: skillIdsToSave };
+        const newData = {
+          ...data,
+          jobId: dialogState.editingJob.postId,
+          jobCategoryId: category.id,
+          companyNo: companyId,
+          skillIds: skillIdsToSave,
+        };
+
         await jobService.updateJob(newData);
         toast.success("Updated job successfully");
-      } else {        
-        const newData = { ...data, companyNo: companyId, skillIds: skillIdsToSave };
+      } else {
+        const newData = {
+          ...data,
+          companyNo: companyId,
+          jobCategoryId: category.id,
+          skillIds: skillIdsToSave,
+        };
+
         await jobService.createJob(newData);
         toast.success("Created new job successfully");
       }
-      setDialogState({ ...dialogState, isOpen: false });
+
+      setDialogState({
+        ...dialogState,
+        isOpen: false,
+      });
     } catch (error: unknown) {
       toast.error((error as Error).message);
     } finally {

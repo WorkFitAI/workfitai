@@ -1,4 +1,4 @@
-import { GetJobsParams, Job, JobData, JobDetail } from "@/types/job";
+import { CreateJobCategoryRequest, GetJobsParams, Job, JobCategoriesResponse, JobCategory, JobData, JobDetail } from "@/types/job";
 import { ApiResponse } from "@/types/response";
 import { apiClient } from "@/lib/api-client";
 import { SkillResponse } from "@/types/skill";
@@ -110,6 +110,33 @@ export const jobService = {
     if (!res.status || res.status >= 500) {
       throw new Error("Failed to delete job");
     }
+  },
+
+  async getAllCategories() {
+    const res = await apiClient.get(
+      "/job/public/jobs/job-categories"
+    ) as ApiResponse<JobCategoriesResponse>;
+
+    if (!res.status || res.status >= 400) {
+      throw new Error("Failed to fetch categories");
+    }
+
+    return res;
+  },
+
+  async createCategory(
+    data: CreateJobCategoryRequest,
+  ) {
+    const res = await apiClient.post(
+      "/job/public/jobs/job-categories",
+      data,
+    ) as ApiResponse<JobCategory>;
+
+    if (!res.status || res.status >= 400) {
+      throw new Error("Failed to create category");
+    }
+
+    return res;
   },
 }
 

@@ -15,6 +15,7 @@ export interface Job {
   currency: string;
   location: string;
   status: string;
+  jobCategoryName: string;
   lastModifiedDate: string;
   lastModifiedBy: string;
 }
@@ -54,10 +55,26 @@ export interface JobDetail {
 
   expiresAt: string;
 
+  jobCategoryName: string;
+
   createdBy: string;
   createdDate: string;
   lastModifiedDate: string;
 }
+
+export interface JobDetailOverviewProps {
+  employmentType: string;
+  experienceLevel: string;
+  salaryMin: number;
+  salaryMax: number;
+  currency: string;
+  location: string;
+  requiredExperience: string;
+  educationLevel: string;
+  expiresAt: string;
+  jobCategoryName: string;
+}
+
 
 export interface JobContent {
   description: string;
@@ -85,3 +102,17 @@ export type GetJobsParams = {
   filter?: string;
   role?: string;
 };
+
+// types
+export interface CreateJobCategoryRequest {
+  name: string;
+}
+
+export interface JobCategoriesResponse {
+  result: JobCategory[];
+}
+
+export interface JobCategory {
+  id: string;
+  name: string;
+}

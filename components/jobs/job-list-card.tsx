@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-import { Briefcase, MapPin, Clock } from "lucide-react";
+import { Briefcase, MapPin, Clock, Layers2 } from "lucide-react";
 import { Job } from "@/types/job";
 import ApplyNowButton from "@/components/applications/apply-now-button";
 
@@ -61,6 +61,11 @@ const JobListCard = ({ job }: Props) => {
         <span className="flex items-center gap-1">
           <Briefcase className="w-3 h-3 text-gray-400" />
           {job.employmentType}
+        </span>
+
+        <span className="flex items-center gap-1 text-blue-400">
+          <Layers2 className="w-3 h-3 text-blue-500" />
+          {job.jobCategoryName}
         </span>
 
         <span className="flex items-center gap-1">

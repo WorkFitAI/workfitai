@@ -1,3 +1,4 @@
+import { JobDetailOverviewProps } from "@/types/job";
 import {
   GraduationCap,
   Network,
@@ -5,19 +6,8 @@ import {
   Clock10,
   MapPin,
   HandCoins,
+  Layers2,
 } from "lucide-react";
-
-interface JobDetailOverviewProps {
-  employmentType: string;
-  experienceLevel: string;
-  salaryMin: number;
-  salaryMax: number;
-  currency: string;
-  location: string;
-  requiredExperience: string;
-  educationLevel: string;
-  expiresAt: string;
-}
 
 const JobDetailOverview = (props: JobDetailOverviewProps) => {
   const {
@@ -29,6 +19,7 @@ const JobDetailOverview = (props: JobDetailOverviewProps) => {
     requiredExperience,
     educationLevel,
     expiresAt,
+    jobCategoryName,
   } = props;
   return (
     <div className="border rounded-xl p-6 mb-8">
@@ -61,6 +52,14 @@ const JobDetailOverview = (props: JobDetailOverviewProps) => {
               ? `$${salaryMin.toLocaleString()} - $${salaryMax.toLocaleString()}`
               : `${salaryMin.toLocaleString()} VND - ${salaryMax.toLocaleString()} VND`}
           </p>
+        </div>
+
+        <div>
+          <p className="text-gray-500 flex items-center gap-1">
+            <Layers2 size={14} />
+            Job Category
+          </p>
+          <p className="font-medium">{jobCategoryName}</p>
         </div>
 
         <div>
