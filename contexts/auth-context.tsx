@@ -133,7 +133,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const token = getAccessToken();
 
       if (token && !isTokenExpired()) {
-        // Fast path: valid token in sessionStorage — restore from cookie or refresh
+        // Fast path: valid token in localStorage — restore from cookie or refresh
         const session = getSessionCookie();
         if (session && session.expiresAt > Date.now()) {
           applyUser(session);
@@ -152,7 +152,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     restore();
   }, [applyUser, scheduleRefresh, restoreFromRefresh]);
 
-  // Cross-tab logout sync via BroadcastChannel
+  // Cross-tab auth sync via BroadcastChannel:
+  // logout → clear session and redirect; login → restore session so all open tabs
+  // reflect the new auth state without requiring a page reload.
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -164,6 +166,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           isLoggedOutRef.current = true;
           applyUser(null);
           routerRef.current.push("/login");
+        } else if (event.data?.type === "login") {
+          const session = event.data.session as UserSession;
+          if (session && session.expiresAt > Date.now()) {
+            isLoggedOutRef.current = false;
+            applyUser(session);
+            scheduleRefresh(session.expiresAt);
+          }
         }
       };
     } catch {
@@ -174,7 +183,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       channel?.close();
       if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
     };
-  }, [applyUser]);
+  }, [applyUser, scheduleRefresh]);
 
   const login = useCallback(
     async (data: LoginRequest) => {
@@ -195,14 +204,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const normalizedRoles = (roles as string[]).map((r) =>
         r.startsWith("ROLE_") ? r : `ROLE_${r}`,
       ) as UserSession["roles"];
-      applyUser({
+      const newSession: UserSession = {
         username,
         email: username,
         companyId: companyId ?? null,
         roles: normalizedRoles,
         expiresAt,
-      });
+      };
+      applyUser(newSession);
       scheduleRefresh(expiresAt);
+
+      // Broadcast login so other open tabs restore auth state immediately
+      try {
+        const ch = new BroadcastChannel(BROADCAST_CHANNEL);
+        ch.postMessage({ type: "login", session: newSession });
+        ch.close();
+      } catch {
+        // BroadcastChannel not supported
+      }
 
       // Role-based redirect: ADMIN / HR → /dashboard, candidates → /
       const isControlUser = normalizedRoles.some((r) =>

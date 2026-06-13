@@ -19,7 +19,7 @@ import {
 } from "../../mocks/handlers";
 import { applicationService } from "@/lib/application/application-service";
 
-const API = "https://be.workfitai.uk";
+const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://be.workfitai.uk";
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }));
 afterEach(() => server.resetHandlers());
@@ -253,7 +253,10 @@ describe("getHRJobs", () => {
     server.use(
       http.get(`${API}/application/hr/jobs`, ({ request }) => {
         capturedUrl = request.url;
-        return apiSuccess({ items: [mockHRJobItem()], meta: mockPaginationMeta() });
+        return apiSuccess({
+          items: [mockHRJobItem()],
+          meta: mockPaginationMeta(),
+        });
       }),
     );
     await applicationService.getHRJobs(0, 20);
@@ -267,7 +270,10 @@ describe("getHRJobs", () => {
     server.use(
       http.get(`${API}/application/hr/jobs`, ({ request }) => {
         capturedUrl = request.url;
-        return apiSuccess({ items: [], meta: mockPaginationMeta({ totalElements: 0 }) });
+        return apiSuccess({
+          items: [],
+          meta: mockPaginationMeta({ totalElements: 0 }),
+        });
       }),
     );
     await applicationService.getHRJobs(0, 20, "Engineer");
@@ -278,7 +284,10 @@ describe("getHRJobs", () => {
     const job = mockHRJobItem({ title: "Backend Dev", totalApplicants: 10 });
     server.use(
       http.get(`${API}/application/hr/jobs`, () =>
-        apiSuccess({ items: [job], meta: mockPaginationMeta({ totalElements: 1 }) }),
+        apiSuccess({
+          items: [job],
+          meta: mockPaginationMeta({ totalElements: 1 }),
+        }),
       ),
     );
     const res = await applicationService.getHRJobs(0, 20);
@@ -295,7 +304,10 @@ describe("getHRCandidates", () => {
     server.use(
       http.get(`${API}/application/hr/candidates`, ({ request }) => {
         capturedUrl = request.url;
-        return apiSuccess({ items: [mockHRCandidateItem()], meta: mockPaginationMeta() });
+        return apiSuccess({
+          items: [mockHRCandidateItem()],
+          meta: mockPaginationMeta(),
+        });
       }),
     );
     await applicationService.getHRCandidates(0, 20);
@@ -309,7 +321,10 @@ describe("getHRCandidates", () => {
     server.use(
       http.get(`${API}/application/hr/candidates`, ({ request }) => {
         capturedUrl = request.url;
-        return apiSuccess({ items: [], meta: mockPaginationMeta({ totalElements: 0 }) });
+        return apiSuccess({
+          items: [],
+          meta: mockPaginationMeta({ totalElements: 0 }),
+        });
       }),
     );
     await applicationService.getHRCandidates(0, 20, "REVIEWING");
@@ -317,7 +332,10 @@ describe("getHRCandidates", () => {
   });
 
   it("returns candidate items on success", async () => {
-    const candidate = mockHRCandidateItem({ fullName: "Jane Doe", applicationCount: 3 });
+    const candidate = mockHRCandidateItem({
+      fullName: "Jane Doe",
+      applicationCount: 3,
+    });
     server.use(
       http.get(`${API}/application/hr/candidates`, () =>
         apiSuccess({ items: [candidate], meta: mockPaginationMeta() }),
@@ -345,7 +363,10 @@ describe("getHRCandidateDetail", () => {
   });
 
   it("returns full candidate detail with applications", async () => {
-    const detail = mockCandidateDetail({ username: "jdoe", totalApplications: 2 });
+    const detail = mockCandidateDetail({
+      username: "jdoe",
+      totalApplications: 2,
+    });
     server.use(
       http.get(`${API}/application/hr/candidates/:username`, () =>
         apiSuccess(detail),
@@ -365,7 +386,10 @@ describe("getCompanyJobs", () => {
     server.use(
       http.get(`${API}/application/company/:companyNo/jobs`, ({ request }) => {
         capturedUrl = request.url;
-        return apiSuccess({ items: [mockHRJobItem()], meta: mockPaginationMeta() });
+        return apiSuccess({
+          items: [mockHRJobItem()],
+          meta: mockPaginationMeta(),
+        });
       }),
     );
     await applicationService.getCompanyJobs("C001", 0, 20);
@@ -379,7 +403,10 @@ describe("getCompanyJobs", () => {
     server.use(
       http.get(`${API}/application/company/:companyNo/jobs`, ({ request }) => {
         capturedUrl = request.url;
-        return apiSuccess({ items: [], meta: mockPaginationMeta({ totalElements: 0 }) });
+        return apiSuccess({
+          items: [],
+          meta: mockPaginationMeta({ totalElements: 0 }),
+        });
       }),
     );
     await applicationService.getCompanyJobs("C001", 0, 20, "Developer");
@@ -391,7 +418,10 @@ describe("getCompanyJobs", () => {
     server.use(
       http.get(`${API}/application/company/:companyNo/jobs`, ({ request }) => {
         capturedUrl = request.url;
-        return apiSuccess({ items: [], meta: mockPaginationMeta({ totalElements: 0 }) });
+        return apiSuccess({
+          items: [],
+          meta: mockPaginationMeta({ totalElements: 0 }),
+        });
       }),
     );
     await applicationService.getCompanyJobs("ACME-99", 0, 20);
@@ -405,10 +435,16 @@ describe("getCompanyCandidates", () => {
   it("calls GET /application/company/:companyNo/candidates with page and size", async () => {
     let capturedUrl = "";
     server.use(
-      http.get(`${API}/application/company/:companyNo/candidates`, ({ request }) => {
-        capturedUrl = request.url;
-        return apiSuccess({ items: [mockHRCandidateItem()], meta: mockPaginationMeta() });
-      }),
+      http.get(
+        `${API}/application/company/:companyNo/candidates`,
+        ({ request }) => {
+          capturedUrl = request.url;
+          return apiSuccess({
+            items: [mockHRCandidateItem()],
+            meta: mockPaginationMeta(),
+          });
+        },
+      ),
     );
     await applicationService.getCompanyCandidates("C001", 0, 20);
     expect(capturedUrl).toContain("/application/company/C001/candidates");
@@ -419,17 +455,26 @@ describe("getCompanyCandidates", () => {
   it("appends status param when provided", async () => {
     let capturedUrl = "";
     server.use(
-      http.get(`${API}/application/company/:companyNo/candidates`, ({ request }) => {
-        capturedUrl = request.url;
-        return apiSuccess({ items: [], meta: mockPaginationMeta({ totalElements: 0 }) });
-      }),
+      http.get(
+        `${API}/application/company/:companyNo/candidates`,
+        ({ request }) => {
+          capturedUrl = request.url;
+          return apiSuccess({
+            items: [],
+            meta: mockPaginationMeta({ totalElements: 0 }),
+          });
+        },
+      ),
     );
     await applicationService.getCompanyCandidates("C001", 0, 20, "HIRED");
     expect(capturedUrl).toContain("status=HIRED");
   });
 
   it("returns candidate items on success", async () => {
-    const candidate = mockHRCandidateItem({ username: "alice", latestStatus: "REVIEWING" });
+    const candidate = mockHRCandidateItem({
+      username: "alice",
+      latestStatus: "REVIEWING",
+    });
     server.use(
       http.get(`${API}/application/company/:companyNo/candidates`, () =>
         apiSuccess({ items: [candidate], meta: mockPaginationMeta() }),
@@ -456,18 +501,26 @@ describe("getCompanyCandidateDetail", () => {
       ),
     );
     await applicationService.getCompanyCandidateDetail("C001", "candidate1");
-    expect(capturedUrl).toContain("/application/company/C001/candidates/candidate1");
+    expect(capturedUrl).toContain(
+      "/application/company/C001/candidates/candidate1",
+    );
   });
 
   it("returns full candidate detail with applications", async () => {
-    const detail = mockCandidateDetail({ username: "bob", totalApplications: 5 });
+    const detail = mockCandidateDetail({
+      username: "bob",
+      totalApplications: 5,
+    });
     server.use(
       http.get(
         `${API}/application/company/:companyNo/candidates/:username`,
         () => apiSuccess(detail),
       ),
     );
-    const res = await applicationService.getCompanyCandidateDetail("C001", "bob");
+    const res = await applicationService.getCompanyCandidateDetail(
+      "C001",
+      "bob",
+    );
     expect(res.data?.username).toBe("bob");
     expect(res.data?.totalApplications).toBe(5);
   });

@@ -28,7 +28,7 @@ import {
 } from "../mocks/handlers";
 import HrmApplicationsClient from "@/app/(control)/applications/hrm-applications-client";
 
-const API = "https://be.workfitai.uk";
+const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://be.workfitai.uk";
 
 // Auth context mock — must match AuthContextValue shape from contexts/auth-context.tsx
 const mockAuthFn = vi.fn();
@@ -75,10 +75,16 @@ function setupApplicationHandlers(
       apiSuccess(hrUsers),
     ),
     http.get(`${API}/application/company/C001/jobs`, () =>
-      apiSuccess({ items: jobs, meta: mockPaginationMeta({ totalElements: jobs.length }) }),
+      apiSuccess({
+        items: jobs,
+        meta: mockPaginationMeta({ totalElements: jobs.length }),
+      }),
     ),
     http.get(`${API}/application/company/C001/candidates`, () =>
-      apiSuccess({ items: [mockHRCandidateItem()], meta: mockPaginationMeta() }),
+      apiSuccess({
+        items: [mockHRCandidateItem()],
+        meta: mockPaginationMeta(),
+      }),
     ),
     http.get(`${API}/application/company/C001/candidates/:username`, () =>
       apiSuccess(mockCandidateDetail()),
@@ -194,28 +200,50 @@ describe("HrmApplicationsClient", () => {
   it("renders job filter dropdown populated from the jobs API", async () => {
     asHrManager();
     const job = mockHRJobItem({ jobId: "job-001", title: "Senior React Dev" });
-    setupApplicationHandlers([mockCompanyApplication({ jobId: "job-001" })], [mockHRUser()], undefined, [job]);
+    setupApplicationHandlers(
+      [mockCompanyApplication({ jobId: "job-001" })],
+      [mockHRUser()],
+      undefined,
+      [job],
+    );
     render(<HrmApplicationsClient />);
 
     // Wait for applications to load, then check the job filter dropdown
-    await waitFor(() => expect(screen.getByText("candidate1")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("candidate1")).toBeInTheDocument(),
+    );
     const jobSelect = screen.getByDisplayValue("All jobs");
     expect(jobSelect).toBeInTheDocument();
     // The job title should appear as an option in the dropdown
-    expect(screen.getByRole("option", { name: "Senior React Dev" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("option", { name: "Senior React Dev" }),
+    ).toBeInTheDocument();
   });
 
   it("client-side job filter hides applications for other jobs", async () => {
     asHrManager();
     const apps = [
-      mockCompanyApplication({ id: "app-001", username: "alice", jobId: "job-001" }),
-      mockCompanyApplication({ id: "app-002", username: "bob", jobId: "job-002" }),
+      mockCompanyApplication({
+        id: "app-001",
+        username: "alice",
+        jobId: "job-001",
+      }),
+      mockCompanyApplication({
+        id: "app-002",
+        username: "bob",
+        jobId: "job-002",
+      }),
     ];
     const jobs = [
       mockHRJobItem({ jobId: "job-001", title: "Frontend Dev" }),
       mockHRJobItem({ jobId: "job-002", title: "Backend Dev" }),
     ];
-    setupApplicationHandlers(apps, [mockHRUser()], mockPaginationMeta({ totalElements: 2 }), jobs);
+    setupApplicationHandlers(
+      apps,
+      [mockHRUser()],
+      mockPaginationMeta({ totalElements: 2 }),
+      jobs,
+    );
     render(<HrmApplicationsClient />);
 
     await waitFor(() => expect(screen.getByText("alice")).toBeInTheDocument());
@@ -239,7 +267,9 @@ describe("HrmApplicationsClient", () => {
 
     // Wait for initial load
     await waitFor(() =>
-      expect(screen.getByRole("heading", { name: /applications/i })).toBeInTheDocument(),
+      expect(
+        screen.getByRole("heading", { name: /applications/i }),
+      ).toBeInTheDocument(),
     );
 
     // Click the Candidates tab

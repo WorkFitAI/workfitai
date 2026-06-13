@@ -81,21 +81,21 @@ export const adminUserService = {
     )
   },
 
-  /** POST /user/hr/username/:username/approve — approve an HR staff account */
+  /** Approve an HR staff account */
   async approveHR(username: string): Promise<ApiResponse<unknown>> {
     return apiClient.post<ApiResponse<unknown>>(
       `/user/hr/username/${username}/approve`,
     )
   },
 
-  /** POST /user/hr/username/:username/reject-manager — reject an HR Manager (Admin only) */
+  /** Reject an HR Manager (Admin only) */
   async rejectManager(username: string): Promise<ApiResponse<unknown>> {
     return apiClient.post<ApiResponse<unknown>>(
       `/user/hr/username/${username}/reject-manager`,
     )
   },
 
-  /** POST /user/hr/username/:username/reject — reject an HR staff account (HR Manager only) */
+  /** Reject an HR staff account (HR Manager only) */
   async rejectHR(username: string): Promise<ApiResponse<unknown>> {
     return apiClient.post<ApiResponse<unknown>>(
       `/user/hr/username/${username}/reject`,

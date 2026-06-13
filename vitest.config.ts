@@ -1,6 +1,9 @@
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
+import dotenv from "dotenv";
+
+dotenv.config({ path: ".env.local" });
 
 export default defineConfig({
   plugins: [react()],
@@ -9,7 +12,11 @@ export default defineConfig({
     globals: true,
     setupFiles: ["__tests__/setup.ts"],
     env: {
-      NEXT_PUBLIC_API_BASE_URL: "https://be.workfitai.uk",
+      NEXT_PUBLIC_API_BASE_URL:
+        process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://be.workfitai.uk",
+      // Disable the Next.js API proxy in tests so api-client uses the direct
+      // backend URL, matching the MSW handlers registered in __tests__/mocks/handlers.ts.
+      NEXT_PUBLIC_USE_API_PROXY: "false",
     },
     include: [
       // Unit tests — pure logic, no rendering
@@ -39,6 +46,8 @@ export default defineConfig({
       "__tests__/integration/jobs-page.test.tsx",
       "__tests__/integration/cv-management.test.tsx",
       "__tests__/integration/apply-now-modal.test.tsx",
+      // Role/permission management integration tests (MSW + RTL)
+      "__tests__/integration/roles-permissions-page.test.tsx",
       // kafka-otp.test.ts intentionally excluded — requires live backend + Kafka infra
     ],
     coverage: {
@@ -53,6 +62,10 @@ export default defineConfig({
         "lib/schemas/auth-schemas.ts",
         "store/auth-slice.ts",
         "middleware.ts",
+        "lib/admin/role-permission-service.ts",
+        "hooks/useRoles.ts",
+        "hooks/usePermissions.ts",
+        "hooks/useUserRoles.ts",
       ],
       thresholds: {
         lines: 80,

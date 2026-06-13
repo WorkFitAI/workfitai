@@ -6,7 +6,7 @@ import { apiSuccess } from "../../mocks/handlers";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import type { CandidateProfile, AvatarData } from "@/types/user";
 
-const API = "https://be.workfitai.uk";
+const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://be.workfitai.uk";
 
 function mockCandidateProfile(
   overrides: Partial<CandidateProfile> = {},
@@ -183,6 +183,9 @@ describe("useUserProfile", () => {
       http.get(`${API}/user/profile/me`, () => {
         throw new Error("Network error");
       }),
+      http.get(`${API}/user/profile/avatar`, () =>
+        HttpResponse.json({ error: "Not found" }, { status: 404 }),
+      ),
     );
 
     const { result } = renderHook(() => useUserProfile());

@@ -6,6 +6,19 @@ import type { AdminUserSummary, AdminUserFullProfile } from "@/types/admin-user"
 
 vi.mock("@/hooks/useAdminUsers")
 
+// UserDetail now calls useAuth() for role-aware UserRolesPanel rendering.
+// Mock returns no roles so isAdmin=false, isHrManager=false → panel hidden,
+// which keeps all pre-existing test assertions unchanged.
+vi.mock("@/contexts/auth-context", () => ({
+  useAuth: () => ({
+    user: { roles: [] as string[] },
+    isAuthenticated: false,
+    isLoading: false,
+    login: vi.fn(),
+    logout: vi.fn(),
+  }),
+}))
+
 function mockAdminUserSummary(
   overrides: Partial<AdminUserSummary> = {}
 ): AdminUserSummary {

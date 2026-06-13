@@ -17,7 +17,7 @@ import { server } from "../mocks/server";
 import { apiStatusSuccess, mockJobItem } from "../mocks/handlers";
 import JobsPageClient from "@/components/jobs/jobs-page-client";
 
-const API = "https://be.workfitai.uk";
+const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://be.workfitai.uk";
 
 vi.mock("@/contexts/auth-context", () => ({
   useAuth: () => ({

@@ -1,0 +1,60 @@
+{
+  "jobs": [
+    {
+      "hrmKey": "hrm1",
+      "title": "Frontend Developer - React/TypeScript",
+      "shortDescription": "Join our product team as a Frontend Developer building fast, accessible web interfaces with React and TypeScript.",
+      "fullDescription": "Responsibilities:\n- Build React/TypeScript web interfaces that are fast and accessible\n- Collaborate with designers on pixel-perfect implementations\n- Own features from design handoff to production deployment\n- Write maintainable, well-tested frontend code\n\nRequirements:\n- At least 2 years of professional React experience\n- Strong TypeScript proficiency\n- Experience with state management (Redux or Zustand)\n- Familiarity with RESTful API integration\n- Good understanding of responsive design and accessibility",
+      "location": "Ha Noi, Vietnam",
+      "educationLevel": "Bachelor's in Computer Science or related field",
+      "requiredExperience": "2+ years of React/TypeScript experience",
+      "skills": ["ReactJS", "Angular", "NodeJS"],
+      "salaryMin": 1500,
+      "salaryMax": 3500,
+      "quantity": 20,
+      "categoryName": "Frontend Development"
+    },
+    {
+      "hrmKey": "hrm1",
+      "title": "Data Analyst / Business Intelligence",
+      "shortDescription": "We are seeking a Data Analyst to turn raw data into actionable insights through dashboards and reports.",
+      "fullDescription": "Responsibilities:\n- Design dashboards and run ad-hoc analyses\n- Build automated reports and collaborate with product teams\n- Drive data-informed decisions across the organisation\n\nRequirements:\n- Proficient in SQL — complex queries, CTEs, window functions\n- Experience with Python or R for data manipulation\n- Hands-on Tableau, Power BI, or Metabase experience\n- Strong analytical and problem-solving mindset",
+      "location": "Ho Chi Minh City, Vietnam",
+      "educationLevel": "Bachelor's in Statistics, Mathematics, or CS",
+      "requiredExperience": "0-2 years of data analysis experience",
+      "skills": ["Python", "MySQL", "MongoDB"],
+      "salaryMin": 1000,
+      "salaryMax": 2200,
+      "quantity": 20,
+      "categoryName": "Data Science"
+    },
+    {
+      "hrmKey": "hrm2",
+      "title": "Product Manager - Mobile Apps",
+      "shortDescription": "Lead product strategy and execution for our flagship mobile application with ownership of the product roadmap.",
+      "fullDescription": "Responsibilities:\n- Own the product roadmap for our mobile application\n- Gather user feedback and prioritise features with engineering\n- Drive key product metrics from concept through launch\n\nRequirements:\n- Minimum 3 years of product management experience\n- Proven track record shipping mobile products on iOS and Android\n- Experience with Agile/Scrum methodologies\n- Strong data-driven decision making with SQL and analytics tools",
+      "location": "Da Nang, Vietnam",
+      "educationLevel": "Bachelor's in Business, Computer Science, or related",
+      "requiredExperience": "3+ years of product management experience",
+      "skills": ["AWS", "Docker"],
+      "salaryMin": 2000,
+      "salaryMax": 4000,
+      "quantity": 20,
+      "categoryName": "Mobile Development"
+    },
+    {
+      "hrmKey": "hrm2",
+      "title": "Mobile Developer - React Native / Flutter",
+      "shortDescription": "Build exceptional cross-platform mobile experiences in our React Native and Flutter codebases.",
+      "fullDescription": "Responsibilities:\n- Architect and develop features in React Native and Flutter codebases\n- Optimise performance on both iOS and Android\n- Integrate native SDKs and maintain high code quality\n\nRequirements:\n- 2+ years building production mobile apps with React Native or Flutter\n- Strong knowledge of iOS and Android platform guidelines\n- Experience integrating third-party SDKs (payments, maps, analytics)\n- Familiarity with CI/CD pipelines for mobile",
+      "location": "Ho Chi Minh City, Vietnam",
+      "educationLevel": "Bachelor's in Computer Science or related",
+      "requiredExperience": "2+ years of mobile development",
+      "skills": ["ReactJS", "NodeJS"],
+      "salaryMin": 1800,
+      "salaryMax": 3200,
+      "quantity": 20,
+      "categoryName": "Mobile Development"
+    }
+  ]
+}

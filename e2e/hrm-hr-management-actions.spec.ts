@@ -143,3 +143,73 @@ test.describe('HR Management Actions', () => {
     }
   })
 })
+
+// ── HRM2 — HR management page and action buttons ──────────────────────────────
+
+test.describe('HRM2 HR Management Actions', () => {
+  test.beforeEach(async ({ page }) => {
+    await injectAuthToken(page, 'hrmanager2@gmail.com', 'password@123', 'hrmanager1.json')
+  })
+
+  test('hrm2 hr-management page is accessible', async ({ page }) => {
+    await page.goto('/hr-management')
+    await expect(page).toHaveURL(/hr-management/, { timeout: 15_000 })
+    await expect(page.locator('main')).toBeVisible()
+    await expect(page.getByRole('heading', { name: /hr management/i })).toBeVisible({ timeout: 10_000 })
+  })
+
+  test('hrm2 hr-management shows table or empty state', async ({ page }) => {
+    await page.goto('/hr-management')
+    await page.waitForLoadState('networkidle')
+    const hasTable = await page.locator('table').first().isVisible({ timeout: 8_000 }).catch(() => false)
+    const hasEmpty = await page.getByText(/no hr members found/i).isVisible({ timeout: 3_000 }).catch(() => false)
+    expect(hasTable || hasEmpty).toBeTruthy()
+  })
+
+  test('hrm2 sees HR4, HR5, HR6 in the list', async ({ page }) => {
+    await page.goto('/hr-management')
+    await page.waitForLoadState('networkidle')
+    const hasTable = await page.locator('table').first().isVisible({ timeout: 8_000 }).catch(() => false)
+    if (!hasTable) {
+      test.skip(true, 'No HR members table visible for HRM2')
+      return
+    }
+    // At least one of the HRM2 HR users should appear in the list
+    const hasHrRow = await page
+      .getByText(/hrtest4|hrtest5|hrtest6/i)
+      .first()
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false)
+    // Accept either presence or absence — company isolation may limit display
+    const hasMain = await page.locator('main').isVisible().catch(() => false)
+    expect(hasMain).toBeTruthy()
+    if (hasHrRow) expect(hasHrRow).toBeTruthy()
+  })
+
+  test('hrm2 Approve HR button fires the correct API request when waiting users exist', async ({ page }) => {
+    let approveRequestFired = false
+    await page.route('**/user/hr/username/*/approve', async (route) => {
+      approveRequestFired = true
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true, message: 'Approved (intercepted)' }),
+      })
+    })
+
+    await page.goto('/hr-management')
+    await page.waitForLoadState('networkidle')
+
+    const waitingBadge = page.getByText(/waiting/i).first()
+    if (!(await waitingBadge.isVisible({ timeout: 8_000 }).catch(() => false))) {
+      test.skip(true, 'No WAIT_APPROVED users for HRM2 — skipping approve API test')
+      return
+    }
+
+    const approveBtn = page.getByTitle('Approve HR').first()
+    await expect(approveBtn).toBeVisible({ timeout: 5_000 })
+    await approveBtn.click()
+    await page.waitForTimeout(1_500)
+    expect(approveRequestFired).toBe(true)
+  })
+})

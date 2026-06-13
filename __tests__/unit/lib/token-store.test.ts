@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 // Reset module state between tests (in-memory cache)
 beforeEach(() => {
   vi.resetModules()
-  sessionStorage.clear()
+  localStorage.clear()
 })
 
 describe('token-store', () => {
@@ -12,19 +12,19 @@ describe('token-store', () => {
     expect(getAccessToken()).toBeNull()
   })
 
-  it('getAccessToken loads from sessionStorage when in-memory cache is empty', async () => {
-    // Populate sessionStorage directly (simulates a page reload where memory is cleared)
-    sessionStorage.setItem('wfa_access_token', 'persisted_tok')
-    sessionStorage.setItem('wfa_token_expiry', String(Date.now() + 900_000))
+  it('getAccessToken loads from localStorage when in-memory cache is empty', async () => {
+    // Populate localStorage directly (simulates a page reload where memory is cleared)
+    localStorage.setItem('wfa_access_token', 'persisted_tok')
+    localStorage.setItem('wfa_token_expiry', String(Date.now() + 900_000))
     const { getAccessToken } = await import('@/lib/auth/token-store')
     expect(getAccessToken()).toBe('persisted_tok')
   })
 
-  it('setAccessToken stores token in sessionStorage', async () => {
+  it('setAccessToken stores token in localStorage', async () => {
     const { setAccessToken, getAccessToken } = await import('@/lib/auth/token-store')
     setAccessToken('tok_abc', 900_000)
     expect(getAccessToken()).toBe('tok_abc')
-    expect(sessionStorage.getItem('wfa_access_token')).toBe('tok_abc')
+    expect(localStorage.getItem('wfa_access_token')).toBe('tok_abc')
   })
 
   it('setAccessToken stores computed expiry', async () => {
@@ -57,11 +57,11 @@ describe('token-store', () => {
     expect(isTokenExpired()).toBe(true)
   })
 
-  it('clearAccessToken removes token from memory and sessionStorage', async () => {
+  it('clearAccessToken removes token from memory and localStorage', async () => {
     const { setAccessToken, clearAccessToken, getAccessToken } = await import('@/lib/auth/token-store')
     setAccessToken('tok_abc', 900_000)
     clearAccessToken()
     expect(getAccessToken()).toBeNull()
-    expect(sessionStorage.getItem('wfa_access_token')).toBeNull()
+    expect(localStorage.getItem('wfa_access_token')).toBeNull()
   })
 })

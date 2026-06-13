@@ -14,7 +14,7 @@ import type {
   AdminUserSummary,
 } from "@/types/admin-user";
 
-const API = "https://be.workfitai.uk";
+const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://be.workfitai.uk";
 
 function mockEsResult(overrides: Partial<EsSearchResult> = {}): EsSearchResult {
   return {
