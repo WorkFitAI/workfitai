@@ -4,9 +4,24 @@ import * as path from "path";
 
 const DATA_DIR = path.join(__dirname, "../.data");
 const TEST_JOB_FILE = path.join(DATA_DIR, "test-job.json");
+const FIXTURE_FILE = path.join(__dirname, "../fixtures/single-job-definition.json");
 
 setup("create and publish test job as HRM1", async ({ page }) => {
   setup.setTimeout(60_000);
+
+  const jobDef = JSON.parse(fs.readFileSync(FIXTURE_FILE, "utf-8")) as {
+    title: string
+    shortDescription: string
+    fullDescription: string
+    location: string
+    educationLevel: string
+    requiredExperience: string
+    skillFallbacks: string[]
+    salaryMin: number
+    salaryMax: number
+    quantity: number
+    categoryName: string
+  }
 
   // storageState restores cookies (auth_session) and localStorage (including wfa_access_token).
   // Do a fresh login to guarantee a non-expired token — backend binds tokens to device IDs
@@ -65,40 +80,16 @@ setup("create and publish test job as HRM1", async ({ page }) => {
   await expect(dialog).toBeVisible({ timeout: 8_000 });
 
   // ── Fill required fields ────────────────────────────────────────────────
-  await page.getByLabel("Job Title").fill("E2E Test Job - Backend Engineer");
-  await page
-    .getByPlaceholder("Brief overview for job listing...")
-    .fill(
-      "We are looking for a skilled Backend Engineer to join our growing engineering team. " +
-      "You will design and build scalable REST APIs, own microservice infrastructure, and " +
-      "collaborate with frontend and data teams to deliver high-quality product features.",
-    );
-  await page
-    .locator("label:has-text('Full Description') ~ textarea")
-    .fill(
-      "Responsibilities:\n" +
-      "- Design, implement, and maintain high-performance REST APIs using Node.js / NestJS\n" +
-      "- Build and optimise relational database schemas (PostgreSQL)\n" +
-      "- Write clean, well-tested TypeScript code with >80% unit-test coverage\n" +
-      "- Participate in code reviews and mentor junior developers\n" +
-      "- Collaborate with DevOps to manage CI/CD pipelines on GitHub Actions\n\n" +
-      "Requirements:\n" +
-      "- 3-5 years of professional backend development experience\n" +
-      "- Proficiency in TypeScript / Node.js and RESTful API design\n" +
-      "- Experience with PostgreSQL, Redis, and message queues (RabbitMQ or Kafka)\n" +
-      "- Familiarity with Docker, Kubernetes, and cloud platforms (AWS / GCP)\n" +
-      "- Strong communication skills and ability to work in an Agile team\n\n" +
-      "Nice to have:\n" +
-      "- Experience with GraphQL or gRPC\n" +
-      "- Contributions to open-source projects",
-    );
-  await page.getByPlaceholder("City, Country").fill("Ho Chi Minh City, Vietnam");
-  await page.getByPlaceholder("e.g. Bachelor in CS").fill("Bachelor in Computer Science or related field");
-  await page.getByPlaceholder("e.g. 3-5 years").fill("3-5 years of professional experience");
+  await page.getByLabel("Job Title").fill(jobDef.title);
+  await page.getByPlaceholder("Brief overview for job listing...").fill(jobDef.shortDescription);
+  await page.locator("label:has-text('Full Description') ~ textarea").fill(jobDef.fullDescription);
+  await page.getByPlaceholder("City, Country").fill(jobDef.location);
+  await page.getByPlaceholder("e.g. Bachelor in CS").fill(jobDef.educationLevel);
+  await page.getByPlaceholder("e.g. 3-5 years").fill(jobDef.requiredExperience);
 
   // ── Add skills (backend requires skillIds to be non-empty) ────────────────
   // Fetch real skill names so they match what the job-post-client has in its dropdown state.
-  const skillFallbacks = ["JavaScript", "TypeScript", "Node.js", "PostgreSQL", "Docker"];
+  const skillFallbacks = jobDef.skillFallbacks;
   let availableSkills: string[] = skillFallbacks;
   try {
     const skillsRes = await page.request.get(`${API_BASE}/job/public/skills`);
@@ -134,10 +125,20 @@ setup("create and publish test job as HRM1", async ({ page }) => {
   }
 
   // Salary range — [0]=salaryMin, [1]=salaryMax, [2]=quantity
-  await page.locator('input[type="number"]').nth(0).fill("2000");
-  await page.locator('input[type="number"]').nth(1).fill("5000");
-  // Quantity: 3 open positions
-  await page.locator('input[type="number"]').nth(2).fill("3").catch(() => {/* field may not exist */});
+  await page.locator('input[type="number"]').nth(0).fill(String(jobDef.salaryMin));
+  await page.locator('input[type="number"]').nth(1).fill(String(jobDef.salaryMax));
+  await page.locator('input[type="number"]').nth(2).fill(String(jobDef.quantity)).catch(() => {/* field may not exist */});
+
+  // ── Select job category ─────────────────────────────────────────────────
+  const categoryTrigger = dialog.locator('button[role="combobox"]').filter({ hasText: /select job category/i }).first();
+  if (await categoryTrigger.isVisible({ timeout: 5_000 }).catch(() => false)) {
+    await categoryTrigger.click();
+    const categoryOption = page.getByRole("option", { name: jobDef.categoryName }).first();
+    if (await categoryOption.isVisible({ timeout: 3_000 }).catch(() => false)) {
+      await categoryOption.click();
+    }
+    await page.waitForTimeout(300);
+  }
 
   // ── Set expiration date (must be in the future) ─────────────────────────
   const calTrigger = page
@@ -261,7 +262,7 @@ setup("create and publish test job as HRM1", async ({ page }) => {
     JSON.stringify(
       {
         jobId: createdJobId,
-        jobTitle: "E2E Test Job - Backend Engineer",
+        jobTitle: jobDef.title,
         createdAt: new Date().toISOString(),
       },
       null,

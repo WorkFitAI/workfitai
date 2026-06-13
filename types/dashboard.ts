@@ -92,6 +92,7 @@ export interface AdminJobStats {
   totalJobViews: number
   pendingReports: number
   byEmploymentType: Record<string, number>
+  byJobCategory: Record<string, number>
   byExperienceLevel: Record<string, number>
   topJobsByViews: AdminTopJobByViews[]
 }

@@ -1,7 +1,6 @@
 /**
- * Data setup — creates 4 diverse published jobs via browser UI automation.
- *   HRM1 creates: Frontend Developer, Data Analyst
- *   HRM2 creates: Product Manager, Mobile Developer
+ * Data setup — creates published jobs via browser UI automation.
+ * Job definitions are loaded from e2e/fixtures/multi-job-definitions.json.
  *
  * Uses UI form submission (not direct API) to bypass the job-service circuit
  * breaker that rejects POST /job/hr/jobs when triggered by prior failures.
@@ -16,6 +15,7 @@ import * as path from 'path'
 
 const DATA_DIR = path.join(__dirname, '../.data')
 const TEST_JOBS_FILE = path.join(DATA_DIR, 'test-jobs.json')
+const FIXTURES_FILE = path.join(__dirname, '../fixtures/multi-job-definitions.json')
 
 export interface TestJobEntry {
   jobId: string
@@ -126,6 +126,7 @@ interface JobFormData {
   salaryMin: number
   salaryMax: number
   quantity: number
+  categoryName: string
 }
 
 async function createJobViaUI(
@@ -172,6 +173,17 @@ async function createJobViaUI(
       await suggestion.click()
     } else {
       await skillInput.press('Enter')
+    }
+    await page.waitForTimeout(300)
+  }
+
+  // Select job category
+  const categoryTrigger = dialog.locator('button[role="combobox"]').filter({ hasText: /select job category/i }).first()
+  if (await categoryTrigger.isVisible({ timeout: 5_000 }).catch(() => false)) {
+    await categoryTrigger.click()
+    const categoryOption = page.getByRole('option', { name: jobData.categoryName }).first()
+    if (await categoryOption.isVisible({ timeout: 3_000 }).catch(() => false)) {
+      await categoryOption.click()
     }
     await page.waitForTimeout(300)
   }
@@ -364,130 +376,22 @@ setup('create multi-job test data', async ({ page }) => {
   // Navigate to a page first so evaluate() + cookies work
   await page.goto('/')
 
-  // ── HRM1: Frontend Developer ─────────────────────────────────────────────
-  if (hrm1) {
-    const jobId = await createJobViaUI(page, hrm1, {
-      title: 'Frontend Developer - React/TypeScript',
-      shortDescription:
-        'Join our product team as a Frontend Developer building fast, accessible web interfaces with React and TypeScript.',
-      fullDescription:
-        'Responsibilities:\n' +
-        '- Build React/TypeScript web interfaces that are fast and accessible\n' +
-        '- Collaborate with designers on pixel-perfect implementations\n' +
-        '- Own features from design handoff to production deployment\n' +
-        '- Write maintainable, well-tested frontend code\n\n' +
-        'Requirements:\n' +
-        '- At least 2 years of professional React experience\n' +
-        '- Strong TypeScript proficiency\n' +
-        '- Experience with state management (Redux or Zustand)\n' +
-        '- Familiarity with RESTful API integration\n' +
-        '- Good understanding of responsive design and accessibility',
-      location: 'Ha Noi, Vietnam',
-      educationLevel: "Bachelor's in Computer Science or related field",
-      requiredExperience: '2+ years of React/TypeScript experience',
-      skills: ['ReactJS', 'Angular', 'NodeJS'],
-      salaryMin: 1500,
-      salaryMax: 3500,
-      quantity: 20,
-    }, API_BASE)
-
-    if (jobId) {
-      results.push({ jobId, jobTitle: 'Frontend Developer - React/TypeScript', hrmKey: 'hrm1', createdAt: new Date().toISOString() })
-      console.log(`HRM1 created Frontend Developer: ${jobId}`)
-    }
-
-    // ── HRM1: Data Analyst ─────────────────────────────────────────────────
-    const jobId2 = await createJobViaUI(page, hrm1, {
-      title: 'Data Analyst / Business Intelligence',
-      shortDescription:
-        'We are seeking a Data Analyst to turn raw data into actionable insights through dashboards and reports.',
-      fullDescription:
-        'Responsibilities:\n' +
-        '- Design dashboards and run ad-hoc analyses\n' +
-        '- Build automated reports and collaborate with product teams\n' +
-        '- Drive data-informed decisions across the organisation\n\n' +
-        'Requirements:\n' +
-        '- Proficient in SQL — complex queries, CTEs, window functions\n' +
-        '- Experience with Python or R for data manipulation\n' +
-        '- Hands-on Tableau, Power BI, or Metabase experience\n' +
-        '- Strong analytical and problem-solving mindset',
-      location: 'Ho Chi Minh City, Vietnam',
-      educationLevel: "Bachelor's in Statistics, Mathematics, or CS",
-      requiredExperience: '0-2 years of data analysis experience',
-      skills: ['Python', 'MySQL', 'MongoDB'],
-      salaryMin: 1000,
-      salaryMax: 2200,
-      quantity: 20,
-    }, API_BASE)
-
-    if (jobId2) {
-      results.push({ jobId: jobId2, jobTitle: 'Data Analyst / Business Intelligence', hrmKey: 'hrm1', createdAt: new Date().toISOString() })
-      console.log(`HRM1 created Data Analyst: ${jobId2}`)
-    }
-  } else {
-    console.warn('HRM1 login failed — skipping HRM1 jobs')
+  // Load job definitions from fixture file
+  const { jobs: jobDefs } = JSON.parse(fs.readFileSync(FIXTURES_FILE, 'utf-8')) as {
+    jobs: Array<JobFormData & { hrmKey: 'hrm1' | 'hrm2' }>
   }
 
-  // ── HRM2: Product Manager ────────────────────────────────────────────────
-  if (hrm2) {
-    const jobId3 = await createJobViaUI(page, hrm2, {
-      title: 'Product Manager - Mobile Apps',
-      shortDescription:
-        'Lead product strategy and execution for our flagship mobile application with ownership of the product roadmap.',
-      fullDescription:
-        'Responsibilities:\n' +
-        '- Own the product roadmap for our mobile application\n' +
-        '- Gather user feedback and prioritise features with engineering\n' +
-        '- Drive key product metrics from concept through launch\n\n' +
-        'Requirements:\n' +
-        '- Minimum 3 years of product management experience\n' +
-        '- Proven track record shipping mobile products on iOS and Android\n' +
-        '- Experience with Agile/Scrum methodologies\n' +
-        '- Strong data-driven decision making with SQL and analytics tools',
-      location: 'Da Nang, Vietnam',
-      educationLevel: "Bachelor's in Business, Computer Science, or related",
-      requiredExperience: '3+ years of product management experience',
-      skills: ['AWS', 'Docker'],
-      salaryMin: 2000,
-      salaryMax: 4000,
-      quantity: 20,
-    }, API_BASE)
-
-    if (jobId3) {
-      results.push({ jobId: jobId3, jobTitle: 'Product Manager - Mobile Apps', hrmKey: 'hrm2', createdAt: new Date().toISOString() })
-      console.log(`HRM2 created Product Manager: ${jobId3}`)
+  for (const jobDef of jobDefs) {
+    const auth = jobDef.hrmKey === 'hrm1' ? hrm1 : hrm2
+    if (!auth) {
+      console.warn(`${jobDef.hrmKey} login failed — skipping "${jobDef.title}"`)
+      continue
     }
-
-    // ── HRM2: Mobile Developer ───────────────────────────────────────────────
-    const jobId4 = await createJobViaUI(page, hrm2, {
-      title: 'Mobile Developer - React Native / Flutter',
-      shortDescription:
-        'Build exceptional cross-platform mobile experiences in our React Native and Flutter codebases.',
-      fullDescription:
-        'Responsibilities:\n' +
-        '- Architect and develop features in React Native and Flutter codebases\n' +
-        '- Optimise performance on both iOS and Android\n' +
-        '- Integrate native SDKs and maintain high code quality\n\n' +
-        'Requirements:\n' +
-        '- 2+ years building production mobile apps with React Native or Flutter\n' +
-        '- Strong knowledge of iOS and Android platform guidelines\n' +
-        '- Experience integrating third-party SDKs (payments, maps, analytics)\n' +
-        '- Familiarity with CI/CD pipelines for mobile',
-      location: 'Ho Chi Minh City, Vietnam',
-      educationLevel: "Bachelor's in Computer Science or related",
-      requiredExperience: '2+ years of mobile development',
-      skills: ['ReactJS', 'NodeJS'],
-      salaryMin: 1800,
-      salaryMax: 3200,
-      quantity: 20,
-    }, API_BASE)
-
-    if (jobId4) {
-      results.push({ jobId: jobId4, jobTitle: 'Mobile Developer - React Native / Flutter', hrmKey: 'hrm2', createdAt: new Date().toISOString() })
-      console.log(`HRM2 created Mobile Developer: ${jobId4}`)
+    const jobId = await createJobViaUI(page, auth, jobDef, API_BASE)
+    if (jobId) {
+      results.push({ jobId, jobTitle: jobDef.title, hrmKey: jobDef.hrmKey, createdAt: new Date().toISOString() })
+      console.log(`${jobDef.hrmKey} created "${jobDef.title}": ${jobId}`)
     }
-  } else {
-    console.warn('HRM2 login failed — skipping HRM2 jobs')
   }
 
   fs.writeFileSync(TEST_JOBS_FILE, JSON.stringify({ jobs: results }, null, 2))

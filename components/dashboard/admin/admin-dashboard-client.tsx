@@ -13,6 +13,7 @@ import { AdminTopJobsSection } from "./admin-top-jobs-section"
 import { AdminAuditOverviewSection } from "./admin-audit-overview-section"
 import { AdminRecentEventsSection } from "./admin-recent-events-section"
 import { AdminLiveActivitySection } from "./admin-live-activity-section"
+import { AdminJobCategorySection } from "./admin-job-category-section"
 
 export function AdminDashboardClient() {
   const { data, loading, error, refetch } = useAdminDashboard()
@@ -42,6 +43,9 @@ export function AdminDashboardClient() {
         </div>
         <div className="col-span-2">
           <AdminTopSkillsSection skills={data.topSkills} />
+        </div>
+        <div className="col-span-2">
+          <AdminJobCategorySection stats={data.jobStats} />
         </div>
       </div>
 
