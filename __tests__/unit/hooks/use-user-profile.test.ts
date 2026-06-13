@@ -183,6 +183,9 @@ describe("useUserProfile", () => {
       http.get(`${API}/user/profile/me`, () => {
         throw new Error("Network error");
       }),
+      http.get(`${API}/user/profile/avatar`, () =>
+        HttpResponse.json({ error: "Not found" }, { status: 404 }),
+      ),
     );
 
     const { result } = renderHook(() => useUserProfile());
