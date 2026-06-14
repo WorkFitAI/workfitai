@@ -43,6 +43,9 @@ async function openApplyModal(page: import('@playwright/test').Page): Promise<bo
   if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
     return false
   }
+  if (!(await applyBtn.isEnabled().catch(() => false))) {
+    return false
+  }
 
   await applyBtn.click()
   await expect(page.getByRole('dialog')).toBeVisible({ timeout: 8_000 })
@@ -83,6 +86,12 @@ test.describe('Apply Now Modal', () => {
       return
     }
 
+    // Skip if button is visible but disabled (candidate already applied, button shows disabled "Apply Now")
+    if (!(await applyBtn.isEnabled().catch(() => false))) {
+      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
+      return
+    }
+
     await applyBtn.click()
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 8_000 })
   })
@@ -110,6 +119,10 @@ test.describe('Apply Now Modal', () => {
 
     if (!isApplyVisible) {
       test.skip(true, 'Neither Apply Now nor Applied button found')
+      return
+    }
+    if (!(await applyBtn.isEnabled().catch(() => false))) {
+      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
       return
     }
 
@@ -140,6 +153,10 @@ test.describe('Apply Now Modal', () => {
     const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
     if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
       test.skip(true, 'Apply Now button not visible')
+      return
+    }
+    if (!(await applyBtn.isEnabled().catch(() => false))) {
+      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
       return
     }
 
@@ -176,6 +193,10 @@ test.describe('Apply Now Modal', () => {
       test.skip(true, 'Apply Now button not visible')
       return
     }
+    if (!(await applyBtn.isEnabled().catch(() => false))) {
+      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
+      return
+    }
 
     await applyBtn.click()
     const dialog = page.getByRole('dialog')
@@ -206,6 +227,10 @@ test.describe('Apply Now Modal', () => {
     const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
     if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
       test.skip(true, 'Apply Now button not visible')
+      return
+    }
+    if (!(await applyBtn.isEnabled().catch(() => false))) {
+      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
       return
     }
 
@@ -245,6 +270,10 @@ test.describe('Apply Now Modal', () => {
       test.skip(true, 'Apply Now button not visible')
       return
     }
+    if (!(await applyBtn.isEnabled().catch(() => false))) {
+      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
+      return
+    }
 
     await applyBtn.click()
     const dialog = page.getByRole('dialog')
@@ -280,6 +309,10 @@ test.describe('Apply Now Modal', () => {
     const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
     if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
       test.skip(true, 'Apply Now button not visible')
+      return
+    }
+    if (!(await applyBtn.isEnabled().catch(() => false))) {
+      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
       return
     }
 
@@ -321,6 +354,10 @@ test.describe('Apply Now Modal', () => {
       test.skip(true, 'Apply Now button not visible')
       return
     }
+    if (!(await applyBtn.isEnabled().catch(() => false))) {
+      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
+      return
+    }
 
     await applyBtn.click()
     const dialog = page.getByRole('dialog')
@@ -346,6 +383,10 @@ test.describe('Apply Now Modal', () => {
     const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
     if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
       test.skip(true, 'Apply Now button not visible')
+      return
+    }
+    if (!(await applyBtn.isEnabled().catch(() => false))) {
+      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
       return
     }
 
@@ -375,6 +416,10 @@ test.describe('Apply Now Modal', () => {
     const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
     if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
       test.skip(true, 'Apply Now button not visible')
+      return
+    }
+    if (!(await applyBtn.isEnabled().catch(() => false))) {
+      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
       return
     }
 
@@ -421,6 +466,10 @@ test.describe('Apply Now Modal', () => {
       test.skip(true, 'Apply Now button not visible')
       return
     }
+    if (!(await applyBtn.isEnabled().catch(() => false))) {
+      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
+      return
+    }
 
     await applyBtn.click()
     const dialog = page.getByRole('dialog')
@@ -457,6 +506,10 @@ test.describe('Apply Now Modal', () => {
     const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
     if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
       test.skip(true, 'Apply Now button not visible')
+      return
+    }
+    if (!(await applyBtn.isEnabled().catch(() => false))) {
+      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
       return
     }
 

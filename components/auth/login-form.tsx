@@ -15,15 +15,28 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { PasswordInput } from "@/components/auth/password-input";
 import { useAuth } from "@/contexts/auth-context";
 import { loginSchema, type LoginFormValues } from "@/lib/schemas/auth-schemas";
-
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:9085";
+import { apiClient } from "@/lib/api-client";
+import type { OAuthAuthorizeResponse } from "@/types/auth";
 
 export function LoginForm() {
 
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState<"GOOGLE" | "GITHUB" | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
+
+  async function handleOAuthLogin(provider: "GOOGLE" | "GITHUB") {
+    setOauthLoading(provider);
+    try {
+      const res = await apiClient.get<OAuthAuthorizeResponse>(
+        `/auth/oauth/authorize/${provider}`,
+      );
+      window.location.href = res.data.authorizationUrl;
+    } catch {
+      toast.error("Failed to initiate OAuth login. Please try again.");
+      setOauthLoading(null);
+    }
+  }
 
   const {
     register,
@@ -124,20 +137,20 @@ export function LoginForm() {
           type="button"
           variant="outline"
           className="w-full"
-          onClick={() => {
-            window.location.href = `${API_BASE}/auth/oauth2/google`;
-          }}
+          disabled={oauthLoading !== null}
+          onClick={() => handleOAuthLogin("GOOGLE")}
         >
+          {oauthLoading === "GOOGLE" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Continue with Google
         </Button>
         <Button
           type="button"
           variant="outline"
           className="w-full"
-          onClick={() => {
-            window.location.href = `${API_BASE}/auth/oauth2/github`;
-          }}
+          disabled={oauthLoading !== null}
+          onClick={() => handleOAuthLogin("GITHUB")}
         >
+          {oauthLoading === "GITHUB" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Continue with GitHub
         </Button>
       </div>

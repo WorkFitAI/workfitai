@@ -96,3 +96,14 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
 }
+
+export interface OAuthAuthorizeResponse {
+  status: number;
+  message: string;
+  data: {
+    authorizationUrl: string;
+    state: string;
+    provider: string;
+    expiresIn: number;
+  };
+}

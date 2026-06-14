@@ -30,6 +30,8 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (data: LoginRequest) => Promise<void>;
+  /** Apply an already-exchanged OAuth session without a full page reload */
+  loginWithSession: (session: UserSession) => void;
   logout: () => Promise<void>;
 }
 
@@ -185,6 +187,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [applyUser, scheduleRefresh]);
 
+  const loginWithSession = useCallback(
+    (session: UserSession) => {
+      isLoggedOutRef.current = false;
+      applyUser(session);
+      scheduleRefresh(session.expiresAt);
+    },
+    [applyUser, scheduleRefresh],
+  );
+
   const login = useCallback(
     async (data: LoginRequest) => {
       const response = await authService.login(data);
@@ -242,7 +253,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated: !!user, isLoading, login, logout }}
+      value={{ user, isAuthenticated: !!user, isLoading, login, loginWithSession, logout }}
     >
       {children}
     </AuthContext.Provider>

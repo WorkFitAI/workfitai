@@ -11,6 +11,8 @@ export function useCompanyApplications(
   page: number,
   pageSize = 50,
   statusFilter?: ApplicationStatus,
+  jobTitle?: string,
+  keyword?: string,
 ) {
   const [applications, setApplications] = useState<Application[]>([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -28,12 +30,12 @@ export function useCompanyApplications(
         companyNo,
         page - 1,
         pageSize,
+        statusFilter,
+        undefined,
+        jobTitle,
+        keyword,
       );
-      let items = res.data?.items ?? [];
-      if (statusFilter) {
-        items = items.filter((a) => a.status === statusFilter);
-      }
-      setApplications(items);
+      setApplications(res.data?.items ?? []);
       setTotalPages(res.data?.meta.totalPages ?? 1);
       setTotal(res.data?.meta.totalElements ?? 0);
     } catch {
@@ -41,7 +43,7 @@ export function useCompanyApplications(
     } finally {
       setLoading(false);
     }
-  }, [companyNo, page, pageSize, statusFilter]);
+  }, [companyNo, page, pageSize, statusFilter, jobTitle, keyword]);
 
   useEffect(() => {
     fetch();

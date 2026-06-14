@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useDebounce } from "@/hooks/useDebounce";
 import {
   useCompanyApplications,
   useCompanyHRUsers,
@@ -32,16 +33,32 @@ export default function HrmApplicationsClient() {
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [assignTarget, setAssignTarget] = useState<{ id: string; currentAssignee: string } | null>(null);
 
+  // Load jobs for the filter dropdown (large page size to get all)
+  const { jobs } = useCompanyJobs(companyNo, 1, 100);
+
+  // Derive jobTitle from the selected jobId for server-side filtering
+  const selectedJobTitle = useMemo(
+    () => jobs.find((j) => j.jobId === jobFilter)?.title,
+    [jobs, jobFilter],
+  );
+
+  // Debounce keyword search to avoid excessive API calls
+  const debouncedKeyword = useDebounce(searchQuery, 400);
+
   const { applications, totalPages, total, loading, error, refresh } =
-    useCompanyApplications(companyNo, page, PAGE_SIZE, statusFilter || undefined);
+    useCompanyApplications(
+      companyNo,
+      page,
+      PAGE_SIZE,
+      statusFilter || undefined,
+      selectedJobTitle,
+      debouncedKeyword || undefined,
+    );
   const { hrUsers, loading: hrLoading } = useCompanyHRUsers(companyNo);
   const { assign, assigning, assignError, clearAssignError } = useAssignApplication(() => {
     setAssignTarget(null);
     refresh();
   });
-
-  // Load jobs for the filter dropdown (large page size to get all)
-  const { jobs } = useCompanyJobs(companyNo, 1, 100);
 
   // Candidates tab
   const [candidatesPage, setCandidatesPage] = useState(1);
@@ -54,19 +71,6 @@ export default function HrmApplicationsClient() {
     loading: candidatesLoading,
     refresh: refreshCandidates,
   } = useCompanyCandidates(companyNo, candidatesPage, PAGE_SIZE, candidatesStatus || undefined);
-
-  const filteredApplications = useMemo(() => {
-    let list = applications;
-    if (jobFilter) list = list.filter((a) => a.jobId === jobFilter);
-    if (!searchQuery.trim()) return list;
-    const q = searchQuery.toLowerCase();
-    return list.filter(
-      (a) =>
-        a.username.toLowerCase().includes(q) ||
-        a.email.toLowerCase().includes(q) ||
-        a.jobSnapshot?.title?.toLowerCase().includes(q),
-    );
-  }, [applications, searchQuery, jobFilter]);
 
   const filteredCandidates = useMemo(() => {
     if (!candidatesSearch.trim()) return candidates;
@@ -142,14 +146,14 @@ export default function HrmApplicationsClient() {
               statusFilter={statusFilter}
               onStatusChange={(s) => { setStatusFilter(s); setPage(1); }}
               searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              total={filteredApplications.length}
+              onSearchChange={(q) => { setSearchQuery(q); setPage(1); }}
+              total={total}
               jobs={jobs}
               jobFilter={jobFilter}
               onJobChange={(id) => { setJobFilter(id); setPage(1); }}
             />
             <ApplicationTable
-              applications={filteredApplications}
+              applications={applications}
               loading={loading}
               onViewDetail={(id) => { const app = applications.find((a) => a.id === id); if (app) setSelectedApp(app); }}
               onAssign={(id, currentAssignee) => setAssignTarget({ id, currentAssignee })}

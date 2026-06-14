@@ -178,7 +178,7 @@ async function createJobViaUI(
   }
 
   // Select job category
-  const categoryTrigger = dialog.locator('button[role="combobox"]').filter({ hasText: /select job category/i }).first()
+  const categoryTrigger = dialog.locator('button[role="combobox"]').filter({ hasText: /select category/i }).first()
   if (await categoryTrigger.isVisible({ timeout: 5_000 }).catch(() => false)) {
     await categoryTrigger.click()
     const categoryOption = page.getByRole('option', { name: jobData.categoryName }).first()
@@ -329,9 +329,14 @@ async function ensureJobsPublished(
 // ─────────────────────────────────────────────────────────────────────────────
 
 setup('create multi-job test data', async ({ page }) => {
-  setup.setTimeout(300_000) // 5 min — creating 4 jobs via UI takes time
+  setup.setTimeout(750_000) // ~75s per job via UI × 10 jobs
 
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true })
+
+  // Load fixture first — expected job count drives idempotency check
+  const { jobs: jobDefs } = JSON.parse(fs.readFileSync(FIXTURES_FILE, 'utf-8')) as {
+    jobs: Array<JobFormData & { hrmKey: 'hrm1' | 'hrm2' }>
+  }
 
   const API_BASE = readApiBase()
   const results: TestJobEntry[] = []
@@ -350,11 +355,11 @@ setup('create multi-job test data', async ({ page }) => {
     process.env.TEST_HRMANAGER2_PASSWORD!,
   )
 
-  // ── Idempotency: skip creation if 4 valid PUBLISHED jobs already exist ──────
+  // ── Idempotency: skip creation if all fixture jobs already exist as PUBLISHED ──
   if (fs.existsSync(TEST_JOBS_FILE)) {
     try {
       const existing = JSON.parse(fs.readFileSync(TEST_JOBS_FILE, 'utf-8')) as { jobs: TestJobEntry[] }
-      if (existing.jobs?.length === 4 && hrm1 && hrm2) {
+      if (existing.jobs?.length === jobDefs.length && hrm1 && hrm2) {
         const allPublished = await ensureJobsPublished(
           API_BASE,
           page,
@@ -363,7 +368,7 @@ setup('create multi-job test data', async ({ page }) => {
           hrm2.accessToken,
         )
         if (allPublished) {
-          console.log('test-jobs.json has 4 valid jobs (all published) — skipping creation')
+          console.log(`test-jobs.json has ${jobDefs.length} valid jobs (all published) — skipping creation`)
           return
         }
         console.log('Could not verify/publish existing jobs — re-creating')
@@ -375,11 +380,6 @@ setup('create multi-job test data', async ({ page }) => {
 
   // Navigate to a page first so evaluate() + cookies work
   await page.goto('/')
-
-  // Load job definitions from fixture file
-  const { jobs: jobDefs } = JSON.parse(fs.readFileSync(FIXTURES_FILE, 'utf-8')) as {
-    jobs: Array<JobFormData & { hrmKey: 'hrm1' | 'hrm2' }>
-  }
 
   for (const jobDef of jobDefs) {
     const auth = jobDef.hrmKey === 'hrm1' ? hrm1 : hrm2

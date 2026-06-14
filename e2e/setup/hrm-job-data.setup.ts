@@ -130,7 +130,7 @@ setup("create and publish test job as HRM1", async ({ page }) => {
   await page.locator('input[type="number"]').nth(2).fill(String(jobDef.quantity)).catch(() => {/* field may not exist */});
 
   // ── Select job category ─────────────────────────────────────────────────
-  const categoryTrigger = dialog.locator('button[role="combobox"]').filter({ hasText: /select job category/i }).first();
+  const categoryTrigger = dialog.locator('button[role="combobox"]').filter({ hasText: /select category/i }).first();
   if (await categoryTrigger.isVisible({ timeout: 5_000 }).catch(() => false)) {
     await categoryTrigger.click();
     const categoryOption = page.getByRole("option", { name: jobDef.categoryName }).first();

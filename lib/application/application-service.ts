@@ -205,16 +205,27 @@ export const applicationService = {
   // ─── HRM (HR Manager) methods ──────────────────────────────────────────────
 
   /**
-   * GET /application/company/:companyNo?page=&size=
+   * GET /application/company/:companyNo?page=&size=&status=&assignedTo=&jobTitle=&keyword=
    * List all applications submitted to a company (HRM only).
    */
   async getCompanyApplications(
     companyNo: string,
     page = 0,
     size = 50,
+    status?: ApplicationStatus,
+    assignedTo?: string,
+    jobTitle?: string,
+    keyword?: string,
   ): Promise<ApiResponse<ApplicationListData>> {
+    const params = new URLSearchParams();
+    params.append("page", String(page));
+    params.append("size", String(size));
+    if (status) params.append("status", status);
+    if (assignedTo) params.append("assignedTo", assignedTo);
+    if (jobTitle) params.append("jobTitle", jobTitle);
+    if (keyword) params.append("keyword", keyword);
     return apiClient.get<ApiResponse<ApplicationListData>>(
-      `/application/company/${companyNo}?page=${page}&size=${size}`,
+      `/application/company/${companyNo}?${params.toString()}`,
     );
   },
 
