@@ -6,8 +6,8 @@ import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { AuthShell } from '@/components/auth/auth-shell'
 import { OtpInput } from '@/components/auth/otp-input'
 import { authService } from '@/lib/auth/auth-service'
 
@@ -23,6 +23,7 @@ function ForgotPasswordVerifyContent() {
 
   const [otp, setOtp] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [otpError, setOtpError] = useState(false)
   const [cooldown, setCooldown] = useState(0)
 
   // Guard: redirect back if email is missing
@@ -36,20 +37,29 @@ function ForgotPasswordVerifyContent() {
     return () => clearTimeout(timer)
   }, [cooldown])
 
-  async function handleSubmit() {
-    if (otp.length < 6) return toast.error('Enter the 6-digit code')
+  // Accepts an optional code so OtpInput.onComplete can pass the just-completed
+  // value (React state `otp` is still stale within that same event tick).
+  async function handleSubmit(otpValue?: string) {
+    const code = otpValue ?? otp
+    if (code.length < 6) return toast.error('Enter the 6-digit code')
+    if (isSubmitting) return
     setIsSubmitting(true)
+    setOtpError(false)
     try {
-      const response = await authService.verifyResetOtp({ email, otp })
+      const response = await authService.verifyResetOtp({ email, otp: code })
       if (response.success) {
         // Store reset token in sessionStorage — cleared on use in reset page
         sessionStorage.setItem(RESET_TOKEN_SESSION_KEY, response.data.resetToken)
         router.push(`/forgot-password/reset?email=${encodeURIComponent(email)}`)
       } else {
         toast.error(response.message || 'Invalid OTP')
+        setOtpError(true)
+        setOtp('')
       }
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'Verification failed')
+      setOtpError(true)
+      setOtp('')
     } finally {
       setIsSubmitting(false)
     }
@@ -68,17 +78,28 @@ function ForgotPasswordVerifyContent() {
   if (!email) return null
 
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Enter Reset Code</CardTitle>
-        <CardDescription>
+    <AuthShell
+      eyebrow="Reset Code"
+      title="Enter Reset Code"
+      subtitle={
+        <>
           Enter the code sent to <span className="font-medium text-foreground">{email}</span>
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col items-center gap-6">
-        <OtpInput value={otp} onChange={setOtp} disabled={isSubmitting} />
+        </>
+      }
+    >
+      <div className="flex flex-col items-center gap-6">
+        <OtpInput
+          value={otp}
+          onChange={(v) => {
+            setOtp(v)
+            if (otpError) setOtpError(false)
+          }}
+          onComplete={handleSubmit}
+          error={otpError}
+          disabled={isSubmitting}
+        />
 
-        <Button className="w-full" onClick={handleSubmit} disabled={isSubmitting || otp.length < 6}>
+        <Button className="w-full" onClick={() => handleSubmit()} disabled={isSubmitting || otp.length < 6}>
           {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Verify Code
         </Button>
@@ -86,8 +107,8 @@ function ForgotPasswordVerifyContent() {
         <Button variant="ghost" className="text-sm" onClick={handleResend} disabled={cooldown > 0}>
           {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend Code'}
         </Button>
-      </CardContent>
-    </Card>
+      </div>
+    </AuthShell>
   )
 }
 

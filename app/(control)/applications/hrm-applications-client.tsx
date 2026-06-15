@@ -15,10 +15,11 @@ import { ApplicationFilters } from "@/components/hrm/application-filters";
 import { AssignHRModal } from "@/components/hrm/assign-hr-modal";
 import { ApplicationDetailPanel } from "@/components/hrm/application-detail-panel";
 import { HRCandidatesTab } from "@/components/hrm/hr-candidates-tab";
+import { AiCvRankingTab } from "@/components/hrm/ai-cv-ranking-tab";
 import { applicationService } from "@/lib/application/application-service";
 import type { Application, ApplicationStatus, CandidateDetail } from "@/types/application";
 
-type Tab = "applications" | "candidates";
+type Tab = "applications" | "candidates" | "ai-ranking";
 const PAGE_SIZE = 20;
 
 export default function HrmApplicationsClient() {
@@ -93,9 +94,10 @@ export default function HrmApplicationsClient() {
     );
   }
 
-  const tabs: { key: Tab; label: string }[] = [
+  const tabs: { key: Tab; label: string; ai?: boolean }[] = [
     { key: "applications", label: "Applications" },
     { key: "candidates", label: "Candidates" },
+    { key: "ai-ranking", label: "✦ AI Ranking", ai: true },
   ];
 
   return (
@@ -119,14 +121,18 @@ export default function HrmApplicationsClient() {
       {/* Tabs */}
       <div className="border-b border-gray-200">
         <nav className="-mb-px flex gap-6">
-          {tabs.map(({ key, label }) => (
+          {tabs.map(({ key, label, ai }) => (
             <button
               key={key}
               onClick={() => handleTabChange(key)}
               className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === key
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700"
+                  ? ai
+                    ? "border-violet-600 text-violet-600"
+                    : "border-blue-600 text-blue-600"
+                  : ai
+                    ? "border-transparent text-violet-400 hover:text-violet-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
             >
               {label}
@@ -166,6 +172,10 @@ export default function HrmApplicationsClient() {
             />
             <Pagination page={page} totalPages={totalPages} total={total} onPageChange={setPage} />
           </>
+        )}
+
+        {activeTab === "ai-ranking" && (
+          <AiCvRankingTab jobs={jobs} />
         )}
 
         {activeTab === "candidates" && (

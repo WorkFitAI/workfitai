@@ -3,8 +3,29 @@
 import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { AuthPageIllustration } from "@/components/auth/auth-page-illustration";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
+import { AuthShell } from "@/components/auth/auth-shell";
+import { RoleTabs } from "@/components/auth/role-tabs";
+import { fadeSlideUp } from "@/components/auth/motion/auth-motion-variants";
+
+// Cross-fade between role forms. Uses variant LABELS (not object values) so the
+// "show" state propagates to child motion items (AuthFormField) — object-based
+// animation would stop label propagation and leave those fields stuck at their
+// hidden (opacity:0) variant.
+const roleFormVariants: Variants = {
+  hidden: { opacity: 0, y: 8 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.2,
+      ease: "easeOut",
+      when: "beforeChildren",
+      staggerChildren: 0.05,
+    },
+  },
+  exit: { opacity: 0, y: -8, transition: { duration: 0.15, ease: "easeIn" } },
+};
 import { RegisterFormCandidate } from "@/components/auth/register-form-candidate";
 import { RegisterFormHr } from "@/components/auth/register-form-hr";
 import { RegisterFormHrManager } from "@/components/auth/register-form-hr-manager";
@@ -55,67 +76,48 @@ function RegisterContent() {
   }
 
   return (
-    <div className="relative overflow-hidden px-4 py-16">
-      <AuthPageIllustration />
+    <AuthShell eyebrow="Register" title={title} subtitle={subtitle}>
+      {/* Role switcher tabs */}
+      <motion.div variants={fadeSlideUp} className="mb-8">
+        <RoleTabs tabs={tabs} value={activeType} onChange={handleTabChange} />
+      </motion.div>
 
-      <div className="relative mx-auto max-w-lg">
-        {/* Header */}
-        <p className="mb-2 text-center text-sm font-semibold text-primary">
-          Register
+      {/* Form — cross-fade between roles */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeType}
+          variants={roleFormVariants}
+          initial="hidden"
+          animate="show"
+          exit="exit"
+        >
+          {activeType === "hr" && <RegisterFormHr />}
+          {activeType === "hr-manager" && <RegisterFormHrManager />}
+          {activeType === "candidate" && <RegisterFormCandidate />}
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Footer links */}
+      <motion.div
+        variants={fadeSlideUp}
+        className="mt-4 space-y-1 text-center text-sm text-muted-foreground"
+      >
+        <p>
+          Already have an account?{" "}
+          <Link href="/login" className="font-medium text-foreground underline">
+            Sign In
+          </Link>
         </p>
-        <h1 className="mb-1 text-center text-3xl font-bold text-foreground">
-          {title}
-        </h1>
-        <p className="mb-6 text-center text-sm text-muted-foreground">
-          {subtitle}
+        <p>
+          <Link
+            href="/register?type=employer"
+            className="font-medium text-foreground underline"
+          >
+            Register as Employer
+          </Link>
         </p>
-
-        {/* Role switcher tabs */}
-        <div className="mb-8 flex rounded-xl border border-border bg-muted/40 p-1">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => handleTabChange(tab.id)}
-              className={cn(
-                "flex-1 rounded-lg py-2 text-sm font-medium transition-all",
-                activeType === tab.id
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Form */}
-        {activeType === "hr" && <RegisterFormHr />}
-        {activeType === "hr-manager" && <RegisterFormHrManager />}
-        {activeType === "candidate" && <RegisterFormCandidate />}
-
-        {/* Footer links */}
-        <div className="mt-4 space-y-1 text-center text-sm text-muted-foreground">
-          <p>
-            Already have an account?{" "}
-            <Link
-              href="/login"
-              className="font-medium text-foreground underline"
-            >
-              Sign In
-            </Link>
-          </p>
-          <p>
-            <Link
-              href="/register?type=employer"
-              className="font-medium text-foreground underline"
-            >
-              Register as Employer
-            </Link>
-          </p>
-        </div>
-      </div>
-    </div>
+      </motion.div>
+    </AuthShell>
   );
 }
 

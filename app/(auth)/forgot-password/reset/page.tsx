@@ -8,9 +8,10 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { AuthShell } from '@/components/auth/auth-shell'
 import { PasswordInput } from '@/components/auth/password-input'
+import { PasswordStrengthMeter } from '@/components/auth/password-strength-meter'
 import { authService } from '@/lib/auth/auth-service'
 import { resetPasswordSchema, type ResetPasswordFormValues } from '@/lib/schemas/auth-schemas'
 import { RESET_TOKEN_SESSION_KEY } from '@/app/(auth)/forgot-password/verify/page'
@@ -37,8 +38,11 @@ function ResetPasswordForm() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<ResetPasswordFormValues>({ resolver: zodResolver(resetPasswordSchema) })
+
+  const newPasswordValue = watch('newPassword', '')
 
   async function onSubmit(data: ResetPasswordFormValues) {
     if (!resetToken) return
@@ -66,13 +70,13 @@ function ResetPasswordForm() {
   if (!resetToken) return null
 
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Set New Password</CardTitle>
-        <CardDescription>Choose a strong password for your account</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <AuthShell
+      eyebrow="New Password"
+      title="Set New Password"
+      subtitle="Choose a strong password for your account"
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div className="space-y-1">
           <PasswordInput
             id="new-password"
             label="New Password"
@@ -80,20 +84,21 @@ function ResetPasswordForm() {
             error={errors.newPassword?.message}
             {...register('newPassword')}
           />
-          <PasswordInput
-            id="confirm-password"
-            label="Confirm Password"
-            autoComplete="new-password"
-            error={errors.confirmPassword?.message}
-            {...register('confirmPassword')}
-          />
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Reset Password
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+          <PasswordStrengthMeter value={newPasswordValue} />
+        </div>
+        <PasswordInput
+          id="confirm-password"
+          label="Confirm Password"
+          autoComplete="new-password"
+          error={errors.confirmPassword?.message}
+          {...register('confirmPassword')}
+        />
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Reset Password
+        </Button>
+      </form>
+    </AuthShell>
   )
 }
 

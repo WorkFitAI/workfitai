@@ -3,8 +3,10 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { AuthPageIllustration } from "@/components/auth/auth-page-illustration";
+import { AuthShell } from "@/components/auth/auth-shell";
+import { fadeSlideUp } from "@/components/auth/motion/auth-motion-variants";
 
 const ROLE_CONFIG = {
   HR_MANAGER: {
@@ -39,11 +41,10 @@ function PendingApprovalContent() {
   const config = ROLE_CONFIG[role] ?? ROLE_CONFIG.HR;
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden px-4 py-16">
-      <AuthPageIllustration />
-      <div className="relative mx-auto max-w-lg">
+    <AuthShell>
+      <>
         {/* Status badge */}
-        <div className="mb-6 flex justify-center">
+        <motion.div variants={fadeSlideUp} className="mb-6 flex justify-center">
           <span className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-1.5 text-sm font-medium text-amber-700 dark:bg-amber-950/40 dark:text-amber-400">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
@@ -51,22 +52,27 @@ function PendingApprovalContent() {
             </span>
             Pending Approval
           </span>
-        </div>
+        </motion.div>
 
         {/* Icon + heading */}
-        <div className="mb-2 text-center text-5xl">{config.icon}</div>
-        <p className="mb-1 text-center text-sm font-semibold text-primary">
-          Almost there!
-        </p>
-        <h1 className="mb-1 text-center text-3xl font-bold text-foreground">
-          {config.title}
-        </h1>
-        <p className="mb-8 text-center text-sm text-muted-foreground">
-          {config.subtitle}
-        </p>
+        <motion.div variants={fadeSlideUp}>
+          <div className="mb-2 text-center text-5xl">{config.icon}</div>
+          <p className="mb-1 text-center text-sm font-semibold text-primary">
+            Almost there!
+          </p>
+          <h1 className="mb-1 text-center text-3xl font-bold text-foreground">
+            {config.title}
+          </h1>
+          <p className="mb-8 text-center text-sm text-muted-foreground">
+            {config.subtitle}
+          </p>
+        </motion.div>
 
         {/* Info card */}
-        <div className={`rounded-xl border p-6 ${config.bg} ${config.border}`}>
+        <motion.div
+          variants={fadeSlideUp}
+          className={`rounded-xl border p-6 ${config.bg} ${config.border}`}
+        >
           <p className="text-sm text-foreground/80 leading-relaxed">
             {config.message}
           </p>
@@ -78,14 +84,14 @@ function PendingApprovalContent() {
                 Check your email
               </p>
               <p className="text-xs text-muted-foreground">
-                We'll notify you when {config.approver} reviews your account.
+                We&apos;ll notify you when {config.approver} reviews your account.
               </p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* What happens next */}
-        <div className="mt-6 space-y-3">
+        <motion.div variants={fadeSlideUp} className="mt-6 space-y-3">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             What happens next?
           </p>
@@ -109,19 +115,19 @@ function PendingApprovalContent() {
               <p className="text-sm text-muted-foreground pt-0.5">{text}</p>
             </div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Actions */}
-        <div className="mt-8 flex flex-col gap-3">
+        <motion.div variants={fadeSlideUp} className="mt-8 flex flex-col gap-3">
           <Button asChild>
             <Link href="/login">Back to Login</Link>
           </Button>
           <Button variant="ghost" asChild>
             <Link href="/">Go to Homepage</Link>
           </Button>
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      </>
+    </AuthShell>
   );
 }
 

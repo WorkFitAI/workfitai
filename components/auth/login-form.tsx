@@ -6,13 +6,15 @@ import Link from "next/link";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Check, Loader2, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PasswordInput } from "@/components/auth/password-input";
+import { AuthFormField } from "@/components/auth/auth-form-field";
+import { fadeSlideUp } from "@/components/auth/motion/auth-motion-variants";
 import { useAuth } from "@/contexts/auth-context";
 import { loginSchema, type LoginFormValues } from "@/lib/schemas/auth-schemas";
 import { apiClient } from "@/lib/api-client";
@@ -69,30 +71,23 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {/* Email field */}
-      <div className="space-y-1">
-        <Label htmlFor="usernameOrEmail">Email</Label>
-        <div className="relative">
-          <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            id="usernameOrEmail"
-            placeholder="Email address"
-            autoComplete="username"
-            className="h-12 rounded-lg border-border pl-10 pr-10 focus-visible:ring-primary"
-            {...register("usernameOrEmail")}
-          />
-          {isEmailValid && (
-            <Check className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-green-500" />
-          )}
-        </div>
-        {errors.usernameOrEmail && (
-          <p className="text-sm text-destructive">
-            {errors.usernameOrEmail.message}
-          </p>
-        )}
-      </div>
+      <AuthFormField
+        id="usernameOrEmail"
+        label="Email"
+        icon={Mail}
+        placeholder="Email address"
+        autoComplete="username"
+        error={errors.usernameOrEmail?.message}
+        adornment={
+          isEmailValid ? (
+            <Check className="h-4 w-4 text-green-500" />
+          ) : undefined
+        }
+        {...register("usernameOrEmail")}
+      />
 
       {/* Password field */}
-      <div className="space-y-1">
+      <motion.div variants={fadeSlideUp} className="space-y-1">
         <Label htmlFor="login-password">Password</Label>
         <PasswordInput
           id="login-password"
@@ -101,10 +96,10 @@ export function LoginForm() {
           placeholder="Password"
           {...register("password")}
         />
-      </div>
+      </motion.div>
 
       {/* Remember me + forgot password */}
-      <div className="flex items-center justify-between">
+      <motion.div variants={fadeSlideUp} className="flex items-center justify-between">
         <label className="flex cursor-pointer items-center gap-2 text-sm">
           <Checkbox
             checked={rememberMe}
@@ -119,20 +114,22 @@ export function LoginForm() {
         >
           Forgot password?
         </Link>
-      </div>
+      </motion.div>
 
       {/* Submit */}
-      <Button
-        type="submit"
-        className="h-12 w-full rounded-lg bg-primary text-base text-white hover:bg-primary/90"
-        disabled={isLoading}
-      >
-        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        Login →
-      </Button>
+      <motion.div variants={fadeSlideUp} whileTap={{ scale: 0.98 }}>
+        <Button
+          type="submit"
+          className="h-12 w-full rounded-lg bg-primary text-base text-white hover:bg-primary/90"
+          disabled={isLoading}
+        >
+          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Login →
+        </Button>
+      </motion.div>
 
       {/* OAuth */}
-      <div className="flex flex-col gap-2 pt-2">
+      <motion.div variants={fadeSlideUp} className="flex flex-col gap-2 pt-2">
         <Button
           type="button"
           variant="outline"
@@ -153,7 +150,7 @@ export function LoginForm() {
           {oauthLoading === "GITHUB" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Continue with GitHub
         </Button>
-      </div>
+      </motion.div>
     </form>
   );
 }

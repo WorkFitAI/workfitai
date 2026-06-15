@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/auth/password-input";
+import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter";
 import { authService } from "@/lib/auth/auth-service";
 import {
   hrRegisterSchema,
@@ -24,10 +25,13 @@ export function RegisterFormHr() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<HrRegisterFormValues>({
     resolver: zodResolver(hrRegisterSchema),
   });
+
+  const passwordValue = watch("password", "");
 
   async function onSubmit(data: HrRegisterFormValues) {
     setIsLoading(true);
@@ -165,13 +169,16 @@ export function RegisterFormHr() {
       </div>
 
       {/* Passwords */}
-      <PasswordInput
-        id="hr-password"
-        label="Password"
-        placeholder="Password"
-        error={errors.password?.message}
-        {...register("password")}
-      />
+      <div className="space-y-1">
+        <PasswordInput
+          id="hr-password"
+          label="Password"
+          placeholder="Password"
+          error={errors.password?.message}
+          {...register("password")}
+        />
+        <PasswordStrengthMeter value={passwordValue} />
+      </div>
       <PasswordInput
         id="hr-confirm"
         label="Confirm Password"
