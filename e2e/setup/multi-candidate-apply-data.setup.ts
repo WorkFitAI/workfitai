@@ -1,13 +1,8 @@
 /**
- * Data setup — all 10 candidates submit applications to the multi-job dataset.
+ * Data setup — candidates submit applications driven by e2e/fixtures/application-definitions.json.
+ * Add or remove entries in that file to control how many applications are created.
+ * CV files are read from e2e/fixtures/cv/<username>.pdf; falls back to a blank PDF if missing.
  *
- * Application matrix:
- *   Candidate 2, 3, 4  → HRM1 Frontend Developer job
- *   Candidate 5, 6, 7  → HRM1 Data Analyst job
- *   Candidate 8, 9     → HRM2 Product Manager job
- *   Candidate 8, 10    → HRM2 Mobile Developer job  (C8 applies to both HRM2 jobs)
- *
- * Candidate 1 is handled by the existing candidate1-apply-data.setup.ts (Backend Engineer).
  * Writes e2e/.data/test-applications.json for downstream assignment setup and spec assertions.
  * Idempotent: skips already-applied candidates.
  */
@@ -18,6 +13,8 @@ import * as path from 'path'
 const DATA_DIR = path.join(__dirname, '../.data')
 const TEST_JOBS_FILE = path.join(DATA_DIR, 'test-jobs.json')
 const TEST_APPLICATIONS_FILE = path.join(DATA_DIR, 'test-applications.json')
+const FIXTURES_FILE = path.join(__dirname, '../fixtures/application-definitions.json')
+const CV_DIR = path.join(__dirname, '../fixtures/cv')
 
 export interface TestApplicationEntry {
   applicationId: string | null
@@ -50,16 +47,18 @@ function minimalPdfBuffer(): Buffer {
   )
 }
 
-const COVER_LETTERS: Record<number, string> = {
-  2: 'I have 3 years of professional React and TypeScript experience, having shipped several large-scale SPAs for e-commerce and fintech clients. I am excited about this Frontend Developer role and confident I can contribute from day one.',
-  3: 'Frontend development is my passion. I specialize in React with TypeScript and have a strong eye for performance — Lighthouse scores above 90 are my baseline. I would love to bring that discipline to your team.',
-  4: 'As a frontend engineer who recently transitioned from backend development, I bring a unique perspective on full-stack concerns. I have 2 years of React/TypeScript work and am eager to grow further in a product-focused environment.',
-  5: 'My background in statistics combined with hands-on SQL and Python experience makes me a strong candidate for this Data Analyst role. I have built end-to-end dashboards in Tableau and Power BI for retail analytics teams.',
-  6: 'With a Master\'s degree in Data Science and 1 year of industry experience, I am eager to bring rigorous analytical thinking and BI skills to your organisation. I am particularly excited about turning complex datasets into clear business stories.',
-  7: 'I am an entry-level analyst with strong SQL fundamentals, a working knowledge of Python (pandas, matplotlib), and hands-on Metabase experience. I am motivated by data-driven cultures and keen to grow with your team.',
-  8: 'With 4 years of mobile product management across iOS and Android — including two apps exceeding 500k MAU — I have a proven record of shipping impactful products. Your remote-friendly culture and equity programme make this opportunity especially exciting.',
-  9: 'I have led product discovery, defined OKRs, and collaborated with engineering and design for 3+ years at a growth-stage startup. I am particularly skilled at balancing user needs with business metrics and would thrive in your senior PM role.',
-  10: 'Two years of React Native development with one shipped Flutter project gives me cross-platform versatility. I focus on clean architecture, smooth animations, and rigorous testing. I am excited to bring this experience to your Mobile Developer position.',
+function resolveCvBuffer(email: string, cvFile?: string): Buffer {
+  // Prefer the per-application CV file (e.g. candidate1_3.pdf) when provided
+  if (cvFile) {
+    const specificPath = path.join(CV_DIR, cvFile)
+    if (fs.existsSync(specificPath)) return fs.readFileSync(specificPath)
+  }
+  // Fallback: generic per-candidate CV (<username>.pdf)
+  const username = email.split('@')[0]
+  const cvPath = path.join(CV_DIR, `${username}.pdf`)
+  if (fs.existsSync(cvPath)) return fs.readFileSync(cvPath)
+  // Last resort: minimal valid single-page PDF
+  return minimalPdfBuffer()
 }
 
 async function loginAndGetToken(
@@ -124,16 +123,18 @@ async function submitApplication(
   email: string,
   coverLetter: string,
   auth: { accessToken: string; deviceId: string },
+  cvBuffer: Buffer,
 ): Promise<string | null> {
+  const username = email.split('@')[0]
   try {
     const res = await page.request.post(`${apiBase}/application`, {
       multipart: {
         jobId,
         email,
         cvPdfFile: {
-          name: 'cv.pdf',
+          name: `${username}.pdf`,
           mimeType: 'application/pdf',
-          buffer: minimalPdfBuffer(),
+          buffer: cvBuffer,
         },
         coverLetter,
       },
@@ -174,33 +175,35 @@ setup('apply to jobs with all candidates', async ({ page }) => {
     return
   }
 
-  const hrm1Jobs = jobs.filter((j) => j.hrmKey === 'hrm1')
-  const hrm2Jobs = jobs.filter((j) => j.hrmKey === 'hrm2')
+  // Index jobs by hrmKey for O(1) lookup by { hrmKey, index }
+  const jobsByKey: Record<string, Array<{ jobId: string; jobTitle: string; hrmKey: 'hrm1' | 'hrm2' }>> = {
+    hrm1: jobs.filter((j) => j.hrmKey === 'hrm1'),
+    hrm2: jobs.filter((j) => j.hrmKey === 'hrm2'),
+  }
 
-  // Map each candidate to the jobs they should apply to
-  const candidateJobMap: Array<{ num: number; jobs: typeof jobs }> = [
-    // Candidates 2-4 → HRM1 jobs (prefer Frontend Developer = index 0)
-    { num: 2, jobs: hrm1Jobs.slice(0, 1) },
-    { num: 3, jobs: hrm1Jobs.slice(0, 1) },
-    { num: 4, jobs: hrm1Jobs.slice(0, 1) },
-    // Candidates 5-7 → HRM1 Data Analyst (index 1) or fallback to first HRM1 job
-    { num: 5, jobs: hrm1Jobs.length > 1 ? hrm1Jobs.slice(1, 2) : hrm1Jobs.slice(0, 1) },
-    { num: 6, jobs: hrm1Jobs.length > 1 ? hrm1Jobs.slice(1, 2) : hrm1Jobs.slice(0, 1) },
-    { num: 7, jobs: hrm1Jobs.length > 1 ? hrm1Jobs.slice(1, 2) : hrm1Jobs.slice(0, 1) },
-    // Candidates 8-9 → HRM2 Product Manager (index 0)
-    { num: 8, jobs: hrm2Jobs.slice(0, 1) },
-    { num: 9, jobs: hrm2Jobs.slice(0, 1) },
-    // Candidate 8 also applies to HRM2 Mobile Developer (index 1) → handled with separate entry
-    { num: 8, jobs: hrm2Jobs.length > 1 ? hrm2Jobs.slice(1, 2) : [] },
-    // Candidate 10 → HRM2 Mobile Developer (index 1)
-    { num: 10, jobs: hrm2Jobs.length > 1 ? hrm2Jobs.slice(1, 2) : hrm2Jobs.slice(0, 1) },
-  ]
+  // Load application definitions from fixture — controls quantity and mapping
+  const { applications: appDefs } = JSON.parse(fs.readFileSync(FIXTURES_FILE, 'utf-8')) as {
+    applications: Array<{
+      candidateNum: number
+      jobRef: { hrmKey: 'hrm1' | 'hrm2'; index: number }
+      cvFile?: string
+      coverLetter: string
+    }>
+  }
 
   const API_BASE = readApiBase()
   const results: TestApplicationEntry[] = []
 
-  for (const { num, jobs: targetJobs } of candidateJobMap) {
-    if (!targetJobs.length) continue
+  for (const appDef of appDefs) {
+    const { candidateNum: num, jobRef, coverLetter } = appDef
+
+    const jobPool = jobsByKey[jobRef.hrmKey] ?? []
+    // Fallback to first job in the pool if the index doesn't exist
+    const job = jobPool[jobRef.index] ?? jobPool[0]
+    if (!job) {
+      console.warn(`No job for ref { hrmKey: ${jobRef.hrmKey}, index: ${jobRef.index} } — skipping candidate${num}`)
+      continue
+    }
 
     const emailKey = `TEST_CANDIDATE${num}_EMAIL`
     const passwordKey = `TEST_CANDIDATE${num}_PASSWORD`
@@ -215,27 +218,11 @@ setup('apply to jobs with all candidates', async ({ page }) => {
     const auth = await loginAndGetToken(page, API_BASE, email, password)
     if (!auth) continue
 
-    for (const job of targetJobs) {
-      const existingId = await getExistingApplicationId(page, API_BASE, job.jobId, auth)
-      if (existingId !== null) {
-        console.log(`candidate${num} already applied to ${job.jobTitle} — id=${existingId}`)
-        results.push({
-          applicationId: existingId === 'already-applied-unknown-id' ? null : existingId,
-          jobId: job.jobId,
-          jobTitle: job.jobTitle,
-          candidateEmail: email,
-          candidateNum: num,
-          hrmKey: job.hrmKey,
-          createdAt: new Date().toISOString(),
-        })
-        continue
-      }
-
-      const coverLetter = COVER_LETTERS[num] ?? `I am excited to apply for the ${job.jobTitle} position.`
-      const applicationId = await submitApplication(page, API_BASE, job.jobId, email, coverLetter, auth)
-
+    const existingId = await getExistingApplicationId(page, API_BASE, job.jobId, auth)
+    if (existingId !== null) {
+      console.log(`candidate${num} already applied to ${job.jobTitle} — id=${existingId}`)
       results.push({
-        applicationId,
+        applicationId: existingId === 'already-applied-unknown-id' ? null : existingId,
         jobId: job.jobId,
         jobTitle: job.jobTitle,
         candidateEmail: email,
@@ -243,9 +230,23 @@ setup('apply to jobs with all candidates', async ({ page }) => {
         hrmKey: job.hrmKey,
         createdAt: new Date().toISOString(),
       })
-
-      console.log(`candidate${num} applied to "${job.jobTitle}": applicationId=${applicationId ?? 'unknown'}`)
+      continue
     }
+
+    const cvBuffer = resolveCvBuffer(email, appDef.cvFile)
+    const applicationId = await submitApplication(page, API_BASE, job.jobId, email, coverLetter, auth, cvBuffer)
+
+    results.push({
+      applicationId,
+      jobId: job.jobId,
+      jobTitle: job.jobTitle,
+      candidateEmail: email,
+      candidateNum: num,
+      hrmKey: job.hrmKey,
+      createdAt: new Date().toISOString(),
+    })
+
+    console.log(`candidate${num} applied to "${job.jobTitle}": applicationId=${applicationId ?? 'unknown'}`)
   }
 
   fs.writeFileSync(TEST_APPLICATIONS_FILE, JSON.stringify({ applications: results }, null, 2))

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { apiClient } from '@/lib/api-client'
 import { setAccessToken } from '@/lib/auth/token-store'
 import { setSessionCookie } from '@/lib/auth/session-cookie'
+import { useAuth } from '@/contexts/auth-context'
 import type { LoginResponse, UserSession } from '@/types/auth'
 
 const CONTROL_ROLES = ['ROLE_HR', 'ROLE_HR_MANAGER', 'ROLE_ADMIN']
@@ -19,6 +20,7 @@ function OAuthCallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session') ?? ''
+  const { loginWithSession } = useAuth()
 
   const [error, setError] = useState<string | null>(null)
 
@@ -36,13 +38,18 @@ function OAuthCallbackContent() {
         if (response.data?.accessToken) {
           const { accessToken, expiryInMs, username, roles } = response.data
           setAccessToken(accessToken, expiryInMs)
+          const normalizedRoles = (roles as string[]).map((r) =>
+            r.startsWith('ROLE_') ? r : `ROLE_${r}`,
+          ) as UserSession['roles']
           const session: UserSession = {
             username,
-            roles: roles as UserSession['roles'],
+            roles: normalizedRoles,
             expiresAt: Date.now() + expiryInMs,
           }
           setSessionCookie(session)
-          const isControlUser = roles.some((r) => CONTROL_ROLES.includes(r))
+          // Sync auth state into React/Redux context without a page reload
+          loginWithSession(session)
+          const isControlUser = normalizedRoles.some((r) => CONTROL_ROLES.includes(r))
           router.replace(isControlUser ? '/dashboard' : '/')
         } else {
           setError('Authentication failed. Please try again.')
@@ -53,7 +60,7 @@ function OAuthCallbackContent() {
     }
 
     exchangeSession()
-  }, [sessionId, router])
+  }, [sessionId, router, loginWithSession])
 
   return (
     <Card>

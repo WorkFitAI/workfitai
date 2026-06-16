@@ -6,12 +6,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Loader2, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { AuthPageIllustration } from "@/components/auth/auth-page-illustration";
+import { AuthShell } from "@/components/auth/auth-shell";
+import { AuthFormField } from "@/components/auth/auth-form-field";
+import { fadeSlideUp } from "@/components/auth/motion/auth-motion-variants";
 import { authService } from "@/lib/auth/auth-service";
 import {
   forgotPasswordSchema,
@@ -47,37 +48,23 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden px-4 py-16">
-      <AuthPageIllustration />
-      <div className="relative mx-auto max-w-lg">
-        <p className="mb-2 text-center text-sm font-semibold text-primary">
-          Forgot Password?
-        </p>
-        <h1 className="mb-1 text-center text-3xl font-bold text-foreground">
-          Reset your password.
-        </h1>
-        <p className="mb-8 text-center text-sm text-muted-foreground">
-          Enter your email and instructions will be sent to you!
-        </p>
+    <AuthShell
+      eyebrow="Forgot Password?"
+      title="Reset your password."
+      subtitle="Enter your email and instructions will be sent to you!"
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <AuthFormField
+          id="fp-email"
+          label="Email"
+          icon={Mail}
+          type="email"
+          placeholder="Email address"
+          error={errors.email?.message}
+          {...register("email")}
+        />
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-1">
-            <Label htmlFor="fp-email">Email</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                id="fp-email"
-                type="email"
-                placeholder="Email address"
-                className="h-12 rounded-lg pl-10"
-                {...register("email")}
-              />
-            </div>
-            {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
-            )}
-          </div>
-
+        <motion.div variants={fadeSlideUp} whileTap={{ scale: 0.98 }}>
           <Button
             type="submit"
             className="h-12 w-full rounded-lg bg-primary text-base text-white hover:bg-primary/90"
@@ -86,14 +73,14 @@ export default function ForgotPasswordPage() {
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Send Password Reset Link
           </Button>
-        </form>
+        </motion.div>
+      </form>
 
-        <p className="mt-6 text-center text-sm">
-          <Link href="/login" className="text-foreground underline">
-            Back to login page
-          </Link>
-        </p>
-      </div>
-    </div>
+      <motion.p variants={fadeSlideUp} className="mt-6 text-center text-sm">
+        <Link href="/login" className="text-foreground underline">
+          Back to login page
+        </Link>
+      </motion.p>
+    </AuthShell>
   );
 }

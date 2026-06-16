@@ -17,6 +17,9 @@ export default defineConfig({
       // Disable the Next.js API proxy in tests so api-client uses the direct
       // backend URL, matching the MSW handlers registered in __tests__/mocks/handlers.ts.
       NEXT_PUBLIC_USE_API_PROXY: "false",
+      // Clear cookie domain so JSDOM tests on localhost can set/read session cookies.
+      // In .env.local this is set to .workfitai.uk which causes domain mismatch in tests.
+      NEXT_PUBLIC_COOKIE_DOMAIN: "",
     },
     include: [
       // Unit tests — pure logic, no rendering

@@ -5,6 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { ChevronDown, Menu, User } from "lucide-react"
+import { NotificationBell } from "@/components/notifications/notification-bell"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -58,7 +59,8 @@ function UserDropdown() {
   }, [user])
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-2">
+      <NotificationBell />
       {/* Avatar → direct link to account settings */}
       <Link href="/account-settings" className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-primary">
         <Avatar className="h-8 w-8">

@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import HrmApplicationsClient from "./hrm-applications-client";
+import AdminApplicationsClient from "./admin-applications-client";
 
 export const metadata = {
   title: "Applications — WorkfitAI Control",
@@ -17,15 +18,16 @@ export default async function ApplicationsPage() {
   const session = JSON.parse(decodeURIComponent(cookieValue));
   const roles: string[] = session.roles ?? [];
 
-  // Only HR_MANAGER can access this page; HR goes to /applications/my
   if (!roles.includes("ROLE_HR_MANAGER") && !roles.includes("ROLE_ADMIN")) {
     if (roles.includes("ROLE_HR")) redirect("/applications/my");
     else redirect("/dashboard");
   }
 
+  const isAdmin = roles.includes("ROLE_ADMIN");
+
   return (
     <Suspense fallback={<div className="p-6 text-sm text-gray-400">Loading…</div>}>
-      <HrmApplicationsClient />
+      {isAdmin ? <AdminApplicationsClient /> : <HrmApplicationsClient />}
     </Suspense>
   );
 }

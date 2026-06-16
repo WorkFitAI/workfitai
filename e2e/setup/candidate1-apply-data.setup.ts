@@ -92,13 +92,17 @@ setup('candidate1 applies to test job', async ({ page }) => {
     }
   }
 
+  // Resolve CV from fixture or fall back to minimal blank PDF
+  const username = candidate1Email.split('@')[0]
+  const cvPath = path.join(__dirname, `../fixtures/cv/${username}.pdf`)
+  const pdfBuffer = fs.existsSync(cvPath) ? fs.readFileSync(cvPath) : minimalPdfBuffer()
+
   // Submit application directly via multipart/form-data API call
-  const pdfBuffer = minimalPdfBuffer()
   const submitRes = await page.request.post(`${API_BASE}/application`, {
     multipart: {
       jobId,
       email: candidate1Email,
-      cvPdfFile: { name: 'test-cv.pdf', mimeType: 'application/pdf', buffer: pdfBuffer },
+      cvPdfFile: { name: `${username}.pdf`, mimeType: 'application/pdf', buffer: pdfBuffer },
       coverLetter: 'Test application submitted by E2E setup.',
     },
     headers: { 'Authorization': `Bearer ${accessToken}`, 'X-Device-Id': deviceId },

@@ -1,13 +1,13 @@
 {
-  "title": "E2E Test Job - Backend Engineer",
+  "title": "Senior Backend Engineer - NestJS",
   "shortDescription": "We are looking for a skilled Backend Engineer to join our growing engineering team. You will design and build scalable REST APIs, own microservice infrastructure, and collaborate with frontend and data teams to deliver high-quality product features.",
-  "fullDescription": "Responsibilities:\n- Design, implement, and maintain high-performance REST APIs using Node.js / NestJS\n- Build and optimise relational database schemas (PostgreSQL)\n- Write clean, well-tested TypeScript code with >80% unit-test coverage\n- Participate in code reviews and mentor junior developers\n- Collaborate with DevOps to manage CI/CD pipelines on GitHub Actions\n\nRequirements:\n- 3-5 years of professional backend development experience\n- Proficiency in TypeScript / Node.js and RESTful API design\n- Experience with PostgreSQL, Redis, and message queues (RabbitMQ or Kafka)\n- Familiarity with Docker, Kubernetes, and cloud platforms (AWS / GCP)\n- Strong communication skills and ability to work in an Agile team\n\nNice to have:\n- Experience with GraphQL or gRPC\n- Contributions to open-source projects",
+  "fullDescription": "Responsibilities:\n- Design and implement high-performance REST/GraphQL APIs with Node.js and NestJS\n- Manage PostgreSQL schemas, query optimisation, and data migrations\n- Integrate Redis caching, RabbitMQ messaging, and third-party services\n- Define coding standards and mentor junior engineers\n- Collaborate with DevOps on CI/CD pipelines (GitHub Actions, Docker, Kubernetes)\n\nRequirements:\n- 3+ years of professional Node.js / NestJS backend experience\n- Strong command of TypeScript and RESTful API design principles\n- Hands-on experience with PostgreSQL, Redis, and message queues\n- Familiarity with containerisation (Docker) and cloud platforms (AWS / GCP)\n- Good understanding of security best practices (OWASP Top 10)\n\nNice to have:\n- Experience with microservices architecture and event-driven systems\n- Knowledge of GraphQL and API gateway patterns",
   "location": "Ho Chi Minh City, Vietnam",
-  "educationLevel": "Bachelor in Computer Science or related field",
-  "requiredExperience": "3-5 years of professional experience",
-  "skillFallbacks": ["JavaScript", "TypeScript", "Node.js", "PostgreSQL", "Docker"],
+  "educationLevel": "Bachelor's in Computer Science or related field",
+  "requiredExperience": "3+ years of backend development",
+  "skills": ["NodeJS", "TypeScript", "PostgreSQL", "Redis", "Docker"],
   "salaryMin": 2000,
-  "salaryMax": 5000,
+  "salaryMax": 4000,
   "quantity": 20,
   "categoryName": "Backend Development"
 }

@@ -17,6 +17,7 @@ import {
   HRJobListData,
   CandidateListData,
   CandidateDetail,
+  CvRankingData,
 } from "@/types/application";
 
 const API_BASE =
@@ -205,16 +206,27 @@ export const applicationService = {
   // ─── HRM (HR Manager) methods ──────────────────────────────────────────────
 
   /**
-   * GET /application/company/:companyNo?page=&size=
+   * GET /application/company/:companyNo?page=&size=&status=&assignedTo=&jobTitle=&keyword=
    * List all applications submitted to a company (HRM only).
    */
   async getCompanyApplications(
     companyNo: string,
     page = 0,
     size = 50,
+    status?: ApplicationStatus,
+    assignedTo?: string,
+    jobTitle?: string,
+    keyword?: string,
   ): Promise<ApiResponse<ApplicationListData>> {
+    const params = new URLSearchParams();
+    params.append("page", String(page));
+    params.append("size", String(size));
+    if (status) params.append("status", status);
+    if (assignedTo) params.append("assignedTo", assignedTo);
+    if (jobTitle) params.append("jobTitle", jobTitle);
+    if (keyword) params.append("keyword", keyword);
     return apiClient.get<ApiResponse<ApplicationListData>>(
-      `/application/company/${companyNo}?page=${page}&size=${size}`,
+      `/application/company/${companyNo}?${params.toString()}`,
     );
   },
 
@@ -454,5 +466,145 @@ export const applicationService = {
     return apiClient.get<ApiResponse<CandidateDetail>>(
       `/application/company/${companyNo}/candidates/${username}`,
     );
+  },
+
+  // ─── ADMIN endpoints ───────────────────────────────────────────────────────
+
+  /**
+   * GET /application/admin/all?page=&size=&status=&companyId=&username=&jobTitle=&keyword=
+   * List all applications platform-wide (ADMIN only).
+   * Backend returns Spring Pageable: { content[], totalElements, totalPages, number }
+   * mapped here to the standard { items[], meta } shape used by hooks.
+   */
+  async getAdminApplications(
+    page = 0,
+    size = 50,
+    status?: ApplicationStatus,
+    companyId?: string,
+    username?: string,
+    jobTitle?: string,
+    keyword?: string,
+  ): Promise<ApiResponse<ApplicationListData>> {
+    const params = new URLSearchParams();
+    params.append("page", String(page));
+    params.append("size", String(size));
+    if (status) params.append("status", status);
+    if (companyId) params.append("companyId", companyId);
+    if (username) params.append("username", username);
+    if (jobTitle) params.append("jobTitle", jobTitle);
+    if (keyword) params.append("keyword", keyword);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const raw = await apiClient.get<ApiResponse<any>>(
+      `/application/admin/all?${params.toString()}`,
+    );
+
+    // Map Spring Pageable → ApplicationListData
+    const pageable = raw.data ?? {};
+    return {
+      ...raw,
+      data: {
+        items: pageable.content ?? [],
+        meta: {
+          page: pageable.number ?? 0,
+          size: pageable.size ?? size,
+          totalElements: pageable.totalElements ?? 0,
+          totalPages: pageable.totalPages ?? 1,
+          first: pageable.first ?? true,
+          last: pageable.last ?? true,
+          hasNext: !pageable.last,
+          hasPrevious: !pageable.first,
+        },
+      },
+    };
+  },
+
+  /**
+   * DELETE /application/admin/application/{id}?reason=
+   * Soft-delete an application (marks as WITHDRAWN). ADMIN only.
+   */
+  async adminDeleteApplication(
+    applicationId: string,
+    reason?: string,
+  ): Promise<ApiResponse<ApplicationDetail>> {
+    const params = reason ? `?reason=${encodeURIComponent(reason)}` : "";
+    return apiClient.delete<ApiResponse<ApplicationDetail>>(
+      `/application/admin/application/${applicationId}${params}`,
+    );
+  },
+
+  /**
+   * PUT /application/admin/application/{id}/restore
+   * Restore a WITHDRAWN application back to APPLIED. ADMIN only.
+   */
+  async adminRestoreApplication(
+    applicationId: string,
+  ): Promise<ApiResponse<ApplicationDetail>> {
+    return apiClient.put<ApiResponse<ApplicationDetail>>(
+      `/application/admin/application/${applicationId}/restore`,
+    );
+  },
+
+  /**
+   * GET /application/job/{jobId}/cv-ranking
+   * Triggers AI-powered CV ranking for a job. Response can be very slow (10-15 s).
+   * Retries on 503 (service busy) OR per-request timeout (AbortError) up to maxRetries times.
+   * onRetry is called each time a retry begins, receiving the attempt number (1-based).
+   *
+   * @param requestTimeoutMs - Max ms to wait for each individual request before aborting and retrying (default 60 s)
+   * @param retryDelayMs     - Ms to wait between retry attempts (default 15 s — matches server processing time)
+   */
+  async getCVRanking(
+    jobId: string,
+    maxRetries = 3,
+    retryDelayMs = 15000,
+    onRetry?: (attempt: number) => void,
+    requestTimeoutMs = 60000,
+  ): Promise<ApiResponse<CvRankingData>> {
+    const token = getAccessToken();
+    const deviceId = getDeviceId();
+    const headers: Record<string, string> = { "X-Device-Id": deviceId };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    let lastError: Error = new Error("CV ranking failed");
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      if (attempt > 0) {
+        onRetry?.(attempt);
+        await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), requestTimeoutMs);
+
+      try {
+        const response = await fetch(
+          `${API_BASE}/application/job/${jobId}/cv-ranking`,
+          { method: "GET", headers, credentials: "include", signal: controller.signal },
+        );
+
+        clearTimeout(timeoutId);
+
+        if (response.status === 503) {
+          lastError = new Error(`Service busy — retrying (${attempt + 1}/${maxRetries + 1})`);
+          continue;
+        }
+
+        if (!response.ok) {
+          throw new Error(`CV ranking failed (${response.status})`);
+        }
+
+        return response.json() as Promise<ApiResponse<CvRankingData>>;
+      } catch (err) {
+        clearTimeout(timeoutId);
+        // AbortError means our timeout fired — treat as transient, retry
+        if (err instanceof Error && err.name === "AbortError") {
+          lastError = new Error(`Request timed out — retrying (${attempt + 1}/${maxRetries + 1})`);
+          continue;
+        }
+        throw err;
+      }
+    }
+
+    throw new Error("CV ranking service unavailable after max retries. Please try again later.");
   },
 };

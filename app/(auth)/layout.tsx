@@ -6,7 +6,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="min-h-screen bg-white">
       <header className="fixed top-0 z-50 w-full border-b border-border bg-white/90 backdrop-blur-sm">
-        <div className="container mx-auto flex h-16 items-center px-4">
+        <div className="container mx-auto flex h-16 items-center px-4 duration-500 animate-in fade-in slide-in-from-top-2">
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/imgs/template/workfitai.png"

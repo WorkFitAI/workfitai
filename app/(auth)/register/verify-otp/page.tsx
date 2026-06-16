@@ -5,14 +5,8 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { AuthShell } from "@/components/auth/auth-shell";
 import { OtpInput } from "@/components/auth/otp-input";
 import { authService } from "@/lib/auth/auth-service";
 
@@ -27,6 +21,7 @@ function VerifyOtpContent() {
 
   const [otp, setOtp] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [otpError, setOtpError] = useState(false);
   const [cooldown, setCooldown] = useState(0);
 
   // Guard: redirect back if email param is missing
@@ -43,11 +38,16 @@ function VerifyOtpContent() {
 
   if (!email) return null;
 
-  async function handleSubmit() {
-    if (otp.length < 6) return toast.error("Enter the 6-digit OTP");
+  // Accepts an optional code so OtpInput.onComplete can pass the just-completed
+  // value (React state `otp` is still stale within that same event tick).
+  async function handleSubmit(otpValue?: string) {
+    const code = otpValue ?? otp;
+    if (code.length < 6) return toast.error("Enter the 6-digit OTP");
+    if (isSubmitting) return;
     setIsSubmitting(true);
+    setOtpError(false);
     try {
-      await authService.verifyOtp({ email, otp });
+      await authService.verifyOtp({ email, otp: code });
       // apiClient throws ApiError on non-2xx — reaching here means success
       if (role === "HR" || role === "HR_MANAGER") {
         toast.success("Email verified! Your account is pending approval.");
@@ -58,6 +58,8 @@ function VerifyOtpContent() {
       }
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Verification failed");
+      setOtpError(true);
+      setOtp("");
     } finally {
       setIsSubmitting(false);
     }
@@ -74,20 +76,31 @@ function VerifyOtpContent() {
   }
 
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Verify Your Email</CardTitle>
-        <CardDescription>
+    <AuthShell
+      eyebrow="Verify Email"
+      title="Verify Your Email"
+      subtitle={
+        <>
           Enter the 6-digit code sent to{" "}
           <span className="font-medium text-foreground">{email}</span>
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col items-center gap-6">
-        <OtpInput value={otp} onChange={setOtp} disabled={isSubmitting} />
+        </>
+      }
+    >
+      <div className="flex flex-col items-center gap-6">
+        <OtpInput
+          value={otp}
+          onChange={(v) => {
+            setOtp(v);
+            if (otpError) setOtpError(false);
+          }}
+          onComplete={handleSubmit}
+          error={otpError}
+          disabled={isSubmitting}
+        />
 
         <Button
           className="w-full"
-          onClick={handleSubmit}
+          onClick={() => handleSubmit()}
           disabled={isSubmitting || otp.length < 6}
         >
           {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -102,8 +115,8 @@ function VerifyOtpContent() {
         >
           {cooldown > 0 ? `Resend OTP in ${cooldown}s` : "Resend OTP"}
         </Button>
-      </CardContent>
-    </Card>
+      </div>
+    </AuthShell>
   );
 }
 
