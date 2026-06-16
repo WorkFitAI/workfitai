@@ -137,10 +137,27 @@ describe("HrmApplicationsClient", () => {
       mockCompanyApplication({ id: "app-001", username: "alice" }),
       mockCompanyApplication({ id: "app-002", username: "bob" }),
     ];
-    setupApplicationHandlers(
-      apps,
-      [mockHRUser()],
-      mockPaginationMeta({ totalElements: 2 }),
+    // Handler filters by keyword query param (server-side search)
+    server.use(
+      http.get(`${API}/application/company/C001`, ({ request }) => {
+        const keyword = new URL(request.url).searchParams.get("keyword") ?? "";
+        const filtered = keyword
+          ? apps.filter((a) => a.username.includes(keyword))
+          : apps;
+        return apiSuccess({
+          items: filtered,
+          meta: mockPaginationMeta({ totalElements: filtered.length }),
+        });
+      }),
+      http.get(`${API}/application/company/C001/hr-users`, () =>
+        apiSuccess([mockHRUser()]),
+      ),
+      http.get(`${API}/application/company/C001/jobs`, () =>
+        apiSuccess({ items: [], meta: mockPaginationMeta() }),
+      ),
+      http.get(`${API}/application/company/C001/candidates`, () =>
+        apiSuccess({ items: [mockHRCandidateItem()], meta: mockPaginationMeta() }),
+      ),
     );
     render(<HrmApplicationsClient />);
     // Wait for table to populate
@@ -150,9 +167,10 @@ describe("HrmApplicationsClient", () => {
     const searchInput = screen.getByPlaceholderText(/search candidate or job/i);
     await userEvent.type(searchInput, "alice");
 
-    // bob should no longer be visible, alice should remain
-    await waitFor(() =>
-      expect(screen.queryByText("bob")).not.toBeInTheDocument(),
+    // bob should no longer be visible after debounce fires and API returns filtered result
+    await waitFor(
+      () => expect(screen.queryByText("bob")).not.toBeInTheDocument(),
+      { timeout: 2000 },
     );
     expect(screen.getByText("alice")).toBeInTheDocument();
   });
@@ -238,11 +256,33 @@ describe("HrmApplicationsClient", () => {
       mockHRJobItem({ jobId: "job-001", title: "Frontend Dev" }),
       mockHRJobItem({ jobId: "job-002", title: "Backend Dev" }),
     ];
-    setupApplicationHandlers(
-      apps,
-      [mockHRUser()],
-      mockPaginationMeta({ totalElements: 2 }),
-      jobs,
+    // Handler filters by jobTitle query param (server-side filtering)
+    server.use(
+      http.get(`${API}/application/company/C001`, ({ request }) => {
+        const jobTitle = new URL(request.url).searchParams.get("jobTitle") ?? "";
+        const filtered = jobTitle
+          ? apps.filter((a) => {
+              const job = jobs.find((j) => j.title === jobTitle);
+              return job ? a.jobId === job.jobId : true;
+            })
+          : apps;
+        return apiSuccess({
+          items: filtered,
+          meta: mockPaginationMeta({ totalElements: filtered.length }),
+        });
+      }),
+      http.get(`${API}/application/company/C001/hr-users`, () =>
+        apiSuccess([mockHRUser()]),
+      ),
+      http.get(`${API}/application/company/C001/jobs`, () =>
+        apiSuccess({
+          items: jobs,
+          meta: mockPaginationMeta({ totalElements: jobs.length }),
+        }),
+      ),
+      http.get(`${API}/application/company/C001/candidates`, () =>
+        apiSuccess({ items: [mockHRCandidateItem()], meta: mockPaginationMeta() }),
+      ),
     );
     render(<HrmApplicationsClient />);
 
@@ -253,9 +293,10 @@ describe("HrmApplicationsClient", () => {
     const jobSelect = screen.getByDisplayValue("All jobs");
     await userEvent.selectOptions(jobSelect, "job-001");
 
-    // bob (job-002) should be hidden, alice (job-001) should remain
-    await waitFor(() =>
-      expect(screen.queryByText("bob")).not.toBeInTheDocument(),
+    // bob (job-002) should be hidden after server returns filtered result
+    await waitFor(
+      () => expect(screen.queryByText("bob")).not.toBeInTheDocument(),
+      { timeout: 2000 },
     );
     expect(screen.getByText("alice")).toBeInTheDocument();
   });
