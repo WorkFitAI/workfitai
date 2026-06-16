@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import { applicationService } from "@/lib/application/application-service";
-import type { HRJobItem, CvRankingData } from "@/types/application";
+import { ApplicationDetailPanel } from "@/components/hrm/application-detail-panel";
+import { useAuth } from "@/contexts/auth-context";
+import type { HRJobItem, CvRankingData, Application } from "@/types/application";
 
 const RANKING_STEPS = [
   "Extracting CV content…",
@@ -24,12 +26,14 @@ interface Props {
 }
 
 export function AiCvRankingTab({ jobs }: Props) {
+  const { user } = useAuth();
   const [selectedJobId, setSelectedJobId] = useState("");
   const [loading, setLoading] = useState(false);
   const [retryAttempt, setRetryAttempt] = useState(0);
   const [stepIdx, setStepIdx] = useState(0);
   const [result, setResult] = useState<CvRankingData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -54,7 +58,7 @@ export function AiCvRankingTab({ jobs }: Props) {
     setResult(null);
     setRetryAttempt(0);
     try {
-      const res = await applicationService.getCVRanking(selectedJobId, 3, 15000, setRetryAttempt, 60000);
+      const res = await applicationService.getCVRanking(selectedJobId, 3, 15000, setRetryAttempt, 120000);
       setResult(res.data);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ranking failed. Please try again.");
@@ -173,6 +177,7 @@ export function AiCvRankingTab({ jobs }: Props) {
                   <th className="px-4 py-3 text-left font-medium text-gray-500 whitespace-nowrap">Fit</th>
                   <th className="px-4 py-3 text-left font-medium text-gray-500 whitespace-nowrap">Score</th>
                   <th className="px-4 py-3 text-left font-medium text-gray-500">Explanation</th>
+                  <th className="px-4 py-3 text-right font-medium text-gray-500 whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 bg-white">
@@ -232,6 +237,14 @@ export function AiCvRankingTab({ jobs }: Props) {
                     <td className="px-4 py-3 max-w-xs">
                       <p className="text-xs text-gray-600 line-clamp-2">{item.explanation ?? "—"}</p>
                     </td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        onClick={() => setSelectedApp(item.application)}
+                        className="rounded px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors"
+                      >
+                        View
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -252,6 +265,15 @@ export function AiCvRankingTab({ jobs }: Props) {
           </svg>
           <p className="text-sm">Select a job above and click "Rank CVs" to start AI ranking.</p>
         </div>
+      )}
+
+      {selectedApp && (
+        <ApplicationDetailPanel
+          application={selectedApp}
+          currentUsername={user?.username ?? ""}
+          onClose={() => setSelectedApp(null)}
+          onRefresh={() => setSelectedApp(null)}
+        />
       )}
     </div>
   );

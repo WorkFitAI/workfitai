@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/contexts/auth-context";
 import { ApplyModalProvider } from "@/contexts/apply-modal-context";
+import { NotificationProvider } from "@/contexts/notification-context";
 import { ReduxProvider } from "@/components/providers/redux-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
@@ -33,10 +34,12 @@ export default function RootLayout({
       >
         <ReduxProvider>
           <AuthProvider>
-            <ApplyModalProvider>
-              {children}
-              <Toaster richColors position="bottom-right" />
-            </ApplyModalProvider>
+            <NotificationProvider>
+              <ApplyModalProvider>
+                {children}
+                <Toaster richColors position="bottom-right" />
+              </ApplyModalProvider>
+            </NotificationProvider>
           </AuthProvider>
         </ReduxProvider>
       </body>
