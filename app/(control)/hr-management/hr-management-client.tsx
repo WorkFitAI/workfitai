@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { useCompanyHRManagement, useApproveHR, useRejectHR } from "@/hooks/useHrManagement";
+import { LottieLoader } from "@/components/ui/lottie-loader";
 import type { HRUser } from "@/types/application";
 
 // ─── Role badge ───────────────────────────────────────────────────────────────
@@ -184,7 +185,7 @@ export default function HrManagementClient() {
               {loading ? (
                 <tr>
                   <td colSpan={6} className="py-16 text-center">
-                    <Loader2 className="h-6 w-6 animate-spin text-blue-600 mx-auto mb-2" />
+                    <LottieLoader size={80} className="mx-auto mb-2" />
                     <p className="text-sm text-gray-500">Loading HR members…</p>
                   </td>
                 </tr>

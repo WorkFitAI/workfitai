@@ -4,8 +4,8 @@
 import { Suspense, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { LottieLoader } from '@/components/ui/lottie-loader'
 import { Button } from '@/components/ui/button'
 import { apiClient } from '@/lib/api-client'
 import { setAccessToken } from '@/lib/auth/token-store'
@@ -78,7 +78,7 @@ function OAuthCallbackContent() {
             </Button>
           </>
         ) : (
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <LottieLoader size={110} />
         )}
       </CardContent>
     </Card>

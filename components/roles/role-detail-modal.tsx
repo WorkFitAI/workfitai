@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useRole } from "@/hooks/useRoles"
 import { usePermissions } from "@/hooks/usePermissions"
 import { ReadOnlyPermissions } from "@/components/roles/role-readonly-permissions"
+import { LottieLoader } from "@/components/ui/lottie-loader"
 import type { Permission, Role } from "@/types/role-permission"
 
 const BUILT_IN_ROLES = ["CANDIDATE", "HR", "HR_MANAGER", "ADMIN"]
@@ -143,8 +144,8 @@ export function RoleDetailModal({ role, isAdmin, onClose }: RoleDetailModalProps
         {/* Body */}
         <div className="px-5 py-4">
           {(loading || permsLoading) ? (
-            <div className="flex items-center justify-center py-16 gap-2">
-              <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+            <div className="flex flex-col items-center justify-center py-16 gap-2">
+              <LottieLoader size={80} />
               <span className="text-sm text-gray-500">Loading…</span>
             </div>
           ) : canEdit ? (

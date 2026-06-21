@@ -73,6 +73,10 @@ export const cvService = {
    * direct MinIO access from browser (pdfUrl is an internal Docker URL).
    */
   async downloadCV(cv: CVMetadata): Promise<void> {
+    if (!cv.objectName) {
+      throw new Error("This CV has no downloadable file.");
+    }
+
     const token = getAccessToken();
     const deviceId = getDeviceId();
 

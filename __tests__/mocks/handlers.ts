@@ -309,6 +309,7 @@ export function mockCVMetadata(
     pdfUrl: "http://minio:9000/cvs-files/abc123-resume.pdf",
     belongTo: "testuser",
     templateType: "UPLOAD",
+    applicationId: null,
     sections: {
       skills: [],
       projects: [],

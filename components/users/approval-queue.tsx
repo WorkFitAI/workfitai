@@ -23,6 +23,7 @@ import {
 } from "lucide-react"
 import { useApprovalQueue } from "@/hooks/useAdminUsers"
 import { adminUserService } from "@/lib/admin/admin-user-service"
+import { LottieLoader } from "@/components/ui/lottie-loader"
 import type { AdminUserSummary, EsUserHit } from "@/types/admin-user"
 
 // ─── Role badge inside modal ─────────────────────────────────────────────────
@@ -391,7 +392,7 @@ function ApprovalQueueModal({ onClose }: ApprovalQueueModalProps) {
 
           {loading ? (
             <div className="flex flex-col items-center justify-center py-16 gap-2">
-              <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+              <LottieLoader size={80} />
               <p className="text-sm text-gray-500">Loading queue…</p>
             </div>
           ) : queue.length === 0 ? (

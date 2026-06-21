@@ -551,15 +551,15 @@ export const applicationService = {
    * Retries on 503 (service busy) OR per-request timeout (AbortError) up to maxRetries times.
    * onRetry is called each time a retry begins, receiving the attempt number (1-based).
    *
-   * @param requestTimeoutMs - Max ms to wait for each individual request before aborting and retrying (default 60 s)
-   * @param retryDelayMs     - Ms to wait between retry attempts (default 15 s — matches server processing time)
+   * @param requestTimeoutMs - Max ms to wait for each individual request before aborting and retrying (default 120 s)
+   * @param retryDelayMs     - Ms to wait between retry attempts (default 30 s — matches server processing time)
    */
   async getCVRanking(
     jobId: string,
-    maxRetries = 3,
-    retryDelayMs = 15000,
+    maxRetries = 5,
+    retryDelayMs = 30000,
     onRetry?: (attempt: number) => void,
-    requestTimeoutMs = 60000,
+    requestTimeoutMs = 120000,
   ): Promise<ApiResponse<CvRankingData>> {
     const token = getAccessToken();
     const deviceId = getDeviceId();

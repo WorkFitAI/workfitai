@@ -1,6 +1,6 @@
 import { Suspense } from "react"
-import { Loader2 } from "lucide-react"
 import { AuditLogsClient } from "@/components/audit-logs/audit-logs-client"
+import { LottieLoader } from "@/components/ui/lottie-loader"
 
 export const metadata = {
   title: "Audit Logs — WorkfitAI Admin",
@@ -12,8 +12,8 @@ export default function AuditLogsPage() {
     <div className="p-6">
       <Suspense
         fallback={
-          <div className="flex items-center justify-center py-16 text-muted-foreground gap-2">
-            <Loader2 size={20} className="animate-spin" />
+          <div className="flex flex-col items-center justify-center py-16 text-muted-foreground gap-2">
+            <LottieLoader size={90} />
             <span>Loading…</span>
           </div>
         }

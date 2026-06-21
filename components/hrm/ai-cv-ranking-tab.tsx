@@ -3,8 +3,12 @@
 import { useState, useEffect, useRef } from "react";
 import { applicationService } from "@/lib/application/application-service";
 import { ApplicationDetailPanel } from "@/components/hrm/application-detail-panel";
+import { AiCvRankingLoader } from "@/components/hrm/ai-cv-ranking-loader";
 import { useAuth } from "@/contexts/auth-context";
 import type { HRJobItem, CvRankingData, Application } from "@/types/application";
+
+const MAX_RETRIES = 5;
+const RETRY_DELAY_MS = 30000;
 
 const RANKING_STEPS = [
   "Extracting CV content…",
@@ -29,7 +33,6 @@ export function AiCvRankingTab({ jobs }: Props) {
   const { user } = useAuth();
   const [selectedJobId, setSelectedJobId] = useState("");
   const [loading, setLoading] = useState(false);
-  const [retryAttempt, setRetryAttempt] = useState(0);
   const [stepIdx, setStepIdx] = useState(0);
   const [result, setResult] = useState<CvRankingData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -56,9 +59,14 @@ export function AiCvRankingTab({ jobs }: Props) {
     setLoading(true);
     setError(null);
     setResult(null);
-    setRetryAttempt(0);
     try {
-      const res = await applicationService.getCVRanking(selectedJobId, 3, 15000, setRetryAttempt, 120000);
+      const res = await applicationService.getCVRanking(
+        selectedJobId,
+        MAX_RETRIES,
+        RETRY_DELAY_MS,
+        undefined,
+        120000,
+      );
       setResult(res.data);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ranking failed. Please try again.");
@@ -79,7 +87,7 @@ export function AiCvRankingTab({ jobs }: Props) {
             setError(null);
           }}
           disabled={loading}
-          className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 disabled:opacity-60"
+          className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-60"
         >
           <option value="">Select a job to rank CVs…</option>
           {jobs.map((j) => (
@@ -91,7 +99,7 @@ export function AiCvRankingTab({ jobs }: Props) {
         <button
           onClick={handleRank}
           disabled={!selectedJobId || loading}
-          className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 disabled:opacity-50 flex items-center gap-2 whitespace-nowrap transition-colors"
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50 flex items-center gap-2 whitespace-nowrap transition-colors"
         >
           {loading ? (
             <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -109,32 +117,11 @@ export function AiCvRankingTab({ jobs }: Props) {
 
       {/* Loading animation */}
       {loading && (
-        <div className="rounded-xl border border-violet-100 bg-violet-50 p-6 flex flex-col items-center gap-4">
-          <div className="relative h-14 w-14">
-            <svg className="h-14 w-14 animate-spin text-violet-300" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-30" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
-              <path className="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-            </svg>
-            <span className="absolute inset-0 flex items-center justify-center text-violet-600 text-2xl select-none">
-              ✦
-            </span>
-          </div>
+        <div className="rounded-xl border border-primary/20 bg-primary/5 p-6 flex flex-col items-center gap-2">
+          <AiCvRankingLoader />
           <div className="text-center space-y-1">
-            <p className="text-sm font-medium text-violet-800 animate-pulse">{RANKING_STEPS[stepIdx]}</p>
-            {retryAttempt > 0 && (
-              <p className="text-xs text-violet-500">Server busy — retry {retryAttempt} of 3…</p>
-            )}
-            <p className="text-xs text-violet-400">AI is analyzing each CV against the job requirements</p>
-          </div>
-          <div className="flex gap-1.5">
-            {RANKING_STEPS.map((_, i) => (
-              <span
-                key={i}
-                className={`h-1.5 w-6 rounded-full transition-colors duration-700 ${
-                  i <= stepIdx ? "bg-violet-500" : "bg-violet-200"
-                }`}
-              />
-            ))}
+            <p className="text-sm font-medium text-primary animate-pulse">{RANKING_STEPS[stepIdx]}</p>
+            <p className="text-xs text-primary/70">AI is analyzing each CV against the job requirements</p>
           </div>
         </div>
       )}
@@ -250,10 +237,6 @@ export function AiCvRankingTab({ jobs }: Props) {
               </tbody>
             </table>
           </div>
-
-          <p className="text-xs text-gray-400 text-right">
-            Processed in {(result.processing_time_ms / 1000).toFixed(2)}s
-          </p>
         </>
       )}
 

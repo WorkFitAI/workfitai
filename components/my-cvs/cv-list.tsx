@@ -29,11 +29,39 @@ export default function CVList({ cvs, loading, onDeleted }: Props) {
     );
   }
 
+  // Self-uploaded CVs (deletable) vs CVs used in a job application (view-only).
+  const ownCvs = cvs.filter((cv) => cv.applicationId === null);
+  const applicationCvs = cvs.filter((cv) => cv.applicationId !== null);
+
   return (
-    <div className="space-y-3">
-      {cvs.map((cv) => (
-        <CVCard key={cv.cvId} cv={cv} onDeleted={onDeleted} />
-      ))}
+    <div className="space-y-8">
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold text-foreground">My CVs</h2>
+        {ownCvs.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            No self-uploaded CVs yet.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {ownCvs.map((cv) => (
+              <CVCard key={cv.cvId} cv={cv} onDeleted={onDeleted} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {applicationCvs.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-sm font-semibold text-foreground">
+            Used in Applications
+          </h2>
+          <div className="space-y-3">
+            {applicationCvs.map((cv) => (
+              <CVCard key={cv.cvId} cv={cv} onDeleted={onDeleted} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

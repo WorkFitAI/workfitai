@@ -1,8 +1,9 @@
 "use client"
 
 import { Fragment, useState } from "react"
-import { Search, AlertCircle, Loader2, Key } from "lucide-react"
+import { Search, AlertCircle, Key } from "lucide-react"
 import { usePermissions } from "@/hooks/usePermissions"
+import { LottieLoader } from "@/components/ui/lottie-loader"
 
 const getNs     = (n: string) => n.includes(":") ? n.split(":")[0] : "general"
 const getAction = (n: string) => n.includes(":") ? n.slice(n.indexOf(":") + 1) : n
@@ -113,7 +114,7 @@ export function PermissionsTable() {
             {loading ? (
               <tr>
                 <td colSpan={2} className="py-16 text-center">
-                  <Loader2 className="h-6 w-6 animate-spin text-blue-600 mx-auto mb-2" />
+                  <LottieLoader size={80} className="mx-auto mb-2" />
                   <p className="text-sm text-gray-500">Loading permissions…</p>
                 </td>
               </tr>

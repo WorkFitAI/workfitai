@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { FileText, Download, Calendar } from "lucide-react";
+import Link from "next/link";
+import { FileText, Download, Calendar, Lock, ExternalLink } from "lucide-react";
 import { CVMetadata } from "@/types/cv";
 import { cvService } from "@/lib/cv/cv-service";
 import { cn } from "@/lib/utils";
@@ -23,7 +24,8 @@ const TEMPLATE_COLORS: Record<string, string> = {
 };
 
 /** Strip leading UUID prefix to get the original upload filename. */
-function extractFilename(objectName: string): string {
+function extractFilename(objectName: string | null, fallback: string): string {
+  if (!objectName) return fallback;
   const uuidPrefix = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-/i;
   return objectName.replace(uuidPrefix, "") || objectName;
 }
@@ -36,7 +38,12 @@ interface Props {
 export default function CVCard({ cv, onDeleted }: Props) {
   const [downloading, setDownloading] = useState(false);
 
-  const filename = extractFilename(cv.objectName);
+  // CVs uploaded as part of a job application are view-only and cannot be deleted.
+  const isApplicationCV = cv.applicationId !== null;
+  const filename = extractFilename(
+    cv.objectName,
+    cv.headline || TEMPLATE_LABELS[cv.templateType] || "CV",
+  );
 
   const uploadedDate = new Date(cv.createdAt).toLocaleDateString("en-US", {
     year: "numeric",
@@ -91,21 +98,40 @@ export default function CVCard({ cv, onDeleted }: Props) {
             <Calendar className="h-3 w-3" />
             {uploadedDate}
           </span>
+          {isApplicationCV && (
+            <span className="flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+              <Lock className="h-3 w-3" />
+              View only
+            </span>
+          )}
         </div>
       </div>
 
       {/* Actions */}
       <div className="flex items-center gap-2 shrink-0">
-        <button
-          onClick={handleDownload}
-          disabled={downloading}
-          title="Download CV"
-          className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-50"
-        >
-          <Download className="h-3.5 w-3.5" />
-          {downloading ? "…" : "Download"}
-        </button>
-        <CVDeleteDialog cvId={cv.cvId} filename={filename} onDeleted={onDeleted} />
+        {cv.objectName && (
+          <button
+            onClick={handleDownload}
+            disabled={downloading}
+            title="Download CV"
+            className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+          >
+            <Download className="h-3.5 w-3.5" />
+            {downloading ? "…" : "Download"}
+          </button>
+        )}
+        {isApplicationCV ? (
+          <Link
+            href={`/applied-jobs/${cv.applicationId}`}
+            title="View application"
+            className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+            View application
+          </Link>
+        ) : (
+          <CVDeleteDialog cvId={cv.cvId} filename={filename} onDeleted={onDeleted} />
+        )}
       </div>
     </div>
   );

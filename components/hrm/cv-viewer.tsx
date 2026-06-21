@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { Loader2, AlertCircle, Download } from "lucide-react";
+import { AlertCircle, Download } from "lucide-react";
 import { applicationService } from "@/lib/application/application-service";
+import { LottieLoader } from "@/components/ui/lottie-loader";
 
 interface CvViewerProps {
   applicationId: string;
@@ -73,8 +74,8 @@ export function CvViewer({ applicationId, fileName }: CvViewerProps) {
 
       {/* Inline PDF preview — fills remaining height */}
       {previewLoading && (
-        <div className="flex-1 flex items-center justify-center gap-2 text-sm text-gray-400">
-          <Loader2 className="h-4 w-4 animate-spin" />
+        <div className="flex-1 flex flex-col items-center justify-center gap-2 text-sm text-gray-400">
+          <LottieLoader size={80} />
           Loading preview…
         </div>
       )}

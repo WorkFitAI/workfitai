@@ -116,3 +116,33 @@ export interface JobCategory {
   id: string;
   name: string;
 }
+
+/** Job shape returned by the recommendations endpoint — a subset of Job's fields. */
+export interface RecommendedJob {
+  postId: string;
+  title: string;
+  shortDescription: string;
+  employmentType: string;
+  experienceLevel: string;
+  salaryMin: number;
+  salaryMax: number;
+  expiresAt: string;
+  skillNames: string[];
+  jobCategoryName: string;
+  company: Company;
+  createdDate: string;
+  status: string;
+  deleted: boolean;
+}
+
+export interface JobRecommendation {
+  job: RecommendedJob;
+  score: number;
+  rank: number;
+}
+
+export interface JobRecommendationsData {
+  recommendations: JobRecommendation[];
+  totalResults: number;
+  processingTime: string;
+}
