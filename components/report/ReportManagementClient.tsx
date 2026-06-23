@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { RotateCcwIcon, Search } from "lucide-react";
+import { Building2, Eye, Flag, Lock, RotateCcwIcon, Search } from "lucide-react";
 import { reportService } from "@/lib/report/report-service";
 import { Report } from "@/types/report";
-import ReportCard from "@/components/report/ReportCard";
 import Pagination from "@/components/report/Pagination";
 import ReportModal from "@/components/report/ReportModal";
 import { toast } from "sonner";
 import { jobService } from "@/lib/job/job-service";
+import Link from "next/link";
+import StatusFilter from "./StatusFilter";
 
 const ReportManagementClient = () => {
   const searchParams = useSearchParams();
@@ -23,6 +24,32 @@ const ReportManagementClient = () => {
   const status = searchParams.get("status") || "";
 
   const [totalPages, setTotalPages] = useState(1);
+
+  const statusStyles = {
+    PENDING: {
+      badge: "bg-yellow-100 text-yellow-600",
+      active: "bg-yellow-500 text-white",
+      hover: "hover:bg-yellow-50",
+    },
+    IN_PROGRESS: {
+      badge: "bg-blue-100 text-blue-600",
+      active: "bg-blue-500 text-white",
+      hover: "hover:bg-blue-50",
+    },
+    RESOLVED: {
+      badge: "bg-green-100 text-green-600",
+      active: "bg-green-500 text-white",
+      hover: "hover:bg-green-50",
+    },
+    DECLINE: {
+      badge: "bg-red-100 text-red-600",
+      active: "bg-red-500 text-white",
+      hover: "hover:bg-red-50",
+    },
+  } as const;
+
+  const getStatusStyle = (status: keyof typeof statusStyles) =>
+    statusStyles[status];
 
   const fetchReports = async () => {
     try {
@@ -97,50 +124,159 @@ const ReportManagementClient = () => {
           </p>
         </div>
 
-        {/* Search + Filter (SYNC URL) */}
+        {/* Search + Filter */}
         <div className="flex gap-3 justify-between">
-          <input
-            placeholder="Search reports..."
-            value={keyword}
-            onChange={(e) => updateParams("keyword", e.target.value)}
-            className="border bg-white rounded-md px-4 py-2 w-1/3"
-          />
+          <div className="relative w-1/3">
+            <div className="absolute inset-y-0 left-3 flex items-center text-gray-400">
+              <Search className="w-5 h-5"/>
+            </div>
+
+            <input
+              placeholder="Search reports..."
+              value={keyword}
+              onChange={(e) => updateParams("keyword", e.target.value)}
+              className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm text-gray-700 shadow-sm
+                        transition placeholder:text-gray-400
+                        focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100 text-ellipsis"
+            />
+          </div>
           <div className="flex gap-3">
-            <select
-              value={status}
-              onChange={(e) => updateParams("status", e.target.value)}
-              className="border bg-white rounded-md px-3 py-2"
-            >
-              <option value="">All Status</option>
-              <option value="PENDING">PENDING</option>
-              <option value="IN_PROGRESS">IN_PROGRESS</option>
-              <option value="RESOLVED">RESOLVED</option>
-              <option value="DECLINE">DECLINE</option>
-            </select>
+            <StatusFilter status={status} updateParams={updateParams} />
 
             {/* RESET BUTTON */}
             <button
               onClick={() => {
                 router.push("/report");
               }}
-              className="px-4 py-2 text-gray-600 hover:text-red-600 transition"
+              className="px-2 py-2 text-gray-400 hover:text-red-600 transition"
             >
-              <RotateCcwIcon className="w-6 h-6" />
+              <RotateCcwIcon className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        {/* List */}
-        <div className="space-y-4">
-          {reports.map((report) => (
-            <ReportCard
-              key={report.jobId}
-              report={report}
-              onView={setSelectedReport}
-              onLock={handleLock}
-              onChangeStatus={handleChangeStatus}
-            />
-          ))}
+        {/* Table */}
+        <div className="overflow-hidden bg-white border rounded-2xl">
+          <table className="w-full">
+            <thead className="bg-slate-50 border-b">
+              <tr className="text-left text-sm text-slate-500">
+                <th className="px-6 py-4">Job</th>
+                <th className="px-6 py-4">Report Counts</th>
+                <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reports.map((report) => {
+                const isClosed = report.status === "RESOLVED";
+
+                return (
+                  <tr
+                    key={report.jobId}
+                    className="border-b hover:bg-slate-50"
+                  >
+                    {/* Info */}
+                    <td className="px-6 py-4">
+                      <div className="flex items-start gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
+                          <Flag className="h-5 w-5 text-red-600" />
+                          
+                        </div>
+
+                        <div>
+                          <p className="text-sm font-semibold text-slate-800 max-w-[300px] truncate">
+                            {report.snapshot?.title || "Job Title Unavailable"}
+                            <Link
+                            href={`/jobs/${report.jobId}`}
+                            target="_blank"
+                            className="mt-1 inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
+                          />
+                          </p>
+
+                          <div className="mt-1 flex items-center gap-1">
+                            <Building2 className="h-3 w-3 text-slate-400" />
+                            <p className="text-xs text-slate-500">
+                              {report.companyName}
+                            </p>
+                          </div>
+
+
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* JOB */}
+                    <td className="px-6 py-4">
+                      <p className="text-sm text-slate-500">
+                          {report.reportCount} reports
+                      </p>
+                    </td>
+
+                    {/* CHANGE STATUS */}
+                    <td className="px-6 py-4">
+                      <div className="inline-flex rounded-lg border overflow-hidden">
+                        {/* PROCESS */}
+                        <button
+                          onClick={() => handleChangeStatus(report.jobId, "IN_PROGRESS")}
+                          className={`px-3 py-1 text-xs transition border-r ${
+                            report.status === "IN_PROGRESS"
+                              ? getStatusStyle("IN_PROGRESS").active
+                              : getStatusStyle("IN_PROGRESS").hover
+                          }`}
+                        >
+                          Process
+                        </button>
+
+                        {/* RESOLVE */}
+                        <button
+                          onClick={() => handleChangeStatus(report.jobId, "RESOLVED")}
+                          className={`px-3 py-1 text-xs transition border-r ${
+                            report.status === "RESOLVED"
+                              ? getStatusStyle("RESOLVED").active
+                              : getStatusStyle("RESOLVED").hover
+                          }`}
+                        >
+                          Resolve
+                        </button>
+
+                        {/* DECLINE */}
+                        <button
+                          onClick={() => handleChangeStatus(report.jobId, "DECLINE")}
+                          className={`px-3 py-1 text-xs transition ${
+                            report.status === "DECLINE"
+                              ? getStatusStyle("DECLINE").active
+                              : getStatusStyle("DECLINE").hover
+                          }`}
+                        >
+                          Decline
+                        </button>
+                      </div>
+                    </td>
+
+                    {/* ACTIONS */}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setSelectedReport(report)}
+                          className="p-2 border rounded-md hover:bg-slate-100"
+                        >
+                          <Eye size={14} />
+                        </button>
+
+                        <button
+                          disabled={isClosed || report.isDeleted}
+                          onClick={() => handleLock(report.jobId)}
+                          className="p-2 border rounded-md text-red-600 hover:bg-red-50 disabled:opacity-50"
+                        >
+                          <Lock size={14} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
 
         {/* Empty */}
