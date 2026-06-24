@@ -106,7 +106,7 @@ export function StatusPieChart({
       </ResponsiveContainer>
 
       {/* Custom legend */}
-      <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 pt-5">
         {data.map((entry, idx) => {
           const pct = total > 0 ? ((entry.value / total) * 100).toFixed(0) : "0"
           return (

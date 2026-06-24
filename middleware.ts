@@ -1,14 +1,17 @@
 // Next.js Edge middleware for route protection based on auth_session cookie
 import { NextRequest, NextResponse } from 'next/server'
+import { getDefaultRouteForRoles } from '@/lib/auth/default-route'
 
 // Routes accessible to any control role (HR, HRM, Admin)
 const CONTROL_ROUTES = ['/dashboard', '/job-posts', '/settings', '/applications']
 // Routes restricted to HR Manager and Admin only
-const HRM_ROUTES = ['/hr-management', '/roles-permissions']
+const HRM_ROUTES = ['/hr-management']
 // Routes restricted to Admin only
-const ADMIN_ROUTES = ['/users', '/audit-logs']
+const ADMIN_ROUTES = ['/users', '/audit-logs', '/roles-permissions']
 // Routes that require any authenticated user
-const CANDIDATE_ROUTES = ['/applied-jobs', '/saved-jobs', '/my-cvs', '/account-settings']
+const CANDIDATE_ROUTES = ['/applied-jobs', '/my-cvs', '/account-settings']
+// Candidate-only feature routes — control roles (HR/HRM/Admin) get sent to their own area instead
+const CANDIDATE_ONLY_ROUTES = ['/applied-jobs', '/my-cvs']
 // Auth pages that authenticated users should be redirected away from
 const AUTH_ROUTES = ['/login', '/register', '/forgot-password']
 // Roles that can access any control route
@@ -44,14 +47,23 @@ export function middleware(request: NextRequest) {
   // Admin-only routes
   if (ADMIN_ROUTES.some((r) => pathname.startsWith(r))) {
     if (!isAuthenticated) return NextResponse.redirect(new URL('/login', request.url))
-    if (!roles.includes('ROLE_ADMIN')) return NextResponse.redirect(new URL('/dashboard', request.url))
+    if (!roles.includes('ROLE_ADMIN')) return NextResponse.redirect(new URL(getDefaultRouteForRoles(roles), request.url))
   }
 
   // HR Manager + Admin routes
   if (HRM_ROUTES.some((r) => pathname.startsWith(r))) {
     if (!isAuthenticated) return NextResponse.redirect(new URL('/login', request.url))
     const allowed = roles.includes('ROLE_ADMIN') || roles.includes('ROLE_HR_MANAGER')
-    if (!allowed) return NextResponse.redirect(new URL('/dashboard', request.url))
+    if (!allowed) return NextResponse.redirect(new URL(getDefaultRouteForRoles(roles), request.url))
+  }
+
+  // Dashboard is unavailable to plain HR — they land on their assigned applications instead
+  if (pathname.startsWith('/dashboard') && isAuthenticated) {
+    const hasControlRole = roles.some((r) => CONTROL_ROLES.includes(r))
+    if (hasControlRole) {
+      const dest = getDefaultRouteForRoles(roles)
+      if (dest !== '/dashboard') return NextResponse.redirect(new URL(dest, request.url))
+    }
   }
 
   // General control routes (any HR/HRM/Admin)
@@ -61,21 +73,23 @@ export function middleware(request: NextRequest) {
     if (!hasControlRole) return NextResponse.redirect(new URL('/', request.url))
   }
 
-  // Protect candidate-only routes (any authenticated user)
+  // Protect candidate-only routes (any authenticated user; control roles get sent to their own area)
   if (CANDIDATE_ROUTES.some((r) => pathname.startsWith(r))) {
     if (!isAuthenticated) {
       const loginUrl = new URL('/login', request.url)
       loginUrl.searchParams.set('callbackUrl', pathname)
       return NextResponse.redirect(loginUrl)
     }
+    const hasControlRole = roles.some((r) => CONTROL_ROLES.includes(r))
+    if (hasControlRole && CANDIDATE_ONLY_ROUTES.some((r) => pathname.startsWith(r))) {
+      return NextResponse.redirect(new URL(getDefaultRouteForRoles(roles), request.url))
+    }
   }
 
   // Redirect authenticated users away from auth pages
   if (AUTH_ROUTES.some((r) => pathname.startsWith(r))) {
     if (isAuthenticated) {
-      const isControlUser = roles.some((r) => CONTROL_ROLES.includes(r))
-      const dest = isControlUser ? '/dashboard' : '/'
-      return NextResponse.redirect(new URL(dest, request.url))
+      return NextResponse.redirect(new URL(getDefaultRouteForRoles(roles), request.url))
     }
   }
 
@@ -96,8 +110,6 @@ export const config = {
     '/settings/:path*',
     '/applied-jobs',
     '/applied-jobs/:path*',
-    '/saved-jobs',
-    '/saved-jobs/:path*',
     '/my-cvs',
     '/my-cvs/:path*',
     '/account-settings',

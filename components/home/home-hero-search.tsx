@@ -15,15 +15,13 @@ export function HomeHeroSearch() {
   const { page } = useJobFilters();
 
   const urlKeyword = searchParams.get("title") || "";
-  const urlIndustry = searchParams.get("industry") || "";
   const urlLocation = searchParams.get("location") || "";
-  
+
   const [keyword, setKeyword] = useState(urlKeyword);
 
   const debouncedKeyword = useDebounce(keyword, 500);
 
-  // computed value 
-  const industry = urlIndustry;
+  // computed value
   const location = urlLocation;
 
   // update URL khi keyword đổi
@@ -42,25 +40,10 @@ export function HomeHeroSearch() {
   return (
     <div className="flex items-center rounded-lg border bg-white shadow-md">
       
-      {/* Industry */}
+      {/* Industry — fixed to Technology, no selection needed */}
       <div className="flex flex-1 items-center gap-2 px-4 py-3">
         <Briefcase className="h-4 w-4 text-muted-foreground" />
-        <select
-          aria-label="Filter by industry"
-          value={industry}
-          onChange={(e) => {
-            const params = new URLSearchParams(searchParams.toString());
-            if (e.target.value) params.set("industry", e.target.value);
-            else params.delete("industry");
-
-            router.replace(`?${params.toString()}`);
-          }}
-          className="w-full bg-transparent text-sm outline-none"
-        >
-          <option value="">Industry</option>
-          <option value="tech">Technology</option>
-          <option value="finance">Finance</option>
-        </select>
+        <span className="w-full text-sm text-foreground">Technology</span>
       </div>
 
       <div className="h-8 w-px bg-border" />

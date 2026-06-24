@@ -11,9 +11,8 @@ import { apiClient } from '@/lib/api-client'
 import { setAccessToken } from '@/lib/auth/token-store'
 import { setSessionCookie } from '@/lib/auth/session-cookie'
 import { useAuth } from '@/contexts/auth-context'
+import { getDefaultRouteForRoles } from '@/lib/auth/default-route'
 import type { LoginResponse, UserSession } from '@/types/auth'
-
-const CONTROL_ROLES = ['ROLE_HR', 'ROLE_HR_MANAGER', 'ROLE_ADMIN']
 
 /** Inner component — must be inside <Suspense> because it calls useSearchParams() */
 function OAuthCallbackContent() {
@@ -49,8 +48,7 @@ function OAuthCallbackContent() {
           setSessionCookie(session)
           // Sync auth state into React/Redux context without a page reload
           loginWithSession(session)
-          const isControlUser = normalizedRoles.some((r) => CONTROL_ROLES.includes(r))
-          router.replace(isControlUser ? '/dashboard' : '/')
+          router.replace(getDefaultRouteForRoles(normalizedRoles))
         } else {
           setError('Authentication failed. Please try again.')
         }

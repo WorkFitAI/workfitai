@@ -19,7 +19,7 @@ const SERVICE_LABELS: Record<string, string> = {
 export function AdminAuditOverviewSection({ stats }: AdminAuditOverviewSectionProps) {
   if (!stats) return <SectionFallback title="Audit Overview" />
 
-  const successPct = (stats.successRate * 100).toFixed(1)
+  const successPct = (stats.successRate * 1).toFixed(1)
   const serviceEntries = Object.entries(stats.byService).slice(0, 4)
   const maxSvc = Math.max(...serviceEntries.map(([, v]) => v), 1)
 
@@ -69,7 +69,7 @@ export function AdminAuditOverviewSection({ stats }: AdminAuditOverviewSectionPr
         {/* Footer */}
         <div className="flex items-center justify-between border-t pt-2 text-xs text-muted-foreground">
           <span>{stats.uniqueActors} unique actors · {stats.failedEvents} failed</span>
-          <Link href="/audit" className="hover:text-foreground transition-colors">
+          <Link href="/audit-logs" className="hover:text-foreground transition-colors">
             View logs →
           </Link>
         </div>

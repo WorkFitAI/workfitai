@@ -127,6 +127,30 @@ describe('ApplyNowButton', () => {
     })
   })
 
+  it('renders icon-only with aria-label when iconOnly is set', async () => {
+    authCandidate()
+    mockCheckApplied.mockResolvedValue({ data: { applied: false } })
+    render(<ApplyNowButton jobId="job-001" jobTitle="Frontend Engineer" iconOnly />)
+    await waitFor(() => {
+      const btn = screen.getByRole('button')
+      expect(btn).not.toBeDisabled()
+      expect(btn).not.toHaveTextContent('Apply Now')
+      expect(btn).toHaveAttribute('aria-label', 'Apply Now')
+    })
+  })
+
+  it('renders icon-only "Applied" state with accessible label but no visible text', async () => {
+    authCandidate()
+    mockCheckApplied.mockResolvedValue({ data: { applied: true, applicationId: 'app-001' } })
+    render(<ApplyNowButton jobId="job-001" jobTitle="Frontend Engineer" iconOnly />)
+    await waitFor(() => {
+      const btn = screen.getByRole('button')
+      expect(btn).toBeDisabled()
+      expect(btn).not.toHaveTextContent('Applied')
+      expect(btn).toHaveAttribute('aria-label', 'Applied')
+    })
+  })
+
   it('does not call checkApplied for non-candidate authenticated users', async () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,

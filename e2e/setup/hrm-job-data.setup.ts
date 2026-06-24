@@ -1,6 +1,7 @@
 import { test as setup, expect } from "@playwright/test";
 import * as fs from "fs";
 import * as path from "path";
+import { E2E_BASE_URL, readApiBase } from "../helpers/e2e-target";
 
 const DATA_DIR = path.join(__dirname, "../.data");
 const TEST_JOB_FILE = path.join(DATA_DIR, "test-job.json");
@@ -26,7 +27,7 @@ setup("create and publish test job as HRM1", async ({ page }) => {
   // storageState restores cookies (auth_session) and localStorage (including wfa_access_token).
   // Do a fresh login to guarantee a non-expired token — backend binds tokens to device IDs
   // via X-Device-Id header, so we read the persisted device ID from the auth storageState.
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:9085";
+  const API_BASE = readApiBase();
   const hrmanager1Email = process.env.TEST_HRMANAGER1_EMAIL!;
   const hrmanager1Password = process.env.TEST_HRMANAGER1_PASSWORD!;
 
@@ -39,7 +40,7 @@ setup("create and publish test job as HRM1", async ({ page }) => {
     const storageState = JSON.parse(fs.readFileSync(AUTH_FILE, "utf-8"));
     deviceId =
       storageState.origins
-        ?.find((o: { origin: string }) => o.origin === "http://localhost:3000")
+        ?.find((o: { origin: string }) => o.origin === E2E_BASE_URL)
         ?.localStorage?.find((item: { name: string }) => item.name === "wfa_device_id")
         ?.value ?? "playwright-e2e-hrm1";
 

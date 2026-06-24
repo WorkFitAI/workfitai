@@ -24,7 +24,7 @@ export default function DashboardPage() {
     )
   }
 
-  if (roles.includes("ROLE_HR_MANAGER") || roles.includes("ROLE_HR")) {
+  if (roles.includes("ROLE_HR_MANAGER")) {
     return (
       <div className="space-y-4">
         <div>

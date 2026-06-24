@@ -12,6 +12,7 @@
 import { test as setup, expect } from '@playwright/test'
 import * as fs from 'fs'
 import * as path from 'path'
+import { buildAuthSessionCookie, readApiBase } from '../helpers/e2e-target'
 
 const DATA_DIR = path.join(__dirname, '../.data')
 const TEST_JOBS_FILE = path.join(DATA_DIR, 'test-jobs.json')
@@ -22,17 +23,6 @@ export interface TestJobEntry {
   jobTitle: string
   hrmKey: 'hrm1' | 'hrm2'
   createdAt: string
-}
-
-function readApiBase(): string {
-  if (process.env.NEXT_PUBLIC_API_BASE_URL) return process.env.NEXT_PUBLIC_API_BASE_URL
-  const envPath = path.join(__dirname, '../../.env.local')
-  if (fs.existsSync(envPath)) {
-    const raw = fs.readFileSync(envPath, 'utf8')
-    const match = raw.match(/^NEXT_PUBLIC_API_BASE_URL=(.+)$/m)
-    if (match) return match[1].trim()
-  }
-  return 'http://localhost:9085'
 }
 
 interface LoginResult {
@@ -91,18 +81,7 @@ async function switchSession(
 
   // Replace auth_session cookie with the new user's session
   await page.context().clearCookies()
-  await page.context().addCookies([
-    {
-      name: 'auth_session',
-      value: encodeURIComponent(JSON.stringify(session)),
-      domain: 'localhost',
-      path: '/',
-      expires: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60,
-      httpOnly: false,
-      secure: false,
-      sameSite: 'Lax',
-    },
-  ])
+  await page.context().addCookies([buildAuthSessionCookie(session)])
 
   // Replace localStorage tokens
   await page.evaluate(

@@ -21,6 +21,12 @@ import { candidateNavItems } from "@/lib/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { userService } from "@/lib/user/user-service"
 
+function visibleNavItems(roles: string[] | undefined) {
+  return candidateNavItems.filter(
+    (item) => !item.hideForRoles || !item.hideForRoles.some((r) => roles?.includes(r))
+  )
+}
+
 /** Guest auth buttons — Register text link + filled Sign In button */
 function GuestButtons({ scrolled }: { scrolled: boolean }) {
   return (
@@ -50,6 +56,9 @@ function UserDropdown() {
 
   const initials = user?.username?.charAt(0).toUpperCase() ?? "U"
   const firstName = user?.username?.split(" ")[0] ?? "User"
+  const roles = user?.roles ?? []
+  const isAdminOrHrm = roles.includes("ROLE_ADMIN") || roles.includes("ROLE_HR_MANAGER")
+  const isHr = roles.includes("ROLE_HR") && !isAdminOrHrm
 
   useEffect(() => {
     if (!user) return
@@ -81,12 +90,21 @@ function UserDropdown() {
           <DropdownMenuItem asChild>
             <Link href="/account-settings">Account Settings</Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/saved-jobs">Saved Jobs</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/applied-jobs">Applied Jobs</Link>
-          </DropdownMenuItem>
+          {isAdminOrHrm && (
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard">Back to Dashboard</Link>
+            </DropdownMenuItem>
+          )}
+          {isHr && (
+            <DropdownMenuItem asChild>
+              <Link href="/applications/my">Back to Applications</Link>
+            </DropdownMenuItem>
+          )}
+          {!isAdminOrHrm && !isHr && (
+            <DropdownMenuItem asChild>
+              <Link href="/applied-jobs">Applied Jobs</Link>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem className="text-destructive" onClick={logout}>
             Logout
@@ -99,8 +117,9 @@ function UserDropdown() {
 
 export function CandidateHeader() {
   const pathname = usePathname()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
   const [scrolled, setScrolled] = useState(false)
+  const navItems = visibleNavItems(user?.roles)
 
   useEffect(() => {
     function onScroll() {
@@ -139,7 +158,7 @@ export function CandidateHeader() {
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-6 md:flex">
-          {candidateNavItems.map((item) => {
+          {navItems.map((item) => {
             const isActive =
               pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
             return (
@@ -172,7 +191,7 @@ export function CandidateHeader() {
           <SheetContent side="right" className="flex w-64 flex-col">
             <SheetTitle className="sr-only">Navigation menu</SheetTitle>
             <nav className="mt-8 flex flex-col gap-2">
-              {candidateNavItems.map((item) => (
+              {navItems.map((item) => (
                 <SheetClose asChild key={item.href}>
                   <Link
                     href={item.href}

@@ -1,8 +1,13 @@
 import { defineConfig, devices } from '@playwright/test'
 import dotenv from 'dotenv'
 import path from 'path'
+import { E2E_BASE_URL } from './e2e/helpers/e2e-target'
 
 dotenv.config({ path: path.join(__dirname, '.env.local') })
+
+// Set E2E_BASE_URL (e.g. https://workfitai.uk) to run the suite against a deployed
+// environment instead of the local dev server — see e2e/helpers/e2e-target.ts.
+const isRemoteTarget = !!process.env.E2E_BASE_URL
 
 export default defineConfig({
   testDir: './e2e',
@@ -13,7 +18,7 @@ export default defineConfig({
   timeout: 60_000,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: E2E_BASE_URL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     channel: 'chrome',
@@ -184,13 +189,18 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
-    env: {
-      NODE_OPTIONS: '--max-old-space-size=4096',
-    },
-  },
+  // Skip launching the local dev server when targeting a deployed environment.
+  ...(isRemoteTarget
+    ? {}
+    : {
+        webServer: {
+          command: 'npm run dev',
+          url: 'http://localhost:3000',
+          reuseExistingServer: !process.env.CI,
+          timeout: 180_000,
+          env: {
+            NODE_OPTIONS: '--max-old-space-size=4096',
+          },
+        },
+      }),
 })

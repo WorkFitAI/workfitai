@@ -14,19 +14,7 @@
 import type { Page } from "@playwright/test";
 import * as fs from "fs";
 import * as path from "path";
-
-function readApiBase(): string {
-  if (process.env.NEXT_PUBLIC_API_BASE_URL)
-    return process.env.NEXT_PUBLIC_API_BASE_URL;
-  const envPath = path.join(__dirname, "../../.env.local");
-  if (fs.existsSync(envPath)) {
-    const match = fs
-      .readFileSync(envPath, "utf-8")
-      .match(/^NEXT_PUBLIC_API_BASE_URL=(.+)$/m);
-    if (match) return match[1].trim();
-  }
-  return "http://localhost:9085";
-}
+import { E2E_BASE_URL, buildAuthSessionCookie, readApiBase } from "./e2e-target";
 
 export async function injectAuthToken(
   page: Page,
@@ -42,7 +30,7 @@ export async function injectAuthToken(
     try {
       const storageState = JSON.parse(fs.readFileSync(authFilePath, "utf-8"));
       const found = storageState.origins
-        ?.find((o: { origin: string }) => o.origin === "http://localhost:3000")
+        ?.find((o: { origin: string }) => o.origin === E2E_BASE_URL)
         ?.localStorage?.find(
           (item: { name: string }) => item.name === "wfa_device_id",
         )?.value;
@@ -75,21 +63,8 @@ export async function injectAuthToken(
       companyId: companyId ?? null,
       expiresAt: Date.now() + (expiryInMs ?? 900_000),
     };
-    const sessionValue = encodeURIComponent(JSON.stringify(session));
-
     // Set auth_session so the Next.js SSR middleware grants access on navigation
-    await page.context().addCookies([
-      {
-        name: "auth_session",
-        value: sessionValue,
-        domain: "localhost",
-        path: "/",
-        expires: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60,
-        httpOnly: false,
-        secure: false,
-        sameSite: "Lax",
-      },
-    ]);
+    await page.context().addCookies([buildAuthSessionCookie(session)]);
 
     // Inject wfa_access_token so client-side API calls don't need a refresh round-trip
     const expiresAt = String(Date.now() + (expiryInMs ?? 900_000));

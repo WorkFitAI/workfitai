@@ -1,5 +1,6 @@
 import { MapPin } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import ApplyNowButton from "@/components/applications/apply-now-button";
 
 type Props = {
@@ -24,7 +25,7 @@ export default function FeaturedJobCard({
   skills
 }: Props) {
   return (
-    <div className="bg-white border rounded-xl p-5 hover:shadow-md transition mx-auto">
+    <div className="bg-white border rounded-xl p-5 hover:shadow-md transition mx-auto h-full flex flex-col">
       {/* company */}
       <div className="flex items-center gap-3 mb-4">
         <Image
@@ -44,10 +45,14 @@ export default function FeaturedJobCard({
       </div>
 
       {/* title */}
-      <h3 className="font-semibold text-sm mb-4">{title}</h3>
+      <Link href={`/jobs/${postId}`}>
+        <h3 className="font-semibold text-sm mb-4 line-clamp-2 hover:text-blue-600 hover:underline">
+          {title}
+        </h3>
+      </Link>
 
       {/* description */}
-      <p className="text-xs text-gray-500 mb-8 line-clamp-3">
+      <p className="text-xs text-gray-500 mb-8 line-clamp-2">
         {description}
       </p>
 
@@ -74,12 +79,12 @@ export default function FeaturedJobCard({
       </div>
 
       {/* footer */}
-      <div className="flex justify-between items-center gap-2">
+      <div className="flex justify-between items-center gap-2 mt-auto">
         <span className="text-blue-600 font-semibold text-sm">
-          {salary} 
+          {salary}
         </span>
 
-        <ApplyNowButton jobId={postId} jobTitle={title} />
+        <ApplyNowButton jobId={postId} jobTitle={title} iconOnly />
       </div>
     </div>
   );
