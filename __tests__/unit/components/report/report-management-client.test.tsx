@@ -91,6 +91,26 @@ describe("ReportManagementClient", () => {
           status: "PENDING",
           isDeleted: false,
           reports: [],
+          snapshot: {
+            snapshotId: "snapshot1",
+            title: "Senior Developer",
+            description: "A challenging role",
+            shortDescription: "Full-time position",
+            location: "San Francisco, CA",
+            currency: "USD",
+            salaryMin: 120000,
+            salaryMax: 180000,
+            requirements: "5+ years experience",
+            benefits: "Health insurance, 401k",
+            responsibilities: "Lead development",
+            educationLevel: "Bachelor's",
+            experienceLevel: "Senior",
+            requiredExperience: "5 years",
+            employmentType: "Full-time",
+            skills: "React, Node.js",
+            companyName: "Company A",
+            reportedAt: new Date().toISOString(),
+          }
         },
       ],
     });
@@ -194,6 +214,26 @@ describe("ReportManagementClient", () => {
           status: "PENDING",
           isDeleted: false,
           reports: [],
+          snapshot: { 
+            snapshotId: "snapshot1",
+            title: "Senior Developer",
+            description: "A challenging role",
+            shortDescription: "Full-time position",
+            location: "San Francisco, CA",
+            currency: "USD",
+            salaryMin: 120000,
+            salaryMax: 180000,
+            requirements: "5+ years experience",
+            benefits: "Health insurance, 401k",
+            responsibilities: "Lead development",
+            educationLevel: "Bachelor's",
+            experienceLevel: "Senior",
+            requiredExperience: "5 years",
+            employmentType: "Full-time",
+            skills: "React, Node.js, TypeScript",
+            companyName: "Tech Corp",
+            reportedAt: new Date().toISOString(),
+          },
         },
       ],
     });
@@ -211,7 +251,8 @@ describe("ReportManagementClient", () => {
     render(<ReportManagementClient />);
 
     await waitFor(() => {
-      expect(screen.getByTestId("report-card-job1")).toBeInTheDocument();
+      expect(screen.getByText("Senior Developer")).toBeInTheDocument();
+      expect(screen.getByText("Company A")).toBeInTheDocument();
     });
   });
 
@@ -322,6 +363,26 @@ describe("ReportManagementClient", () => {
           status: "PENDING",
           isDeleted: false,
           reports: [],
+          snapshot: {
+            snapshotId: "snapshot1",
+            title: "Senior Developer",
+            description: "A challenging role",
+            shortDescription: "Full-time position",
+            location: "San Francisco, CA",
+            currency: "USD",
+            salaryMin: 120000,
+            salaryMax: 180000,
+            requirements: "5+ years experience",
+            benefits: "Health insurance",
+            responsibilities: "Lead development",
+            educationLevel: "Bachelor's",
+            experienceLevel: "Senior",
+            requiredExperience: "5 years",
+            employmentType: "Full-time",
+            skills: "React, Node.js",
+            companyName: "Company A",
+            reportedAt: new Date().toISOString(),
+          },
         },
         {
           jobId: "job2",
@@ -330,6 +391,26 @@ describe("ReportManagementClient", () => {
           status: "IN_PROGRESS",
           isDeleted: false,
           reports: [],
+          snapshot: {
+            snapshotId: "snapshot2",
+            title: "Frontend Engineer",
+            description: "Frontend role",
+            shortDescription: "Contract position",
+            location: "New York, NY",
+            currency: "USD",
+            salaryMin: 100000,
+            salaryMax: 150000,
+            requirements: "3+ years experience",
+            benefits: "Remote work",
+            responsibilities: "Build UI",
+            educationLevel: "Bachelor's",
+            experienceLevel: "Mid-level",
+            requiredExperience: "3 years",
+            employmentType: "Contract",
+            skills: "React, Vue",
+            companyName: "Company B",
+            reportedAt: new Date().toISOString(),
+          },
         },
       ],
     });
@@ -341,8 +422,10 @@ describe("ReportManagementClient", () => {
     render(<ReportManagementClient />);
 
     await waitFor(() => {
-      expect(screen.getByTestId("report-card-job1")).toBeInTheDocument();
-      expect(screen.getByTestId("report-card-job2")).toBeInTheDocument();
+      expect(screen.getByText("Senior Developer")).toBeInTheDocument();
+      expect(screen.getByText("Frontend Engineer")).toBeInTheDocument();
+      expect(screen.getByText("Company A")).toBeInTheDocument();
+      expect(screen.getByText("Company B")).toBeInTheDocument();
     });
   });
 });

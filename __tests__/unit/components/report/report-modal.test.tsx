@@ -28,7 +28,7 @@ describe("ReportModal", () => {
 
     render(<ReportModal report={report} onClose={mockOnClose} />);
 
-    expect(screen.getByText(/Report Details/i)).toBeInTheDocument();
+    expect(screen.getByText(/Senior Developer/i)).toBeInTheDocument();
     expect(screen.getByText(/Tech Corp/i)).toBeInTheDocument();
   });
 
@@ -40,7 +40,7 @@ describe("ReportModal", () => {
 
     render(<ReportModal report={report} onClose={mockOnClose} />);
 
-    expect(screen.getByText(/Report Details/i)).toBeInTheDocument();
+    expect(screen.getByText(/Senior Developer/i)).toBeInTheDocument();
   });
 
   it("displays company name", () => {
@@ -84,7 +84,7 @@ describe("ReportModal", () => {
     render(<ReportModal report={report} onClose={mockOnClose} />);
 
     expect(screen.getByText("This job posting is spam")).toBeInTheDocument();
-    expect(screen.getByText("Created by: user123")).toBeInTheDocument();
+    expect(screen.getByText("by user123")).toBeInTheDocument();
   });
 
   it("displays multiple report details", () => {
@@ -105,8 +105,8 @@ describe("ReportModal", () => {
 
     expect(screen.getByText(/First report/i)).toBeInTheDocument();
     expect(screen.getByText(/Second report/i)).toBeInTheDocument();
-    expect(screen.getByText(/Created by: user1/i)).toBeInTheDocument();
-    expect(screen.getByText(/Created by: user2/i)).toBeInTheDocument();
+    expect(screen.getByText(/by user1/i)).toBeInTheDocument();
+    expect(screen.getByText(/by user2/i)).toBeInTheDocument();
   });
 
   /* =========================
@@ -124,7 +124,7 @@ describe("ReportModal", () => {
 
     render(<ReportModal report={report} onClose={mockOnClose} />);
 
-    const formattedDate = testDate.toLocaleString();
+    const formattedDate = testDate.toLocaleString("vi-VN");
     expect(screen.getByText(formattedDate)).toBeInTheDocument();
   });
 
@@ -194,7 +194,7 @@ describe("ReportModal", () => {
       <ReportModal report={report} onClose={mockOnClose} />
     );
 
-    const scrollableDivs = container.querySelectorAll("[class*='max-h']");
+    const scrollableDivs = container.querySelectorAll("[class*='overflow-y-auto']");
     expect(scrollableDivs.length).toBeGreaterThan(0);
   });
 
@@ -208,6 +208,68 @@ describe("ReportModal", () => {
 
     render(<ReportModal report={report} onClose={mockOnClose} />);
 
-    expect(screen.getByText(/Report Details/i)).toBeInTheDocument();
+    expect(screen.getByText(/Senior Developer/i)).toBeInTheDocument();
+  });
+
+  /* =========================
+     JOB SNAPSHOT DETAILS
+  ========================= */
+  it("displays job snapshot details (title, location, salary)", () => {
+    const report = createMockReport({
+      snapshot: {
+        title: "Senior Developer",
+        location: "San Francisco, CA",
+        salaryMin: 120000,
+        salaryMax: 180000,
+        skills: "React, Node.js, TypeScript",
+        description: "A challenging role for experienced developers",
+        requirements: "5+ years experience",
+        benefits: "Health insurance, 401k",
+        responsibilities: "Lead development",
+        snapshotId: "snapshot1",
+        shortDescription: "Full-time position",
+        currency: "USD",
+        educationLevel: "Bachelor's",
+        experienceLevel: "Senior",
+        requiredExperience: "5 years",
+        employmentType: "Full-time",
+        companyName: "Tech Corp",
+        reportedAt: new Date().toISOString(),
+      },
+    });
+
+    render(<ReportModal report={report} onClose={mockOnClose} />);
+
+    expect(screen.getByText(/Senior Developer/i)).toBeInTheDocument();
+    expect(screen.getByText(/San Francisco, CA/i)).toBeInTheDocument();
+    expect(screen.getByText(/\$120000 - \$180000/)).toBeInTheDocument();
+    expect(screen.getByText(/React, Node.js, TypeScript/)).toBeInTheDocument();
+  });
+
+  it("displays all job details sections", () => {
+    const report = createMockReport();
+
+    render(<ReportModal report={report} onClose={mockOnClose} />);
+
+    expect(screen.getByText(/Skills/i)).toBeInTheDocument();
+    expect(screen.getByText(/Description/i)).toBeInTheDocument();
+    expect(screen.getByText(/Requirements/i)).toBeInTheDocument();
+    expect(screen.getByText(/Benefits/i)).toBeInTheDocument();
+    expect(screen.getByText(/Responsibilities/i)).toBeInTheDocument();
+  });
+
+  it("displays activity count in report thread", () => {
+    const report = createMockReport({
+      reportCount: 3,
+      reports: [
+        createMockReportDetail({ reportId: "report1" }),
+        createMockReportDetail({ reportId: "report2" }),
+        createMockReportDetail({ reportId: "report3" }),
+      ],
+    });
+
+    render(<ReportModal report={report} onClose={mockOnClose} />);
+
+    expect(screen.getByText(/Activity \(3\)/)).toBeInTheDocument();
   });
 });
