@@ -56,7 +56,7 @@ export default function ReportCard({
       {/* LEFT CONTENT */}
       <div className="ml-3 flex-1">
         <div className="flex items-center gap-3">
-          <h2 className="font-semibold text-lg text-slate-800">
+          <h2 className="font-semibold text-md text-slate-800">
             {report.companyName} - {report.reportCount} reports
           </h2>
 
@@ -73,7 +73,7 @@ export default function ReportCard({
           <Link
             href={`/jobs/${report.jobId}`}
             target="_blank"
-            className="text-sm text-gray-500 hover:text-blue-500 flex items-center gap-1"
+            className="text-xs text-gray-500 hover:text-blue-500 flex items-center gap-1"
           >
             <MousePointerClick size={16} />
             View Job Post
@@ -106,7 +106,7 @@ export default function ReportCard({
                 | "DECLINE"
             )
           }
-          className={`px-2 py-2 rounded-md border text-sm font-medium ${getStatusColor(
+          className={`px-2 py-2 rounded-md border text-xs font-medium ${getStatusColor(
             report.status
           )} disabled:opacity-50`}
         >
