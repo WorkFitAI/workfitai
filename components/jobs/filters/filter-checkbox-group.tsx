@@ -5,7 +5,6 @@ import FilterCheckboxItem from "@/components/jobs/filters/filter-checkbox-item";
 
 type Item = {
   label: string;
-  count: number;
 };
 
 type Props = {
@@ -48,7 +47,6 @@ const FilterCheckboxGroup = ({ title, items, queryKey }: Props) => {
         <FilterCheckboxItem
           key={index}
           label={item.label}
-          count={item.count}
           value={item.label}
           checked={selected.includes(item.label)}
           onChange={handleChange}
