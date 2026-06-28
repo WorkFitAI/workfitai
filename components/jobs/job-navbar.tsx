@@ -5,24 +5,24 @@ import FilterSkills from "@/components/jobs/filters/filter-skills";
 import FilterJobCategory from "@/components/jobs/filters/filter-job-category";
 
 const experienceLevel = [
-  { label: "FRESHER", count: 9 },
-  { label: "JUNIOR", count: 12 },
-  { label: "MID", count: 23 },
-  { label: "SENIOR", count: 43 },
-  { label: "LEAD", count: 43 },
+  { label: "FRESHER"},
+  { label: "JUNIOR"},
+  { label: "MID" },
+  { label: "SENIOR" },
+  { label: "LEAD" },
 ];
 
 const employmentTypes = [
-  { label: "FULL_TIME", count: 24 },
-  { label: "PART_TIME", count: 45 },
-  { label: "CONTRACT", count: 56 },
-  { label: "INTERN", count: 45 },
-  { label: "REMOTE", count: 26 },
+  { label: "FULL_TIME" },
+  { label: "PART_TIME" },
+  { label: "CONTRACT"  },
+  { label: "INTERN"  },
+  { label: "REMOTE" },
 ];
 
 const JobNavbar = () => {
   return (
-    <div className="bg-white p-2">
+    <div className="bg-white rounded-xl border border-slate-200 p-5">
       <FilterHeader title="Advance Filter" action="Reset" />
 
       {/* Industry filter */}

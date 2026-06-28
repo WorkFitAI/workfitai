@@ -1,5 +1,6 @@
 "use client";
 
+import { Funnel } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 type Props = {
@@ -30,13 +31,16 @@ const FilterHeader = ({ title, action }: Props) => {
   };
 
   return (
-    <div className="flex justify-between items-center mb-4">
-      <h3 className="font-semibold text-gray-800">{title}</h3>
+    <div className="flex items-center justify-between px-0 text-black">
+      <div className="flex items-center gap-2">
+        <Funnel className="w-5 h-5" />
+        <h3 className="font-semibold">{title}</h3>
+      </div>
 
       {action && (
         <button
           onClick={handleReset}
-          className="text-sm text-blue-500 hover:text-gray-700 cursor-pointer"
+          className="text-sm text-blue-400 hover:text-blue-100"
         >
           {action}
         </button>

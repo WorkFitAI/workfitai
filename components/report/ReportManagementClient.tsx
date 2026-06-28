@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Building2, Eye, Flag, Lock, RotateCcwIcon, Search } from "lucide-react";
 import { reportService } from "@/lib/report/report-service";
@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { jobService } from "@/lib/job/job-service";
 import Link from "next/link";
 import StatusFilter from "./StatusFilter";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const ReportManagementClient = () => {
   const searchParams = useSearchParams();
@@ -20,10 +21,12 @@ const ReportManagementClient = () => {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
 
   const page = Number(searchParams.get("page") || 1);
-  const keyword = searchParams.get("keyword") || "";
+  const [keyword, setKeyword] = useState(searchParams.get("keyword") || "");
   const status = searchParams.get("status") || "";
 
   const [totalPages, setTotalPages] = useState(1);
+
+  const debouncedKeyword = useDebounce(keyword, 2000);
 
   const statusStyles = {
     PENDING: {
@@ -51,10 +54,10 @@ const ReportManagementClient = () => {
   const getStatusStyle = (status: keyof typeof statusStyles) =>
     statusStyles[status];
 
-  const fetchReports = async () => {
+  const fetchReports = useCallback(async () => {
     try {
       const res = await reportService.getReports(
-        keyword,
+        debouncedKeyword,
         status,
         page,
       );
@@ -66,12 +69,24 @@ const ReportManagementClient = () => {
         description: (err as Error).message,
       });
     }
-  };
+  }, [debouncedKeyword, status, page]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (debouncedKeyword) {
+      params.set("keyword", debouncedKeyword);
+    } else {
+      params.delete("keyword");
+    }
+
+    router.replace(`?${params.toString()}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedKeyword]);
+
+  useEffect(() => {
     fetchReports();
-  }, [keyword, status, page]);
+  }, [fetchReports]);
 
   const updateParams = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -113,12 +128,12 @@ const ReportManagementClient = () => {
   };
 
   return (
-    <div className="p-8 bg-slate-50/40 min-h-screen">
-      <div className="max-w-5xl mx-auto space-y-6">
+    <div className="py-8 bg-slate-50/40 min-h-screen">
+      <div className="space-y-6">
 
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold">Report Management</h1>
+          <h1 className="text-2xl font-semibold">Report Management</h1>
           <p className="text-gray-500 text-sm">
             Monitor and handle user reports
           </p>
@@ -134,7 +149,9 @@ const ReportManagementClient = () => {
             <input
               placeholder="Search reports..."
               value={keyword}
-              onChange={(e) => updateParams("keyword", e.target.value)}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+              }}
               className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm text-gray-700 shadow-sm
                         transition placeholder:text-gray-400
                         focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100 text-ellipsis"
@@ -146,7 +163,13 @@ const ReportManagementClient = () => {
             {/* RESET BUTTON */}
             <button
               onClick={() => {
-                router.push("/report");
+                  setKeyword("");
+
+                  const params = new URLSearchParams(searchParams.toString());
+                  params.delete("keyword");
+                  params.delete("status");
+
+                  router.replace(`?${params.toString()}`);
               }}
               className="px-2 py-2 text-gray-400 hover:text-red-600 transition"
             >
