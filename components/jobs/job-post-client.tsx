@@ -207,15 +207,15 @@ export default function JobAdminPage({ roles, companyId }: { roles: string[]; co
   };
 
   return (
-    <div className="p-8 bg-slate-50/30 min-h-screen">
-      <div className="max-w-5xl mx-auto">
+    <div className="bg-slate-50/30 min-h-screen">
+      <div>
         {/* HEADER SECTION */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
           <div>
-            <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 mb-2">
+            <h1 className="text-2xl font-semibold text-slate-900 mb-2">
               Job Postings
             </h1>
-            <p className="text-slate-500 max-w-lg">
+            <p className="text-slate-500 max-w-xl">
               Manage your career opportunities and track applicant engagement in real-time.
             </p>
           </div>
@@ -248,11 +248,11 @@ export default function JobAdminPage({ roles, companyId }: { roles: string[]; co
                     <div className="flex-1 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                       <div className="space-y-3">
                         <div className="flex items-center gap-3">
-                          <h3 className="font-bold text-xl text-slate-800 group-hover:text-blue-600 transition-colors">
+                          <h3 className="font-bold text-md text-slate-800 group-hover:text-blue-600 transition-colors">
                             <Link
                               href={`/jobs/${job.postId}`}
                               target="_blank"
-                              className="text-sm text-gray-500 hover:text-blue-500 flex items-center gap-1"
+                              className="text-gray-500 hover:text-blue-500 flex items-center gap-1"
                             >
                               {job.title}
                             </Link>
@@ -307,10 +307,10 @@ export default function JobAdminPage({ roles, companyId }: { roles: string[]; co
                           variant="ghost"
                           size="icon"
                           disabled={userType === "admin"}
-                          className="h-10 w-10 rounded-lg hover:bg-white hover:text-blue-600 hover:shadow-sm transition-all"
+                          className="h-8 w-8 rounded-lg hover:bg-white hover:text-blue-600 hover:shadow-sm transition-all"
                           onClick={() => handleOpenEdit(job)}
                         >
-                          <Pencil size={18} />
+                          <Pencil size={16} />
                         </Button>
 
                         <div className="w-[1px] h-6 bg-slate-200 mx-1" />
@@ -318,10 +318,10 @@ export default function JobAdminPage({ roles, companyId }: { roles: string[]; co
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-10 w-10 rounded-lg hover:bg-white hover:text-red-600 hover:shadow-sm transition-all"
+                          className="h-8 w-8 rounded-lg hover:bg-white hover:text-red-600 hover:shadow-sm transition-all"
                           onClick={() => handleDelete(job.postId)}
                         >
-                          <LockOpen size={18} />
+                          <LockOpen size={16} />
                         </Button>
                       </div>
                     </div>

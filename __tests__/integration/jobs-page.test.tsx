@@ -102,7 +102,12 @@ describe("JobsPageClient", () => {
     await waitFor(() =>
       expect(screen.queryByText(/loading/i)).not.toBeInTheDocument(),
     );
-    expect(screen.queryByRole("heading", { level: 2 })).toBeNull();
+    expect(
+      screen.getByRole("heading", { level: 2, name: /no jobs found/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /reset filters/i }),
+    ).toBeInTheDocument();
   });
 
   it("shows company name for each job card", async () => {

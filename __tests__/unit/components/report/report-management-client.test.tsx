@@ -11,6 +11,9 @@ import { createMockReportData, createMockReportResponse } from "@/__tests__/mock
 vi.mock("next/navigation");
 vi.mock("@/lib/report/report-service");
 vi.mock("@/lib/job/job-service");
+vi.mock("@/hooks/useDebounce", () => ({
+  useDebounce: <T,>(value: T) => value,
+}));
 
 vi.mock("@/components/report/ReportCard", () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,6 +44,7 @@ const mockedUseSearchParams = vi.mocked(useSearchParams);
 describe("ReportManagementClient", () => {
   const mockRouter = {
     push: vi.fn(),
+    replace: vi.fn(),
   };
 
   const mockSearchParams = {
@@ -155,7 +159,7 @@ describe("ReportManagementClient", () => {
     fireEvent.change(searchInput, { target: { value: "spam" } });
 
     await waitFor(() => {
-      expect(mockRouter.push).toHaveBeenCalled();
+      expect(mockRouter.replace).toHaveBeenLastCalledWith("?keyword=spam");
     });
   });
 
@@ -193,11 +197,14 @@ describe("ReportManagementClient", () => {
 
     render(<ReportManagementClient />);
 
+    const replaceCallsBeforeReset = mockRouter.replace.mock.calls.length;
+
     const resetButton = screen.getAllByRole("button").find(btn => btn.querySelector('svg[class*="RotateCcw"]') || btn.querySelector('svg[class*="rotate-ccw"]'));
     fireEvent.click(resetButton!);
 
     await waitFor(() => {
-      expect(mockRouter.push).toHaveBeenCalledWith("/report");
+      expect(mockRouter.replace.mock.calls.length).toBeGreaterThan(replaceCallsBeforeReset);
+      expect(mockRouter.replace).toHaveBeenLastCalledWith("?");
     });
   });
 

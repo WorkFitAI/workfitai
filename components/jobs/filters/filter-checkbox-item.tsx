@@ -1,6 +1,5 @@
 type Props = {
   label: string;
-  count: number;
   value: string;
   checked: boolean;
   onChange: (value: string, checked: boolean) => void;
@@ -8,7 +7,6 @@ type Props = {
 
 const FilterCheckboxItem = ({
   label,
-  count,
   value,
   checked,
   onChange,
@@ -25,10 +23,6 @@ const FilterCheckboxItem = ({
 
         <span className="text-sm text-gray-600">{label}</span>
       </div>
-
-      <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded">
-        {count}
-      </span>
     </label>
   );
 };

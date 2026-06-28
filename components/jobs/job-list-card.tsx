@@ -30,7 +30,7 @@ const JobListCard = ({ job }: Props) => {
           />
 
           <div>
-            <p className="font-bold text-gray-800">{job.company.name}</p>
+            <p className="text-md font-semibold text-blue-400">{job.company.name}</p>
 
             <p className="flex items-center text-xs text-gray-500 gap-1">
               <MapPin className="w-3 h-3 text-gray-400" />
@@ -54,7 +54,9 @@ const JobListCard = ({ job }: Props) => {
       </div>
 
       {/* Title */}
-      <h2 className="text-2xl font-bold text-gray-800">{job.title}</h2>
+    <h2 className="text-xl font-bold text-gray-800 overflow-hidden whitespace-nowrap text-ellipsis">
+      {job.title}
+    </h2>
 
       {/* Job info */}
       <div className="flex gap-3 text-xs text-gray-500">
@@ -81,7 +83,7 @@ const JobListCard = ({ job }: Props) => {
 
       {/* Bottom */}
       <div className="flex justify-between items-center mt-1">
-        <p className="text-blue-600 font-semibold text-md">
+        <p className="text-blue-400 font-semibold text-md">
           {job.currency === "USD" ? "$" : "₫"}
           {job.salaryMin.toLocaleString("en-US")} - {job.currency === "USD" ? "$" : "₫"}
           {job.salaryMax.toLocaleString("en-US")}
