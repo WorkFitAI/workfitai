@@ -29,8 +29,9 @@ export const JobDialog = ({ isOpen, onOpenChange, onSubmit, initialData, onSucce
           translate-x-0! translate-y-0!
         "
       >
-        <div className="h-full overflow-y-auto py-10 ">
-              <DialogHeader className="px-38">
+        <div className="h-full overflow-y-auto">
+          <div className="max-w-6xl mx-auto px-6 py-10">
+              <DialogHeader className="max-w-6xl mx-auto w-full px-6">
                 <DialogTitle className="text-3xl">{initialData ? "Edit Job" : "Add New Job"}</DialogTitle>
                 <DialogDescription>
                   Fill in the details for the job position you want to post.
@@ -44,6 +45,7 @@ export const JobDialog = ({ isOpen, onOpenChange, onSubmit, initialData, onSucce
                 }} 
                 onSuccess={onSuccess}
               />
+        </div>
         </div>
       </DialogContent>
     </Dialog>
