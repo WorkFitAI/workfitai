@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import SimilarJobCard from "@/components/jobs/detail/similar-jobs-card";
 import { jobService } from "@/lib/job/job-service";
 import { Job } from "@/types/job";
+import { formatSalary } from "@/lib/utils";
 type Props = {
   jobId: string;
 };
@@ -34,19 +35,22 @@ export default function SimilarJobs({ jobId }: Props) {
   return (
     <div className="bg-white rounded-xl border p-5">
       <h3 className="font-semibold text-gray-800 mb-4">Similar jobs</h3>
+      {jobs.map((job) => {
+        const symbol = job.currency === "USD" ? "$" : "đ";
 
-      {jobs.map((job) => (
-        <SimilarJobCard
-          key={job?.postId}
-          id={job?.postId}
-          title={job.title}
-          company={job.company.name}
-          location={job.company.address}
-          salary={`${job.salaryMin} - ${job.salaryMax}`}
-          type={job.employmentType}
-          logo={job.company.logoUrl}
-        />
-      ))}
+        return (
+          <SimilarJobCard
+            key={job.postId}
+            id={job.postId}
+            title={job.title}
+            company={job.company.name}
+            location={job.company.address}
+            salary={`${symbol}${formatSalary(job.salaryMin)} - ${symbol}${formatSalary(job.salaryMax)}`}
+            type={job.employmentType}
+            logo={job.company.logoUrl}
+          />
+        );
+      })}
     </div>
   );
 }

@@ -72,3 +72,15 @@ export const getPagination = (page: number, totalPages: number) => {
 
   return range;
 };
+
+export const formatSalary = (salary: number) => {
+  if (salary >= 1_000_000) {
+    const value = salary / 1_000_000;
+    return `${value.toLocaleString("vi-VN", {
+      minimumFractionDigits: value % 1 === 0 ? 0 : 1,
+      maximumFractionDigits: 1,
+    })}tr`;
+  }
+
+  return salary.toLocaleString("vi-VN");
+};

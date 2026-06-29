@@ -5,6 +5,7 @@ import FeaturedJobCard from "@/components/jobs/featured/featured-job-card";
 import { jobService } from "@/lib/job/job-service";
 import { Job } from "@/types/job";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { formatSalary } from "@/lib/utils";
 
 export default function FeaturedJobs() {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -54,19 +55,23 @@ export default function FeaturedJobs() {
 
       {/* job list */}
       <div className="grid grid-cols-4 gap-6">
-        {jobs.map((job) => (
-          <FeaturedJobCard
-            key={job.postId}
-            postId={job.postId}
-            logo={job.company.logoUrl}
-            company={job.company.name}
-            title={job.title}
-            location={job.company.address}
-            salary={`$${job.salaryMax} - $${job.salaryMin}`}
-            description={job.shortDescription}
-            skills={job.skillNames}
-          />
-        ))}
+        {jobs.map((job) => {
+        const symbol = job.currency === "USD" ? "$" : "đ";
+
+        return (
+            <FeaturedJobCard
+              key={job.postId}
+              postId={job.postId}
+              logo={job.company.logoUrl}
+              company={job.company.name}
+              title={job.title}
+              location={job.company.address}
+              salary={`${symbol}${formatSalary(job.salaryMin*1000000)} - ${symbol}${formatSalary(job.salaryMax*1000000)}`}
+              description={job.shortDescription}
+              skills={job.skillNames}
+            />
+          );
+        })}
       </div>
     </section>
   );
