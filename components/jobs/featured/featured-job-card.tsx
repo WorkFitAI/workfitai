@@ -79,8 +79,8 @@ export default function FeaturedJobCard({
       </div>
 
       {/* footer */}
-      <div className="flex justify-between items-center gap-2 mt-auto">
-        <span className="text-blue-600 font-semibold text-sm">
+      <div className="flex items-center justify-between gap-4">
+        <span className="text-blue-600 font-semibold text-sm whitespace-nowrap flex-shrink-0">
           {salary}
         </span>
 

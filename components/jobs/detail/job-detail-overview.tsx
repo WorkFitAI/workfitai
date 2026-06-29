@@ -1,3 +1,4 @@
+import { formatSalary } from "@/lib/utils";
 import { JobDetailOverviewProps } from "@/types/job";
 import {
   GraduationCap,
@@ -49,8 +50,8 @@ const JobDetailOverview = (props: JobDetailOverviewProps) => {
           </p>
           <p className="font-medium">
             {currency === "USD"
-              ? `$${salaryMin.toLocaleString()} - $${salaryMax.toLocaleString()}`
-              : `${salaryMin.toLocaleString()} VND - ${salaryMax.toLocaleString()} VND`}
+              ? `$${formatSalary(salaryMin)} - $${formatSalary(salaryMax)}`
+              : `${formatSalary(salaryMin)} - ${formatSalary(salaryMax)}`}
           </p>
         </div>
 

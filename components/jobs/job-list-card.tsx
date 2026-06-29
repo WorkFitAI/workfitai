@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Briefcase, MapPin, Clock, Layers2 } from "lucide-react";
 import { Job } from "@/types/job";
 import ApplyNowButton from "@/components/applications/apply-now-button";
+import { formatSalary } from "@/lib/utils";
 
 interface Props {
   job: Job;
@@ -84,9 +85,9 @@ const JobListCard = ({ job }: Props) => {
       {/* Bottom */}
       <div className="flex justify-between items-center mt-1">
         <p className="text-blue-400 font-semibold text-md">
-          {job.currency === "USD" ? "$" : "₫"}
-          {job.salaryMin.toLocaleString("en-US")} - {job.currency === "USD" ? "$" : "₫"}
-          {job.salaryMax.toLocaleString("en-US")}
+          {job.currency === "USD" ? "$" : "đ"}
+          {formatSalary(job.salaryMin)} - {job.currency === "USD" ? "$" : "đ"}
+          {formatSalary(job.salaryMax)}
         </p>
 
         {/* Stop card click from firing when interacting with the button */}

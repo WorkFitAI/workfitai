@@ -416,7 +416,7 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                         <FormItem>
                           <FormLabel className="text-xs font-bold uppercase">Min Salary</FormLabel>
                           <div className="relative">
-                            { currency === "USD" ? <DollarSign className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" /> : <span className="absolute left-3 top-2.5 w-4 h-4 text-slate-400 text-xs">₫</span>}
+                            { currency === "USD" ? <DollarSign className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" /> : <span className="absolute left-3 top-2.5 w-4 h-4 text-slate-400 text-xs">VND</span>}
                             <Input type="number" {...field} className="pl-9 h-10" />
                           </div>
                         </FormItem>
@@ -429,7 +429,7 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                         <FormItem>
                           <FormLabel className="text-xs font-bold uppercase">Max Salary</FormLabel>
                           <div className="relative">
-                            { currency === "USD" ? <DollarSign className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" /> : <span className="absolute left-3 top-2.5 w-4 h-4 text-slate-400 text-xs">₫</span>}
+                            { currency === "USD" ? <DollarSign className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" /> : <span className="absolute left-3 top-2.5 w-4 h-4 text-slate-400 text-xs">VND</span>}
                             <Input type="number" {...field} className="pl-9 h-10" />
                           </div>
                         </FormItem>
@@ -449,44 +449,41 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                       </FormItem>
                     )}
                   />
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="quantity"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-xs font-bold uppercase flex items-center gap-1">
-                            <Users className="w-3 h-3" /> Hiring Quantity
-                          </FormLabel>
-                          <Input type="number" {...field} className="h-10" />
-                        </FormItem>
-                      )}
-                    />
+                  <FormField
+                    control={form.control}
+                    name="quantity"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-bold uppercase flex items-center gap-1">
+                          <Users className="w-3 h-3" /> Hiring Quantity
+                        </FormLabel>
+                        <Input type="number" {...field} className="h-10" />
+                      </FormItem>
+                    )}
+                  />
 
-                    <FormField
-                      control={form.control}
-                      name="expiresAt"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                          <FormLabel className="text-xs font-bold flex items-center gap-1">
-                            <CalendarIcon className="w-3 h-3" />  <span className="uppercase">Deadline</span> <span className="text-red-500">(Date must be in future)</span>
-                          </FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button variant="outline" className="h-10 justify-start font-normal border-slate-200">
-                                <CalendarIcon className="mr-2 h-4 w-4 text-slate-400" />
-                                {field.value ? field.value.toLocaleDateString() : "Set expiration"}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="end">
-                              <Calendar mode="single" selected={field.value} onSelect={field.onChange} />
-                            </PopoverContent>
-                          </Popover>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
+                  <FormField
+                    control={form.control}
+                    name="expiresAt"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel className="text-xs font-bold flex items-center gap-1">
+                          <CalendarIcon className="w-3 h-3" /> <span className="uppercase">Deadline</span> <span className="text-red-500">(Date must be in future)</span>
+                        </FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" className="h-10 justify-start font-normal border-slate-200">
+                              <CalendarIcon className="mr-2 h-4 w-4 text-slate-400" />
+                              {field.value ? field.value.toLocaleDateString() : "Set expiration"}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="end">
+                            <Calendar mode="single" selected={field.value} onSelect={field.onChange} />
+                          </PopoverContent>
+                        </Popover>
+                      </FormItem>
+                    )}
+                  />
                   <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-md font-bold shadow-lg shadow-blue-200 transition-all active:scale-[0.98]">
                     <Save className="w-5 h-5 mr-2" />
                     SAVE JOB POST
