@@ -56,7 +56,7 @@ export function AdminDashboardClient() {
         <div className="col-span-2">
           <AdminTopJobsSection stats={data.applicationStats} />
         </div>
-        <AdminAuditOverviewSection stats={data.auditStats} />
+        <AdminAuditOverviewSection stats={data.auditStats} recentAuditErrors={data.recentAuditErrors ?? []} />
       </div>
     </div>
   )

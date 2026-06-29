@@ -68,6 +68,50 @@ export const cvService = {
   },
 
   /**
+   * GET /cv/candidate/download/{objectName} → Blob URL for inline preview.
+   * Caller must revoke the URL when done.
+   */
+  async fetchCvBlobUrl(objectName: string): Promise<string> {
+    const token = getAccessToken();
+    const deviceId = getDeviceId();
+    const headers: Record<string, string> = { "X-Device-Id": deviceId };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    const response = await fetch(
+      `${API_BASE}/cv/candidate/download/${objectName}`,
+      { method: "GET", headers, credentials: "include" },
+    );
+    if (!response.ok) throw new Error(`CV fetch failed (${response.status})`);
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
+  },
+
+  /**
+   * Download a self-uploaded CV by its objectName without a full CVMetadata object.
+   */
+  async downloadCvByObjectName(objectName: string, fileName?: string): Promise<void> {
+    const token = getAccessToken();
+    const deviceId = getDeviceId();
+    const headers: Record<string, string> = { "X-Device-Id": deviceId };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    const response = await fetch(
+      `${API_BASE}/cv/candidate/download/${objectName}`,
+      { method: "GET", headers, credentials: "include" },
+    );
+    if (!response.ok) throw new Error(`CV download failed (${response.status})`);
+    const uuidPrefix = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-/i;
+    const autoName = objectName.replace(uuidPrefix, "") || objectName;
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = fileName ?? autoName;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  },
+
+  /**
    * Download CV file as PDF blob via authenticated fetch.
    * Routes through backend (/cv/candidate/download/{objectName}) to avoid
    * direct MinIO access from browser (pdfUrl is an internal Docker URL).

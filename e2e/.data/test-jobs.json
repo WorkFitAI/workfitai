@@ -1,3 +1,64 @@
 {
-  "jobs": []
+  "jobs": [
+    {
+      "jobId": "c1245e9f-f671-4f70-9d85-f1e49b0ca18b",
+      "jobTitle": "Senior Backend Engineer - NodeJS / NestJS",
+      "hrmKey": "hrm1",
+      "createdAt": "2026-06-29T00:38:28.941Z"
+    },
+    {
+      "jobId": "02bb9c65-e9dc-4734-b3fd-2128ad6aff24",
+      "jobTitle": "Frontend Developer - React / TypeScript",
+      "hrmKey": "hrm1",
+      "createdAt": "2026-06-29T00:38:48.644Z"
+    },
+    {
+      "jobId": "27424859-2bee-48bc-9118-b6a533bf74d7",
+      "jobTitle": "Fullstack Engineer - Next.js / NodeJS",
+      "hrmKey": "hrm1",
+      "createdAt": "2026-06-29T00:39:10.609Z"
+    },
+    {
+      "jobId": "2b15b201-de7f-4c4e-bc87-6d451f63c82a",
+      "jobTitle": "Mobile Developer - React Native",
+      "hrmKey": "hrm1",
+      "createdAt": "2026-06-29T00:39:31.893Z"
+    },
+    {
+      "jobId": "9caf1476-f461-4162-9803-48e8a8b9eb35",
+      "jobTitle": "DevOps Engineer - AWS / Kubernetes",
+      "hrmKey": "hrm1",
+      "createdAt": "2026-06-29T00:39:52.195Z"
+    },
+    {
+      "jobId": "213ecd8d-085a-455f-9615-417d5b809d0d",
+      "jobTitle": "Cloud Solutions Architect - AWS / GCP",
+      "hrmKey": "hrm2",
+      "createdAt": "2026-06-29T00:40:12.034Z"
+    },
+    {
+      "jobId": "fac3830e-3027-43bb-9789-d12fdab1b297",
+      "jobTitle": "Data Engineer - Apache Spark / Airflow",
+      "hrmKey": "hrm2",
+      "createdAt": "2026-06-29T00:40:31.405Z"
+    },
+    {
+      "jobId": "91ca33af-05ec-4c3c-af57-7a8198711366",
+      "jobTitle": "Data Scientist - Machine Learning",
+      "hrmKey": "hrm2",
+      "createdAt": "2026-06-29T00:40:51.072Z"
+    },
+    {
+      "jobId": "c731c2dc-2534-4003-a73e-65bd6eaff829",
+      "jobTitle": "Cybersecurity Engineer - Application Security",
+      "hrmKey": "hrm2",
+      "createdAt": "2026-06-29T00:41:11.451Z"
+    },
+    {
+      "jobId": "6521560b-0c45-4bbc-8e0c-1d2e7e8ef249",
+      "jobTitle": "AI Engineer - LLM & Generative AI",
+      "hrmKey": "hrm2",
+      "createdAt": "2026-06-29T00:41:35.453Z"
+    }
+  ]
 }

@@ -109,6 +109,7 @@ export interface AdminDashboardData {
   jobStats: AdminJobStats | null
   topSkills: TopSkill[]
   auditStats: AuditStats | null
+  recentAuditErrors: AuditEventItem[]
 }
 
 // ── HRM Dashboard ──────────────────────────────────────────────────────────
@@ -173,6 +174,8 @@ export interface AuditEventItem {
   entityType: string
   entityId: string
   action: string
+  before?: unknown
+  after?: unknown
   occurredAt: string
   displayMessage: string
   success: boolean

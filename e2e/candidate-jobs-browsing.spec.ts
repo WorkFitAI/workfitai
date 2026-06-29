@@ -26,7 +26,7 @@ test.describe('Jobs Browsing — Candidate', () => {
   test('jobs page renders main heading and content area', async ({ page }) => {
     await page.goto('/jobs')
     await expect(page).toHaveURL(/\/jobs/, { timeout: 15_000 })
-    await expect(page.locator('main')).toBeVisible({ timeout: 10_000 })
+    await expect(page.locator('main').first()).toBeVisible({ timeout: 10_000 })
     const heading = page
       .getByRole('heading', { name: /jobs?/i })
       .or(page.getByText(/find.*job|browse.*job|job.*listing/i).first())
@@ -121,7 +121,7 @@ test.describe('Jobs Browsing — Candidate', () => {
     await page.waitForTimeout(600) // debounce
 
     // Page should show results or empty state — no error page
-    const hasMain = await page.locator('main').isVisible({ timeout: 5_000 }).catch(() => false)
+    const hasMain = await page.locator('main').first().isVisible({ timeout: 5_000 }).catch(() => false)
     expect(hasMain).toBeTruthy()
   })
 
@@ -148,7 +148,7 @@ test.describe('Jobs Browsing — Candidate', () => {
       .isVisible({ timeout: 8_000 })
       .catch(() => false)
 
-    const hasContent = await page.locator('main').isVisible().catch(() => false)
+    const hasContent = await page.locator('main').first().isVisible().catch(() => false)
     // Either an explicit empty state or main stays rendered — never a crash
     expect(hasContent).toBeTruthy()
     if (hasEmptyState) {
@@ -311,7 +311,7 @@ test.describe('Jobs Browsing — Candidate', () => {
       .catch(() => false)
 
     // Salary may not always be shown — page should still render cleanly
-    const hasMain = await page.locator('main').isVisible().catch(() => false)
+    const hasMain = await page.locator('main').first().isVisible().catch(() => false)
     expect(hasMain).toBeTruthy()
     if (hasSalary) expect(hasSalary).toBeTruthy()
   })
@@ -368,7 +368,7 @@ test.describe('Jobs Browsing — Candidate', () => {
 
     await page.goBack()
     await expect(page).toHaveURL(/\/jobs$/, { timeout: 10_000 })
-    await expect(page.locator('main')).toBeVisible({ timeout: 5_000 })
+    await expect(page.locator('main').first()).toBeVisible({ timeout: 5_000 })
   })
 })
 
@@ -380,7 +380,7 @@ test.describe('Jobs Browsing — unauthenticated', () => {
     await page.goto('/jobs')
     await page.waitForLoadState('load')
 
-    await expect(page.locator('main')).toBeVisible({ timeout: 10_000 })
+    await expect(page.locator('main').first()).toBeVisible({ timeout: 10_000 })
 
     const jobLink = page.locator('a[href*="/jobs/"]').first()
     if (!(await jobLink.isVisible({ timeout: 5_000 }).catch(() => false))) {
@@ -426,7 +426,7 @@ test.describe('Jobs Browsing — unauthenticated', () => {
     await expect(page).toHaveURL(/\/jobs/, { timeout: 15_000 })
     // Must not redirect to login
     await expect(page).not.toHaveURL(/\/login/)
-    await expect(page.locator('main')).toBeVisible({ timeout: 10_000 })
+    await expect(page.locator('main').first()).toBeVisible({ timeout: 10_000 })
   })
 })
 
@@ -454,7 +454,7 @@ for (const { num, email, password } of [
     test(`candidate${num} can browse the jobs listing page`, async ({ page }) => {
       await page.goto('/jobs')
       await expect(page).toHaveURL(/\/jobs/, { timeout: 15_000 })
-      await expect(page.locator('main')).toBeVisible({ timeout: 10_000 })
+      await expect(page.locator('main').first()).toBeVisible({ timeout: 10_000 })
     })
 
     test(`candidate${num} can search for a job by keyword`, async ({ page }) => {

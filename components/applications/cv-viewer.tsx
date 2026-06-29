@@ -3,14 +3,18 @@
 import { useEffect, useState, useRef } from "react";
 import { AlertCircle, Download } from "lucide-react";
 import { applicationService } from "@/lib/application/application-service";
+import { cvService } from "@/lib/cv/cv-service";
 import { LottieLoader } from "@/components/ui/lottie-loader";
 
 interface CvViewerProps {
-  applicationId: string;
+  /** Use for CVs linked to an application (HRM panel, applied-jobs detail). */
+  applicationId?: string;
+  /** Use for self-uploaded CVs on the My CVs page. */
+  objectName?: string;
   fileName?: string;
 }
 
-export function CvViewer({ applicationId, fileName }: CvViewerProps) {
+export function CvViewer({ applicationId, objectName, fileName }: CvViewerProps) {
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
@@ -18,14 +22,20 @@ export function CvViewer({ applicationId, fileName }: CvViewerProps) {
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const urlRef = useRef<string | null>(null);
 
-  // Fetch blob for inline preview on mount; revoke on unmount
   useEffect(() => {
+    if (!applicationId && !objectName) return;
+
     let cancelled = false;
     setPreviewLoading(true);
     setPreviewError(null);
+    setBlobUrl(null);
+    if (urlRef.current) { URL.revokeObjectURL(urlRef.current); urlRef.current = null; }
 
-    applicationService
-      .fetchCvBlobUrl(applicationId)
+    const fetchBlob = applicationId
+      ? applicationService.fetchCvBlobUrl(applicationId)
+      : cvService.fetchCvBlobUrl(objectName!);
+
+    fetchBlob
       .then((url) => {
         if (cancelled) { URL.revokeObjectURL(url); return; }
         urlRef.current = url;
@@ -38,13 +48,17 @@ export function CvViewer({ applicationId, fileName }: CvViewerProps) {
       cancelled = true;
       if (urlRef.current) { URL.revokeObjectURL(urlRef.current); urlRef.current = null; }
     };
-  }, [applicationId]);
+  }, [applicationId, objectName]);
 
   const handleDownload = async () => {
     setDownloading(true);
     setDownloadError(null);
     try {
-      await applicationService.downloadCv(applicationId, fileName);
+      if (applicationId) {
+        await applicationService.downloadCv(applicationId, fileName);
+      } else if (objectName) {
+        await cvService.downloadCvByObjectName(objectName, fileName);
+      }
     } catch {
       setDownloadError("Download failed. Please try again.");
     } finally {

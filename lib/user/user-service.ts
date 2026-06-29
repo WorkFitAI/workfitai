@@ -12,6 +12,8 @@ import {
   ChangePasswordRequest,
   EnableTwoFactorRequest,
   DisableTwoFactorRequest,
+  UserProfileSettings,
+  UpdateProfileSettingsRequest,
 } from "@/types/user";
 
 export const userService = {
@@ -93,6 +95,23 @@ export const userService = {
   ): Promise<ApiResponse<PrivacySettings>> {
     return apiClient.put<ApiResponse<PrivacySettings>>(
       "/user/profile/privacy-settings",
+      data,
+    );
+  },
+
+  // ─── Unified profile settings (GET /PUT /user/profile/settings) ─────────
+
+  async getProfileSettings(): Promise<ApiResponse<UserProfileSettings>> {
+    return apiClient.get<ApiResponse<UserProfileSettings>>(
+      "/user/profile/settings",
+    );
+  },
+
+  async updateProfileSettings(
+    data: UpdateProfileSettingsRequest,
+  ): Promise<ApiResponse<unknown>> {
+    return apiClient.put<ApiResponse<unknown>>(
+      "/user/profile/settings",
       data,
     );
   },
