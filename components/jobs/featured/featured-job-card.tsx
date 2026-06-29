@@ -74,9 +74,9 @@ export default function FeaturedJobCard({
       </div>
 
       {/* footer */}
-      <div className="flex justify-between items-center gap-2">
-        <span className="text-blue-600 font-semibold text-sm">
-          {salary} 
+      <div className="flex items-center justify-between gap-4">
+        <span className="text-blue-600 font-semibold text-sm whitespace-nowrap flex-shrink-0">
+          {salary}
         </span>
 
         <ApplyNowButton jobId={postId} jobTitle={title} />

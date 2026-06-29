@@ -416,7 +416,7 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                         <FormItem>
                           <FormLabel className="text-xs font-bold uppercase">Min Salary</FormLabel>
                           <div className="relative">
-                            { currency === "USD" ? <DollarSign className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" /> : <span className="absolute left-3 top-2.5 w-4 h-4 text-slate-400 text-xs">₫</span>}
+                            { currency === "USD" ? <DollarSign className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" /> : <span className="absolute left-3 top-2.5 w-4 h-4 text-slate-400 text-xs">VND</span>}
                             <Input type="number" {...field} className="pl-9 h-10" />
                           </div>
                         </FormItem>
@@ -429,7 +429,7 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                         <FormItem>
                           <FormLabel className="text-xs font-bold uppercase">Max Salary</FormLabel>
                           <div className="relative">
-                            { currency === "USD" ? <DollarSign className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" /> : <span className="absolute left-3 top-2.5 w-4 h-4 text-slate-400 text-xs">₫</span>}
+                            { currency === "USD" ? <DollarSign className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" /> : <span className="absolute left-3 top-2.5 w-4 h-4 text-slate-400 text-xs">VND</span>}
                             <Input type="number" {...field} className="pl-9 h-10" />
                           </div>
                         </FormItem>
