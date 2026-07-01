@@ -4,6 +4,7 @@ import { Globe, Pin, UserRoundPlus, Users } from "lucide-react";
 import { Company } from "@/types/company";
 
 import JobLocationMap from "@/components/jobs/detail/job-location-map";
+import Link from "next/link";
 
 interface CompanyCardProps {
   company: Company;
@@ -57,9 +58,15 @@ const CompanyCard = ({
         </div>
       </div>
 
-      <button className="mt-4 w-full border rounded-lg py-2 hover:bg-gray-50">
+      
+      <Link
+        href={`/companies/${company.companyNo}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-4 w-full block text-center border rounded-lg py-2 hover:bg-gray-100 active:scale-[0.99] transition"
+      >
         View Company
-      </button>
+      </Link>
 
       <JobLocationMap address={company?.address || ""} />
     </div>

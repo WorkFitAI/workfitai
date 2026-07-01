@@ -1,7 +1,7 @@
 import { CreateJobCategoryRequest, GetJobsParams, Job, JobCategoriesResponse, JobCategory, JobData, JobDetail } from "@/types/job";
 import { ApiResponse } from "@/types/response";
 import { apiClient } from "@/lib/api-client";
-import { SkillResponse } from "@/types/skill";
+import { CreateSkillRequest, Skill, SkillResponse } from "@/types/skill";
 import { JobFormValues } from "@/lib/schemas/job-schemas";
 
 export const jobService = {
@@ -138,6 +138,24 @@ export const jobService = {
 
     return res;
   },
+
+  async createSkill(
+    data: CreateSkillRequest,
+  ) {
+    const res = await apiClient.post(
+      "/job/public/skills",
+      data,
+    ) as ApiResponse<Skill>;
+
+    console.log("Create skill response:", res);
+
+    if (!res.status || res.status >= 400) {
+      throw new Error("Failed to create skill");
+    }
+
+    return res;
+  },
+
 }
 
 const rolePathMap: Record<string, string> = {
