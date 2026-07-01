@@ -11,3 +11,7 @@ export type SkillResponse = {
     total: number;
   };
 };
+
+export type CreateSkillRequest = {
+  name: string;
+};
