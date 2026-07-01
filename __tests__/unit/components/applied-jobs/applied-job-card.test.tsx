@@ -45,17 +45,14 @@ describe('AppliedJobCard', () => {
     expect(screen.getAllByText('—').length).toBeGreaterThan(0)
   })
 
-  it.each<ApplicationStatus>(['DRAFT', 'APPLIED', 'REVIEWING'])(
-    'shows withdraw button for withdrawable status: %s',
-    (status) => {
-      const app = mockApplication({ status })
-      render(<AppliedJobCard application={app} onWithdrawn={vi.fn()} />)
-      // Withdraw dialog trigger renders a Trash2 icon button with title
-      expect(screen.getByTitle('Withdraw application')).toBeInTheDocument()
-    }
-  )
+  it('shows withdraw button for withdrawable status: APPLIED', () => {
+    const app = mockApplication({ status: 'APPLIED' })
+    render(<AppliedJobCard application={app} onWithdrawn={vi.fn()} />)
+    // Withdraw dialog trigger renders a Trash2 icon button with title
+    expect(screen.getByTitle('Withdraw application')).toBeInTheDocument()
+  })
 
-  it.each<ApplicationStatus>(['OFFER', 'HIRED', 'REJECTED', 'WITHDRAWN'])(
+  it.each<ApplicationStatus>(['DRAFT', 'REVIEWING', 'OFFER', 'HIRED', 'REJECTED', 'WITHDRAWN'])(
     'hides withdraw button for non-withdrawable status: %s',
     (status) => {
       const app = mockApplication({ status })

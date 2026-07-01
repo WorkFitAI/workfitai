@@ -23,8 +23,10 @@ import {
   ChevronRight,
 } from "lucide-react"
 import { useAdminUser } from "@/hooks/useAdminUsers"
+import { useAuth } from "@/contexts/auth-context"
 import { UserStatusBadge } from "@/components/users/user-status-badge"
 import { UserRoleBadge } from "@/components/users/user-role-badge"
+import { UserRolesPanel } from "@/components/roles/user-roles-panel"
 import type { AdminUserStatus } from "@/types/admin-user"
 
 /** Returns true for statuses that should show the Unblock action */
@@ -101,6 +103,10 @@ interface UserDetailProps {
 }
 
 export function UserDetail({ userId }: UserDetailProps) {
+  const { user: currentUser } = useAuth()
+  const isAdmin = currentUser?.roles?.includes("ROLE_ADMIN") ?? false
+  const isHrManager = currentUser?.roles?.includes("ROLE_HR_MANAGER") ?? false
+
   const {
     user,
     fullProfile,
@@ -185,6 +191,16 @@ export function UserDetail({ userId }: UserDetailProps) {
           </button>
         </div>
       </div>
+
+      {/* Roles management panel */}
+      {(isAdmin || isHrManager) && (
+        <UserRolesPanel
+          username={user.username}
+          isAdmin={isAdmin}
+          isHrManager={isHrManager}
+          targetUserRole={user.userRole}
+        />
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Left — Basic info */}

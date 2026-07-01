@@ -34,10 +34,12 @@ export default function ApplicationWithdrawDialog({
 }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [withdrawError, setWithdrawError] = useState<string | null>(null);
 
   const handleWithdraw = async () => {
     try {
       setLoading(true);
+      setWithdrawError(null);
       await applicationService.withdrawApplication(applicationId);
       if (onWithdrawn) {
         onWithdrawn();
@@ -46,6 +48,7 @@ export default function ApplicationWithdrawDialog({
       }
     } catch (error) {
       console.error("Withdraw error:", error);
+      setWithdrawError("Failed to withdraw application. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -79,6 +82,9 @@ export default function ApplicationWithdrawDialog({
             This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
+        {withdrawError && (
+          <p className="px-1 text-sm text-destructive">{withdrawError}</p>
+        )}
         <AlertDialogFooter>
           <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
           <AlertDialogAction

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Building2, Loader2, Mail, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PasswordInput } from "@/components/auth/password-input";
+import { AuthFormField } from "@/components/auth/auth-form-field";
+import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter";
 import { authService } from "@/lib/auth/auth-service";
 import {
   candidateRegisterSchema,
@@ -46,10 +49,11 @@ function AccountTypeSelector({
   return (
     <div className="grid grid-cols-2 gap-3">
       {accountTypes.map(({ id, icon: Icon, title, desc }) => (
-        <button
+        <motion.button
           key={id}
           type="button"
           onClick={() => onChange(id)}
+          whileTap={{ scale: 0.97 }}
           className={cn(
             "flex flex-col items-center gap-2 rounded-lg border-2 p-4 text-center transition-colors",
             value === id
@@ -60,7 +64,7 @@ function AccountTypeSelector({
           <Icon className="h-8 w-8" />
           <span className="font-semibold text-foreground">{title}</span>
           <span className="text-xs text-muted-foreground">{desc}</span>
-        </button>
+        </motion.button>
       ))}
     </div>
   );
@@ -75,10 +79,13 @@ export function RegisterFormCandidate() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<CandidateRegisterFormValues>({
     resolver: zodResolver(candidateRegisterSchema),
   });
+
+  const passwordValue = watch("password", "");
 
   async function onSubmit(data: CandidateRegisterFormValues) {
     if (!agreeTerms) {
@@ -111,39 +118,25 @@ export function RegisterFormCandidate() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {/* Full name (maps to existing fullName field) */}
-      <div className="space-y-1">
-        <Label htmlFor="c-fullName">Full Name</Label>
-        <div className="relative">
-          <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            id="c-fullName"
-            placeholder="Full name"
-            className="h-12 rounded-lg pl-10"
-            {...register("fullName")}
-          />
-        </div>
-        {errors.fullName && (
-          <p className="text-sm text-destructive">{errors.fullName.message}</p>
-        )}
-      </div>
+      <AuthFormField
+        id="c-fullName"
+        label="Full Name"
+        icon={User}
+        placeholder="Full name"
+        error={errors.fullName?.message}
+        {...register("fullName")}
+      />
 
       {/* Email */}
-      <div className="space-y-1">
-        <Label htmlFor="c-email">Email</Label>
-        <div className="relative">
-          <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            id="c-email"
-            type="email"
-            placeholder="Email address"
-            className="h-12 rounded-lg pl-10"
-            {...register("email")}
-          />
-        </div>
-        {errors.email && (
-          <p className="text-sm text-destructive">{errors.email.message}</p>
-        )}
-      </div>
+      <AuthFormField
+        id="c-email"
+        label="Email"
+        icon={Mail}
+        type="email"
+        placeholder="Email address"
+        error={errors.email?.message}
+        {...register("email")}
+      />
 
       {/* Phone */}
       <div className="space-y-1">
@@ -168,13 +161,16 @@ export function RegisterFormCandidate() {
       </div>
 
       {/* Password */}
-      <PasswordInput
-        id="c-password"
-        label="Password"
-        placeholder="Password"
-        error={errors.password?.message}
-        {...register("password")}
-      />
+      <div className="space-y-1">
+        <PasswordInput
+          id="c-password"
+          label="Password"
+          placeholder="Password"
+          error={errors.password?.message}
+          {...register("password")}
+        />
+        <PasswordStrengthMeter value={passwordValue} />
+      </div>
 
       {/* Confirm Password */}
       <PasswordInput

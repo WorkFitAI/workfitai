@@ -19,7 +19,7 @@ import { server } from "../mocks/server";
 import { apiSuccess, apiError, mockHRUser } from "../mocks/handlers";
 import HrManagementClient from "@/app/(control)/hr-management/hr-management-client";
 
-const API = "https://be.workfitai.uk";
+const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://be.workfitai.uk";
 
 // vi.hoisted ensures these refs are available inside vi.mock() factory closures
 // (vi.mock is hoisted to the top of the file by Vitest's transform, before const declarations)

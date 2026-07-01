@@ -18,7 +18,7 @@ export function AuthPageIllustration() {
   )
 }
 
-function HotAirBalloonSvg() {
+export function HotAirBalloonSvg() {
   return (
     <svg width="180" height="220" viewBox="0 0 180 220" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       {/* Clouds */}
@@ -50,7 +50,7 @@ function HotAirBalloonSvg() {
   )
 }
 
-function CitySilhouetteSvg() {
+export function CitySilhouetteSvg() {
   return (
     <svg width="420" height="120" viewBox="0 0 420 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       {/* Buildings */}

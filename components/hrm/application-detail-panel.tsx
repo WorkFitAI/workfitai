@@ -14,6 +14,7 @@ interface ApplicationDetailPanelProps {
   currentUsername: string;
   onClose: () => void;
   onRefresh: () => void;
+  canUpdateStatus?: boolean;
 }
 
 export function ApplicationDetailPanel({
@@ -21,6 +22,7 @@ export function ApplicationDetailPanel({
   currentUsername,
   onClose,
   onRefresh,
+  canUpdateStatus = true,
 }: ApplicationDetailPanelProps) {
   const [showStatusModal, setShowStatusModal] = useState(false);
 
@@ -161,15 +163,17 @@ export function ApplicationDetailPanel({
             >
               Close
             </button>
-            <button
-              onClick={() => {
-                clearStatusError();
-                setShowStatusModal(true);
-              }}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
-            >
-              Update Status
-            </button>
+            {canUpdateStatus && (
+              <button
+                onClick={() => {
+                  clearStatusError();
+                  setShowStatusModal(true);
+                }}
+                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+              >
+                Update Status
+              </button>
+            )}
           </div>
         </div>
       </div>

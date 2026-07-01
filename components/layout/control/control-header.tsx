@@ -2,7 +2,8 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Bell, Calendar, ChevronRight, Home, Search } from "lucide-react"
+import { Calendar, ChevronRight, Home, Search } from "lucide-react"
+import { NotificationBell } from "@/components/notifications/notification-bell"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -99,14 +100,7 @@ export function ControlHeader() {
           <Calendar className="h-5 w-5" />
         </button>
 
-        {/* Notification bell */}
-        <button
-          aria-label="Notifications"
-          className="relative flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-        >
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-blue-600 ring-2 ring-white" />
-        </button>
+        <NotificationBell />
 
         {/* User avatar dropdown */}
         <DropdownMenu>

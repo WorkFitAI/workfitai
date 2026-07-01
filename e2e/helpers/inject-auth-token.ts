@@ -1,16 +1,14 @@
 /**
- * Utility for Playwright e2e tests — injects a fresh access token into sessionStorage
+ * Utility for Playwright e2e tests — injects a fresh access token into localStorage
  * AND sets the auth_session cookie needed for Next.js SSR middleware.
  *
- * Problem: storageState persists cookies + localStorage but NOT sessionStorage.
- * The wfa_access_token lives in sessionStorage, so spec tests start without it.
- * Without it the first API call gets 401, the refresh fails (no refreshToken cookie
- * in the storageState from the backend domain be.workfitai.uk), and the page
- * redirects to /login.
+ * storageState persists cookies + localStorage (including wfa_access_token since the
+ * switch from sessionStorage). However tokens expire, so we still fetch a fresh one
+ * before each test to guarantee the token is valid for the test duration.
  *
  * Fix: before each test, call page.request.post to get a fresh access token, then:
  *   1. Add the auth_session cookie so the SSR middleware grants access on navigation
- *   2. Use page.addInitScript to inject wfa_access_token into sessionStorage so
+ *   2. Use page.addInitScript to inject wfa_access_token into localStorage so
  *      client-side API calls succeed immediately without a refresh round-trip.
  */
 import type { Page } from "@playwright/test";
@@ -97,8 +95,8 @@ export async function injectAuthToken(
     const expiresAt = String(Date.now() + (expiryInMs ?? 900_000));
     await page.addInitScript(
       ({ token, expiry }: { token: string; expiry: string }) => {
-        sessionStorage.setItem("wfa_access_token", token);
-        sessionStorage.setItem("wfa_token_expiry", expiry);
+        localStorage.setItem("wfa_access_token", token);
+        localStorage.setItem("wfa_token_expiry", expiry);
       },
       { token: accessToken, expiry: expiresAt },
     );

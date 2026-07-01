@@ -13,7 +13,7 @@ import {
 } from "../../mocks/handlers";
 import { useApplicationDetail } from "@/hooks/useApplicationDetail";
 
-const API = "https://be.workfitai.uk";
+const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://be.workfitai.uk";
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }));
 afterEach(() => server.resetHandlers());

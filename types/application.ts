@@ -264,3 +264,30 @@ export interface CandidateListData {
   items: HRCandidateItem[];
   meta: PaginationMeta;
 }
+
+// ---------------------------------------------------------------------------
+// AI CV Ranking — GET /application/job/{jobId}/cv-ranking
+// ---------------------------------------------------------------------------
+
+/** Single ranked entry returned by the AI CV ranking endpoint */
+export interface CvRankedApplication {
+  application: Application;
+  ranked: boolean;
+  rank: number | null;
+  score: number | null;
+  label: string | null;
+  explanation: string | null;
+  similarityScore: number | null;
+  crossScore: number | null;
+}
+
+/** Response `data` block from the AI CV ranking endpoint */
+export interface CvRankingData {
+  applications: CvRankedApplication[];
+  job_id: string;
+  job_overview: string;
+  total_candidates: number;
+  ranked_count: number;
+  unranked_count: number;
+  processing_time_ms: number;
+}

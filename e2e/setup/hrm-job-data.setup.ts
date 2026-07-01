@@ -4,21 +4,31 @@ import * as path from "path";
 
 const DATA_DIR = path.join(__dirname, "../.data");
 const TEST_JOB_FILE = path.join(DATA_DIR, "test-job.json");
+const FIXTURE_FILE = path.join(__dirname, "../fixtures/single-job-definition.json");
 
 setup("create and publish test job as HRM1", async ({ page }) => {
   setup.setTimeout(60_000);
 
-  // storageState restores cookies (auth_session) and localStorage but NOT sessionStorage
-  // (wfa_access_token). Do a fresh login using the same device ID as stored in localStorage
-  // (backend binds access tokens to device IDs via X-Device-Id header), then inject the
-  // access token into sessionStorage via addInitScript so page API calls are authenticated.
-  // Resolve API base from .env.local (Next.js bakes NEXT_PUBLIC_* at build time; read here for test API calls)
-  const envPath = path.join(__dirname, "../../.env.local");
-  let API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:9085";
-  if (!process.env.NEXT_PUBLIC_API_BASE_URL && fs.existsSync(envPath)) {
-    const envMatch = fs.readFileSync(envPath, "utf-8").match(/^NEXT_PUBLIC_API_BASE_URL=(.+)$/m);
-    if (envMatch) API_BASE = envMatch[1].trim();
+  const jobDef = JSON.parse(fs.readFileSync(FIXTURE_FILE, "utf-8")) as {
+    title: string
+    shortDescription: string
+    fullDescription: string
+    location: string
+    educationLevel: string
+    requiredExperience: string
+    skillFallbacks: string[]
+    salaryMin: number
+    salaryMax: number
+    quantity: number
+    categoryName: string
   }
+
+  // storageState restores cookies (auth_session) and localStorage (including wfa_access_token).
+  // Do a fresh login to guarantee a non-expired token — backend binds tokens to device IDs
+  // via X-Device-Id header, so we read the persisted device ID from the auth storageState.
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:9085";
+  const hrmanager1Email = process.env.TEST_HRMANAGER1_EMAIL!;
+  const hrmanager1Password = process.env.TEST_HRMANAGER1_PASSWORD!;
 
   const AUTH_FILE = path.join(__dirname, "../.auth/hrmanager1.json");
   let accessToken: string | null = null;
@@ -34,7 +44,7 @@ setup("create and publish test job as HRM1", async ({ page }) => {
         ?.value ?? "playwright-e2e-hrm1";
 
     const loginRes = await page.request.post(`${API_BASE}/auth/login`, {
-      data: { usernameOrEmail: "hrmanager1@gmail.com", password: "password@123" },
+      data: { usernameOrEmail: hrmanager1Email, password: hrmanager1Password },
       headers: { "Content-Type": "application/json", "X-Device-Id": deviceId },
     });
     if (loginRes.ok()) {
@@ -45,8 +55,8 @@ setup("create and publish test job as HRM1", async ({ page }) => {
         const expiresAt = String(Date.now() + (expiryInMs ?? 900_000));
         await page.addInitScript(
           ({ t, expiry }: { t: string; expiry: string }) => {
-            sessionStorage.setItem("wfa_access_token", t);
-            sessionStorage.setItem("wfa_token_expiry", expiry);
+            localStorage.setItem("wfa_access_token", t);
+            localStorage.setItem("wfa_token_expiry", expiry);
           },
           { t: token, expiry: expiresAt },
         );
@@ -70,48 +80,65 @@ setup("create and publish test job as HRM1", async ({ page }) => {
   await expect(dialog).toBeVisible({ timeout: 8_000 });
 
   // ── Fill required fields ────────────────────────────────────────────────
-  await page.getByLabel("Job Title").fill("E2E Test Job - Backend Engineer");
-  await page
-    .getByPlaceholder("Brief overview for job listing...")
-    .fill("Automated test job created for E2E testing purposes only");
-  await page
-    .locator("label:has-text('Full Description') ~ textarea")
-    .fill("This job was created by automated E2E tests and can be safely deleted after testing.");
-  await page.getByPlaceholder("City, Country").fill("Ho Chi Minh City, Vietnam");
-  await page.getByPlaceholder("e.g. Bachelor in CS").fill("Bachelor in Computer Science");
-  await page.getByPlaceholder("e.g. 3-5 years").fill("3-5 years experience");
+  await page.getByLabel("Job Title").fill(jobDef.title);
+  await page.getByPlaceholder("Brief overview for job listing...").fill(jobDef.shortDescription);
+  await page.locator("label:has-text('Full Description') ~ textarea").fill(jobDef.fullDescription);
+  await page.getByPlaceholder("City, Country").fill(jobDef.location);
+  await page.getByPlaceholder("e.g. Bachelor in CS").fill(jobDef.educationLevel);
+  await page.getByPlaceholder("e.g. 3-5 years").fill(jobDef.requiredExperience);
 
-  // ── Add at least one skill (backend requires skillIds to be non-empty) ──────
-  // Fetch a real skill name from the public API so the name matches job-post-client.tsx skills state
-  let firstSkillName = "JavaScript";
+  // ── Add skills (backend requires skillIds to be non-empty) ────────────────
+  // Fetch real skill names so they match what the job-post-client has in its dropdown state.
+  const skillFallbacks = jobDef.skillFallbacks;
+  let availableSkills: string[] = skillFallbacks;
   try {
     const skillsRes = await page.request.get(`${API_BASE}/job/public/skills`);
     if (skillsRes.ok()) {
       const json = await skillsRes.json();
       const list: Array<{ name: string }> = json?.data?.result ?? json?.result ?? [];
-      if (list.length > 0) firstSkillName = list[0].name;
+      if (list.length > 0) availableSkills = list.map((s) => s.name);
     }
   } catch {
-    // use fallback skill name
-  }
-  console.log(`Using skill name: "${firstSkillName}"`);
-
-  const skillInput = page.getByPlaceholder("Type skill and press Enter...");
-  await skillInput.fill(firstSkillName);
-  await page.waitForTimeout(800); // allow dropdown to filter
-
-  // Skill dropdown renders inside a Card with absolute z-50 — scope to avoid hitting status toggle
-  const skillDropdown = dialog.locator('.absolute.z-50');
-  const skillSuggestion = skillDropdown.locator('.cursor-pointer').filter({ hasText: firstSkillName }).first();
-  if (await skillSuggestion.isVisible({ timeout: 3_000 }).catch(() => false)) {
-    await skillSuggestion.click();
-  } else {
-    // Dropdown not visible — press Enter to add typed text directly
-    await skillInput.press("Enter");
+    // use fallback skill names
   }
 
-  // Max Salary — number inputs order: [0]=salaryMin, [1]=salaryMax, [2]=quantity
-  await page.locator('input[type="number"]').nth(1).fill("5000");
+  // Helper: add one skill by name
+  async function addSkill(name: string): Promise<void> {
+    const skillInput = page.getByPlaceholder("Type skill and press Enter...");
+    await skillInput.fill(name);
+    await page.waitForTimeout(700);
+    const skillDropdown = dialog.locator('.absolute.z-50');
+    const suggestion = skillDropdown.locator('.cursor-pointer').filter({ hasText: name }).first();
+    if (await suggestion.isVisible({ timeout: 2_500 }).catch(() => false)) {
+      await suggestion.click();
+    } else {
+      await skillInput.press("Enter");
+    }
+    await page.waitForTimeout(300);
+  }
+
+  // Add up to 3 diverse skills from the available list
+  const skillsToAdd = availableSkills.slice(0, Math.min(3, availableSkills.length));
+  for (const skill of skillsToAdd) {
+    console.log(`Adding skill: "${skill}"`);
+    await addSkill(skill);
+  }
+
+  // Salary range — [0]=salaryMin, [1]=salaryMax, [2]=quantity
+  await page.locator('input[type="number"]').nth(0).fill(String(jobDef.salaryMin));
+  await page.locator('input[type="number"]').nth(1).fill(String(jobDef.salaryMax));
+  await page.locator('input[type="number"]').nth(2).fill(String(jobDef.quantity)).catch(() => {/* field may not exist */});
+
+  // ── Select job category ─────────────────────────────────────────────────
+  const categoryTrigger = dialog.locator('button[role="combobox"]').filter({ hasText: /select category/i }).first();
+  if (await categoryTrigger.isVisible({ timeout: 5_000 }).catch(() => false)) {
+    await categoryTrigger.click();
+    const categoryOption = page.getByRole("option", { name: jobDef.categoryName }).first();
+    if (await categoryOption.isVisible({ timeout: 3_000 }).catch(() => false)) {
+      await categoryOption.click();
+    }
+    await page.waitForTimeout(300);
+  }
 
   // ── Set expiration date (must be in the future) ─────────────────────────
   const calTrigger = page
@@ -235,7 +262,7 @@ setup("create and publish test job as HRM1", async ({ page }) => {
     JSON.stringify(
       {
         jobId: createdJobId,
-        jobTitle: "E2E Test Job - Backend Engineer",
+        jobTitle: jobDef.title,
         createdAt: new Date().toISOString(),
       },
       null,

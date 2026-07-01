@@ -1,0 +1,3487 @@
+[dotenv@17.3.1] injecting env (29) from .env.local -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+{
+  "config": {
+    "configFile": "D:\\source\\workfitai\\workfitai\\playwright.config.ts",
+    "rootDir": "D:/source/workfitai/workfitai/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 6
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/source/workfitai/workfitai/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "candidate-setup",
+        "name": "candidate-setup",
+        "testDir": "D:/source/workfitai/workfitai/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "e2e/setup/candidate-auth.setup.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/source/workfitai/workfitai/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "admin-setup",
+        "name": "admin-setup",
+        "testDir": "D:/source/workfitai/workfitai/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "e2e/setup/admin-auth.setup.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/source/workfitai/workfitai/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "hrmanager1-setup",
+        "name": "hrmanager1-setup",
+        "testDir": "D:/source/workfitai/workfitai/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "e2e/setup/hrmanager1-auth.setup.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/source/workfitai/workfitai/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "hr1-setup",
+        "name": "hr1-setup",
+        "testDir": "D:/source/workfitai/workfitai/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "e2e/setup/hr1-auth.setup.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/source/workfitai/workfitai/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "candidate1-setup",
+        "name": "candidate1-setup",
+        "testDir": "D:/source/workfitai/workfitai/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "e2e/setup/candidate1-auth.setup.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/source/workfitai/workfitai/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "hrm-job-data-setup",
+        "name": "hrm-job-data-setup",
+        "testDir": "D:/source/workfitai/workfitai/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "e2e/setup/hrm-job-data.setup.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/source/workfitai/workfitai/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "candidate1-apply-data-setup",
+        "name": "candidate1-apply-data-setup",
+        "testDir": "D:/source/workfitai/workfitai/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "e2e/setup/candidate1-apply-data.setup.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/source/workfitai/workfitai/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "e2e-candidate",
+        "name": "e2e-candidate",
+        "testDir": "D:/source/workfitai/workfitai/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "e2e/candidate-*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/source/workfitai/workfitai/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "e2e-hrm",
+        "name": "e2e-hrm",
+        "testDir": "D:/source/workfitai/workfitai/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "e2e/hrm-*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/source/workfitai/workfitai/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "e2e-hr",
+        "name": "e2e-hr",
+        "testDir": "D:/source/workfitai/workfitai/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "e2e/hr-*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/source/workfitai/workfitai/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "e2e-admin",
+        "name": "e2e-admin",
+        "testDir": "D:/source/workfitai/workfitai/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "e2e/admin-*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/source/workfitai/workfitai/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "e2e-chromium",
+        "name": "e2e-chromium",
+        "testDir": "D:/source/workfitai/workfitai/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "e2e/application-flow.spec.ts",
+          "e2e/auth.spec.ts",
+          "e2e/homepage.spec.ts",
+          "e2e/route-protection.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/source/workfitai/workfitai/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "e2e-firefox",
+        "name": "e2e-firefox",
+        "testDir": "D:/source/workfitai/workfitai/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "e2e/application-flow.spec.ts",
+          "e2e/auth.spec.ts",
+          "e2e/homepage.spec.ts",
+          "e2e/route-protection.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/source/workfitai/workfitai/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "visual",
+        "name": "visual",
+        "testDir": "D:/source/workfitai/workfitai/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "e2e/visual/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "D:/source/workfitai/workfitai/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "a11y",
+        "name": "a11y",
+        "testDir": "D:/source/workfitai/workfitai/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "e2e/a11y/*.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "runAgents": "none",
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.58.2",
+    "workers": 6,
+    "webServer": {
+      "command": "npm run dev",
+      "url": "http://localhost:3000",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "setup\\candidate1-apply-data.setup.ts",
+      "file": "setup/candidate1-apply-data.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "candidate1 applies to test job",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "candidate1-apply-data-setup",
+              "projectName": "candidate1-apply-data-setup",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 51093,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [
+                    {
+                      "text": "Apply modal did not close within 45 s — backend may be slow or erroring. Writing sentinel for dependent tests.\n"
+                    }
+                  ],
+                  "retry": 0,
+                  "startTime": "2026-05-31T10:13:14.605Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "05d5f423606d4afcebf0-e1703b4f2b6268027657",
+          "file": "setup/candidate1-apply-data.setup.ts",
+          "line": 15,
+          "column": 6
+        }
+      ]
+    },
+    {
+      "title": "setup\\hrmanager1-auth.setup.ts",
+      "file": "setup/hrmanager1-auth.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "authenticate as hrmanager1",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "hrmanager1-setup",
+              "projectName": "hrmanager1-setup",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1745,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-31T10:12:54.059Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fe094cd7b3ed385d9bdd-c2e022f9fd701b615cad",
+          "file": "setup/hrmanager1-auth.setup.ts",
+          "line": 9,
+          "column": 6
+        }
+      ]
+    },
+    {
+      "title": "setup\\hrm-job-data.setup.ts",
+      "file": "setup/hrm-job-data.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "create and publish test job as HRM1",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "hrm-job-data-setup",
+              "projectName": "hrm-job-data-setup",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 16176,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "Adding skill: \"Java\"\n"
+                    },
+                    {
+                      "text": "Adding skill: \"Spring Boot\"\n"
+                    },
+                    {
+                      "text": "Adding skill: \"MySQL\"\n"
+                    },
+                    {
+                      "text": "Job published via API: db93f739-8c40-4455-bf17-80c9712cba83\n"
+                    },
+                    {
+                      "text": "Test job created and published: db93f739-8c40-4455-bf17-80c9712cba83\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-31T10:12:57.257Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "302594ce4063c522ab1a-b0ec496863f15b92879f",
+          "file": "setup/hrm-job-data.setup.ts",
+          "line": 8,
+          "column": 6
+        }
+      ]
+    },
+    {
+      "title": "setup\\candidate1-auth.setup.ts",
+      "file": "setup/candidate1-auth.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "authenticate as candidate1",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "candidate1-setup",
+              "projectName": "candidate1-setup",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2037,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-31T10:12:54.062Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e203858e1e117c92b8fb-b9c9d1c3167b45353904",
+          "file": "setup/candidate1-auth.setup.ts",
+          "line": 9,
+          "column": 6
+        }
+      ]
+    },
+    {
+      "title": "candidate-application-flow.spec.ts",
+      "file": "candidate-application-flow.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Candidate Application Flow",
+          "file": "candidate-application-flow.spec.ts",
+          "line": 21,
+          "column": 6,
+          "specs": [
+            {
+              "title": "applied-jobs page loads and shows My Applications heading",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4362,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:07.230Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e27f66a86d8b2f77aff6-036af02f43a5e5e37724",
+              "file": "candidate-application-flow.spec.ts",
+              "line": 26,
+              "column": 7
+            },
+            {
+              "title": "applied jobs list shows applications with status badges or empty state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 5384,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:07.273Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e27f66a86d8b2f77aff6-cefb4e27a6540cea7121",
+              "file": "candidate-application-flow.spec.ts",
+              "line": 34,
+              "column": 7
+            },
+            {
+              "title": "status filter tabs are rendered and clickable",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 5656,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:07.195Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e27f66a86d8b2f77aff6-9003e14bd85998c7a504",
+              "file": "candidate-application-flow.spec.ts",
+              "line": 58,
+              "column": 7
+            },
+            {
+              "title": "clicking each status filter tab updates the total count display",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 10661,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:07.205Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e27f66a86d8b2f77aff6-e25c35f0ff3dc035617d",
+              "file": "candidate-application-flow.spec.ts",
+              "line": 72,
+              "column": 7
+            },
+            {
+              "title": "Withdrawn tab is present or gracefully absent",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 4440,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:07.224Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e27f66a86d8b2f77aff6-b6a8341f5a47fddec923",
+              "file": "candidate-application-flow.spec.ts",
+              "line": 88,
+              "column": 7
+            },
+            {
+              "title": "can navigate to test job detail and see Apply or Already Applied state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 4792,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:07.211Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e27f66a86d8b2f77aff6-9e6aba5eba1dba92657c",
+              "file": "candidate-application-flow.spec.ts",
+              "line": 103,
+              "column": 7
+            },
+            {
+              "title": "test job detail page renders all key metadata sections",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3684,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:11.898Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e27f66a86d8b2f77aff6-eff8892b9c28797dc259",
+              "file": "candidate-application-flow.spec.ts",
+              "line": 123,
+              "column": 7
+            },
+            {
+              "title": "applied-jobs page shows correct subtitle with application count",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 2292,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:11.991Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e27f66a86d8b2f77aff6-13ae3f68277b581bfe5c",
+              "file": "candidate-application-flow.spec.ts",
+              "line": 152,
+              "column": 7
+            },
+            {
+              "title": "job application card shows status badge when applications exist",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 2755,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:12.408Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e27f66a86d8b2f77aff6-b00f03c125abae1028f7",
+              "file": "candidate-application-flow.spec.ts",
+              "line": 167,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "candidate-apply-modal.spec.ts",
+      "file": "candidate-apply-modal.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Apply Now Modal",
+          "file": "candidate-apply-modal.spec.ts",
+          "line": 65,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Apply Now button opens the application dialog",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 5581,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:13.056Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a6d53d756e73a87aa3d0-f74a36a4252b2428c6d6",
+              "file": "candidate-apply-modal.spec.ts",
+              "line": 70,
+              "column": 7
+            },
+            {
+              "title": "modal shows Already Applied state when candidate has already submitted",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Candidate has not yet applied — already-applied state not shown",
+                      "location": {
+                        "file": "D:\\source\\workfitai\\workfitai\\e2e\\candidate-apply-modal.spec.ts",
+                        "line": 126,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 2,
+                      "status": "skipped",
+                      "duration": 5753,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:13.101Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "Candidate has not yet applied — already-applied state not shown",
+                          "location": {
+                            "file": "D:\\source\\workfitai\\workfitai\\e2e\\candidate-apply-modal.spec.ts",
+                            "line": 126,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "a6d53d756e73a87aa3d0-caf559a3b827d6c508b6",
+              "file": "candidate-apply-modal.spec.ts",
+              "line": 90,
+              "column": 7
+            },
+            {
+              "title": "modal shows email field and CV upload zone when candidate has not applied",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 5678,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:14.336Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a6d53d756e73a87aa3d0-2719f9035f7e39bc5830",
+              "file": "candidate-apply-modal.spec.ts",
+              "line": 130,
+              "column": 7
+            },
+            {
+              "title": "uploading a non-PDF file shows a file-type validation error",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 7834,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:15.217Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a6d53d756e73a87aa3d0-4df232eb1c03d0421515",
+              "file": "candidate-apply-modal.spec.ts",
+              "line": 164,
+              "column": 7
+            },
+            {
+              "title": "uploading an image file also shows the file-type validation error",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7243,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:15.658Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a6d53d756e73a87aa3d0-07f0efc00f430db692dc",
+              "file": "candidate-apply-modal.spec.ts",
+              "line": 196,
+              "column": 7
+            },
+            {
+              "title": "uploading a valid PDF shows the filename and enables Submit",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 6144,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:18.169Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a6d53d756e73a87aa3d0-9ce87ba47e9bb2a9246c",
+              "file": "candidate-apply-modal.spec.ts",
+              "line": 233,
+              "column": 7
+            },
+            {
+              "title": "uploading a second PDF replaces the first file",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 6538,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:18.661Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a6d53d756e73a87aa3d0-1dac35f82ebce3258341",
+              "file": "candidate-apply-modal.spec.ts",
+              "line": 270,
+              "column": 7
+            },
+            {
+              "title": "clicking Submit without a CV shows the required-file validation error",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 6321,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:18.877Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a6d53d756e73a87aa3d0-767926f1d6c09bf4bada",
+              "file": "candidate-apply-modal.spec.ts",
+              "line": 309,
+              "column": 7
+            },
+            {
+              "title": "cover letter textarea is visible and accepts text input",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Apply Now button not visible",
+                      "location": {
+                        "file": "D:\\source\\workfitai\\workfitai\\e2e\\candidate-apply-modal.spec.ts",
+                        "line": 348,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 4,
+                      "status": "skipped",
+                      "duration": 3558,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:20.044Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "Apply Now button not visible",
+                          "location": {
+                            "file": "D:\\source\\workfitai\\workfitai\\e2e\\candidate-apply-modal.spec.ts",
+                            "line": 348,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "a6d53d756e73a87aa3d0-431de6d2c7f2fda073d4",
+              "file": "candidate-apply-modal.spec.ts",
+              "line": 336,
+              "column": 7
+            },
+            {
+              "title": "cover letter accepts a detailed multi-line cover letter",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7638,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:23.007Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a6d53d756e73a87aa3d0-66a8668280041fc25b22",
+              "file": "candidate-apply-modal.spec.ts",
+              "line": 365,
+              "column": 7
+            },
+            {
+              "title": "cover letter accepts special characters and unicode",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 5623,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:23.114Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a6d53d756e73a87aa3d0-4c8e9c955065454a2b21",
+              "file": "candidate-apply-modal.spec.ts",
+              "line": 409,
+              "column": 7
+            },
+            {
+              "title": "modal dialog has an accessible title or heading",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 5830,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:23.675Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a6d53d756e73a87aa3d0-ae4f8f83415755357fbd",
+              "file": "candidate-apply-modal.spec.ts",
+              "line": 447,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "candidate-jobs-browsing.spec.ts",
+      "file": "candidate-jobs-browsing.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Jobs Browsing — Candidate",
+          "file": "candidate-jobs-browsing.spec.ts",
+          "line": 21,
+          "column": 6,
+          "specs": [
+            {
+              "title": "jobs page renders main heading and content area",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 2442,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:24.378Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "adc3d0cdc9be2b9e0037-e6373f70d9341028d82a",
+              "file": "candidate-jobs-browsing.spec.ts",
+              "line": 26,
+              "column": 7
+            },
+            {
+              "title": "job cards or empty state is visible after load",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2054,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:25.230Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "adc3d0cdc9be2b9e0037-02609c53e8ae42298ff4",
+              "file": "candidate-jobs-browsing.spec.ts",
+              "line": 36,
+              "column": 7
+            },
+            {
+              "title": "search / keyword input accepts text",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2156,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:25.237Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "adc3d0cdc9be2b9e0037-312caf7baa7af0646310",
+              "file": "candidate-jobs-browsing.spec.ts",
+              "line": 61,
+              "column": 7
+            },
+            {
+              "title": "search works with diverse technical role keywords",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 6014,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:26.849Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "adc3d0cdc9be2b9e0037-547062a2a661478a263e",
+              "file": "candidate-jobs-browsing.spec.ts",
+              "line": 79,
+              "column": 7
+            },
+            {
+              "title": "search with partial match returns results or empty state (not an error)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 4782,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:27.306Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "adc3d0cdc9be2b9e0037-0ec79736d27b2eb6d3d9",
+              "file": "candidate-jobs-browsing.spec.ts",
+              "line": 105,
+              "column": 7
+            },
+            {
+              "title": "search with non-existent keyword shows empty state gracefully",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 4849,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:27.421Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "adc3d0cdc9be2b9e0037-0b64dcfcfa0c832153fd",
+              "file": "candidate-jobs-browsing.spec.ts",
+              "line": 128,
+              "column": 7
+            },
+            {
+              "title": "filter sidebar or filter controls are rendered",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 2616,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:28.776Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "adc3d0cdc9be2b9e0037-2b782ca9ea12b442801a",
+              "file": "candidate-jobs-browsing.spec.ts",
+              "line": 159,
+              "column": 7
+            },
+            {
+              "title": "filter sidebar has employment type or skill checkboxes",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 1864,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:29.534Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "adc3d0cdc9be2b9e0037-fd0e4e4b46e37fc00b1b",
+              "file": "candidate-jobs-browsing.spec.ts",
+              "line": 178,
+              "column": 7
+            },
+            {
+              "title": "clicking a job card navigates to the job detail page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No job listings available — skipping navigation test",
+                      "location": {
+                        "file": "D:\\source\\workfitai\\workfitai\\e2e\\candidate-jobs-browsing.spec.ts",
+                        "line": 204,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 1958,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:30.681Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No job listings available — skipping navigation test",
+                          "location": {
+                            "file": "D:\\source\\workfitai\\workfitai\\e2e\\candidate-jobs-browsing.spec.ts",
+                            "line": 204,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "adc3d0cdc9be2b9e0037-be5a5d6b2af50a3e87f2",
+              "file": "candidate-jobs-browsing.spec.ts",
+              "line": 198,
+              "column": 7
+            },
+            {
+              "title": "job detail page shows the job title heading",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No job listings available",
+                      "location": {
+                        "file": "D:\\source\\workfitai\\workfitai\\e2e\\candidate-jobs-browsing.spec.ts",
+                        "line": 218,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 5,
+                      "status": "skipped",
+                      "duration": 2237,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:31.416Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No job listings available",
+                          "location": {
+                            "file": "D:\\source\\workfitai\\workfitai\\e2e\\candidate-jobs-browsing.spec.ts",
+                            "line": 218,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "adc3d0cdc9be2b9e0037-981ea8bc008bf027e52c",
+              "file": "candidate-jobs-browsing.spec.ts",
+              "line": 212,
+              "column": 7
+            },
+            {
+              "title": "job detail page shows key sections (description, requirements or overview)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No job listings available",
+                      "location": {
+                        "file": "D:\\source\\workfitai\\workfitai\\e2e\\candidate-jobs-browsing.spec.ts",
+                        "line": 240,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 4,
+                      "status": "skipped",
+                      "duration": 2438,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:31.415Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No job listings available",
+                          "location": {
+                            "file": "D:\\source\\workfitai\\workfitai\\e2e\\candidate-jobs-browsing.spec.ts",
+                            "line": 240,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "adc3d0cdc9be2b9e0037-2b4d360fbb030f1e357d",
+              "file": "candidate-jobs-browsing.spec.ts",
+              "line": 234,
+              "column": 7
+            },
+            {
+              "title": "job detail page shows location information",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No job listings available",
+                      "location": {
+                        "file": "D:\\source\\workfitai\\workfitai\\e2e\\candidate-jobs-browsing.spec.ts",
+                        "line": 271,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 1,
+                      "status": "skipped",
+                      "duration": 3287,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:32.114Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No job listings available",
+                          "location": {
+                            "file": "D:\\source\\workfitai\\workfitai\\e2e\\candidate-jobs-browsing.spec.ts",
+                            "line": 271,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "adc3d0cdc9be2b9e0037-1b1dc2dd8dac035d420b",
+              "file": "candidate-jobs-browsing.spec.ts",
+              "line": 265,
+              "column": 7
+            },
+            {
+              "title": "job detail page shows salary or compensation info",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 3923,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:32.300Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "adc3d0cdc9be2b9e0037-6199651bfcf890567b77",
+              "file": "candidate-jobs-browsing.spec.ts",
+              "line": 297,
+              "column": 7
+            },
+            {
+              "title": "test job detail shows Apply Now or Already Applied button",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 4222,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at D:\\source\\workfitai\\workfitai\\e2e\\candidate-jobs-browsing.spec.ts:337:43",
+                        "location": {
+                          "file": "D:\\source\\workfitai\\workfitai\\e2e\\candidate-jobs-browsing.spec.ts",
+                          "column": 43,
+                          "line": 337
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 335 |\u001b[39m     \u001b[36mconst\u001b[39m hasAlreadyApplied \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m alreadyApplied\u001b[33m.\u001b[39mfirst()\u001b[33m.\u001b[39misVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m3\u001b[39m_000 })\u001b[33m.\u001b[39m\u001b[36mcatch\u001b[39m(() \u001b[33m=>\u001b[39m \u001b[36mfalse\u001b[39m)\n \u001b[90m 336 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 337 |\u001b[39m     expect(hasApply \u001b[33m||\u001b[39m hasAlreadyApplied)\u001b[33m.\u001b[39mtoBeTruthy()\n \u001b[90m     |\u001b[39m                                           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 338 |\u001b[39m   })\n \u001b[90m 339 |\u001b[39m\n \u001b[90m 340 |\u001b[39m   test(\u001b[32m'test job detail shows the expected job title'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "D:\\source\\workfitai\\workfitai\\e2e\\candidate-jobs-browsing.spec.ts",
+                            "column": 43,
+                            "line": 337
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  335 |     const hasAlreadyApplied = await alreadyApplied.first().isVisible({ timeout: 3_000 }).catch(() => false)\n  336 |\n> 337 |     expect(hasApply || hasAlreadyApplied).toBeTruthy()\n      |                                           ^\n  338 |   })\n  339 |\n  340 |   test('test job detail shows the expected job title', async ({ page }) => {\n    at D:\\source\\workfitai\\workfitai\\e2e\\candidate-jobs-browsing.spec.ts:337:43"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:32.669Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "D:\\source\\workfitai\\workfitai\\test-results\\candidate-jobs-browsing-Jo-247ff-w-or-Already-Applied-button-e2e-candidate\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "D:\\source\\workfitai\\workfitai\\test-results\\candidate-jobs-browsing-Jo-247ff-w-or-Already-Applied-button-e2e-candidate\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "D:\\source\\workfitai\\workfitai\\e2e\\candidate-jobs-browsing.spec.ts",
+                        "column": 43,
+                        "line": 337
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "adc3d0cdc9be2b9e0037-e2faf8b3a4901af4ef3b",
+              "file": "candidate-jobs-browsing.spec.ts",
+              "line": 319,
+              "column": 7
+            },
+            {
+              "title": "test job detail shows the expected job title",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 5455,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:32.896Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "adc3d0cdc9be2b9e0037-20c20e01339efb7ccf68",
+              "file": "candidate-jobs-browsing.spec.ts",
+              "line": 340,
+              "column": 7
+            },
+            {
+              "title": "back navigation from job detail returns to jobs list",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No job listings available",
+                      "location": {
+                        "file": "D:\\source\\workfitai\\workfitai\\e2e\\candidate-jobs-browsing.spec.ts",
+                        "line": 362,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 5,
+                      "status": "skipped",
+                      "duration": 2530,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:33.670Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No job listings available",
+                          "location": {
+                            "file": "D:\\source\\workfitai\\workfitai\\e2e\\candidate-jobs-browsing.spec.ts",
+                            "line": 362,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "adc3d0cdc9be2b9e0037-6ca4bc57deed436a63ed",
+              "file": "candidate-jobs-browsing.spec.ts",
+              "line": 356,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Jobs Browsing — unauthenticated",
+          "file": "candidate-jobs-browsing.spec.ts",
+          "line": 376,
+          "column": 6,
+          "specs": [
+            {
+              "title": "unauthenticated user visiting /jobs can browse but Apply redirects to login",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 2045,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:33.877Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "adc3d0cdc9be2b9e0037-771e1f589e4f2596b5d9",
+              "file": "candidate-jobs-browsing.spec.ts",
+              "line": 379,
+              "column": 7
+            },
+            {
+              "title": "unauthenticated user can view job details without logging in",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3496,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:35.425Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "adc3d0cdc9be2b9e0037-3fbfd0727ff1f2f33429",
+              "file": "candidate-jobs-browsing.spec.ts",
+              "line": 404,
+              "column": 7
+            },
+            {
+              "title": "jobs page is publicly accessible and shows listings",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-candidate",
+                  "projectName": "e2e-candidate",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 2980,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:35.963Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "adc3d0cdc9be2b9e0037-f872347aca1b63c83989",
+              "file": "candidate-jobs-browsing.spec.ts",
+              "line": 424,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "hrm-application-detail.spec.ts",
+      "file": "hrm-application-detail.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "HRM Application Detail Panel",
+          "file": "hrm-application-detail.spec.ts",
+          "line": 29,
+          "column": 6,
+          "specs": [
+            {
+              "title": "View button opens detail panel with candidate info",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No applications available — skipping detail panel test",
+                      "location": {
+                        "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-application-detail.spec.ts",
+                        "line": 37,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 5,
+                      "status": "skipped",
+                      "duration": 2000,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:38.298Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No applications available — skipping detail panel test",
+                          "location": {
+                            "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-application-detail.spec.ts",
+                            "line": 37,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3e82c8687a2a11812119-28a2a7d745236f253612",
+              "file": "hrm-application-detail.spec.ts",
+              "line": 34,
+              "column": 7
+            },
+            {
+              "title": "detail panel shows Job Details section",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No applications available",
+                      "location": {
+                        "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-application-detail.spec.ts",
+                        "line": 55,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 2,
+                      "status": "skipped",
+                      "duration": 2073,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:38.266Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No applications available",
+                          "location": {
+                            "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-application-detail.spec.ts",
+                            "line": 55,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3e82c8687a2a11812119-dcec4663af77381cde7e",
+              "file": "hrm-application-detail.spec.ts",
+              "line": 52,
+              "column": 7
+            },
+            {
+              "title": "detail panel shows Application Info section with applied date",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No applications available",
+                      "location": {
+                        "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-application-detail.spec.ts",
+                        "line": 67,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 12,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 1561,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:38.834Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No applications available",
+                          "location": {
+                            "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-application-detail.spec.ts",
+                            "line": 67,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3e82c8687a2a11812119-e64bd6df5915f4386877",
+              "file": "hrm-application-detail.spec.ts",
+              "line": 64,
+              "column": 7
+            },
+            {
+              "title": "detail panel shows Status Timeline section",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No applications available",
+                      "location": {
+                        "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-application-detail.spec.ts",
+                        "line": 84,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 3,
+                      "status": "skipped",
+                      "duration": 2957,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:41.097Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No applications available",
+                          "location": {
+                            "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-application-detail.spec.ts",
+                            "line": 84,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3e82c8687a2a11812119-6e1ab9640be1004a0d0a",
+              "file": "hrm-application-detail.spec.ts",
+              "line": 81,
+              "column": 7
+            },
+            {
+              "title": "detail panel shows HR Notes section with add-note form",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No applications available",
+                      "location": {
+                        "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-application-detail.spec.ts",
+                        "line": 96,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 15,
+                      "parallelIndex": 1,
+                      "status": "skipped",
+                      "duration": 3217,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:41.481Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No applications available",
+                          "location": {
+                            "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-application-detail.spec.ts",
+                            "line": 96,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3e82c8687a2a11812119-c17866c898458b2e9124",
+              "file": "hrm-application-detail.spec.ts",
+              "line": 93,
+              "column": 7
+            },
+            {
+              "title": "detail panel shows CV / Resume section",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No applications available",
+                      "location": {
+                        "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-application-detail.spec.ts",
+                        "line": 114,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 14,
+                      "parallelIndex": 4,
+                      "status": "skipped",
+                      "duration": 3265,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:41.449Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No applications available",
+                          "location": {
+                            "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-application-detail.spec.ts",
+                            "line": 114,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3e82c8687a2a11812119-2188cf6af920b442c46b",
+              "file": "hrm-application-detail.spec.ts",
+              "line": 111,
+              "column": 7
+            },
+            {
+              "title": "Update Status button opens the status update modal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No applications available",
+                      "location": {
+                        "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-application-detail.spec.ts",
+                        "line": 127,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 5,
+                      "status": "skipped",
+                      "duration": 2015,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:40.638Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No applications available",
+                          "location": {
+                            "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-application-detail.spec.ts",
+                            "line": 127,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3e82c8687a2a11812119-a0395d9456c37e0be94d",
+              "file": "hrm-application-detail.spec.ts",
+              "line": 124,
+              "column": 7
+            },
+            {
+              "title": "Close button dismisses the detail panel",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No applications available",
+                      "location": {
+                        "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-application-detail.spec.ts",
+                        "line": 151,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 2,
+                      "status": "skipped",
+                      "duration": 2640,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:40.718Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No applications available",
+                          "location": {
+                            "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-application-detail.spec.ts",
+                            "line": 151,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3e82c8687a2a11812119-ab2465bb99f1c6ffe94e",
+              "file": "hrm-application-detail.spec.ts",
+              "line": 148,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "hrm-application-management.spec.ts",
+      "file": "hrm-application-management.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "HRM Application Management",
+          "file": "hrm-application-management.spec.ts",
+          "line": 20,
+          "column": 6,
+          "specs": [
+            {
+              "title": "applications page loads and shows main content",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 12,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2403,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:40.849Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f10d705c260f95a19023-dba1bc47c238d2f25f12",
+              "file": "hrm-application-management.spec.ts",
+              "line": 25,
+              "column": 7
+            },
+            {
+              "title": "applications table or empty state is visible after load",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 3498,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:42.690Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f10d705c260f95a19023-561bb0c42558a84d6043",
+              "file": "hrm-application-management.spec.ts",
+              "line": 33,
+              "column": 7
+            },
+            {
+              "title": "search input is present and accepts text",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 12,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7077,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:43.296Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f10d705c260f95a19023-a189e994c9b5262cf343",
+              "file": "hrm-application-management.spec.ts",
+              "line": 52,
+              "column": 7
+            },
+            {
+              "title": "search accepts diverse candidate and job title keywords",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 4824,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:43.390Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f10d705c260f95a19023-dc8202946c5d9a94c632",
+              "file": "hrm-application-management.spec.ts",
+              "line": 63,
+              "column": 7
+            },
+            {
+              "title": "search with non-existent keyword does not crash the page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 3862,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:44.367Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f10d705c260f95a19023-bfb9c3680f9de881c4cd",
+              "file": "hrm-application-management.spec.ts",
+              "line": 91,
+              "column": 7
+            },
+            {
+              "title": "status filter dropdown is present and changes selection",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 14,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 2845,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:45.049Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f10d705c260f95a19023-06cfe84d78c537742c3e",
+              "file": "hrm-application-management.spec.ts",
+              "line": 109,
+              "column": 7
+            },
+            {
+              "title": "status filter covers all expected application statuses",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 15,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3632,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:45.134Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f10d705c260f95a19023-40de5775e5dabddbfb0a",
+              "file": "hrm-application-management.spec.ts",
+              "line": 120,
+              "column": 7
+            },
+            {
+              "title": "switching status filter updates the result count or table",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 2887,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:46.224Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f10d705c260f95a19023-a3ff7548cddb9228fb90",
+              "file": "hrm-application-management.spec.ts",
+              "line": 149,
+              "column": 7
+            },
+            {
+              "title": "View button opens the application detail panel",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No applications available — skipping detail panel test",
+                      "location": {
+                        "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-application-management.spec.ts",
+                        "line": 174,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 14,
+                      "parallelIndex": 4,
+                      "status": "skipped",
+                      "duration": 2252,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:47.933Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No applications available — skipping detail panel test",
+                          "location": {
+                            "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-application-management.spec.ts",
+                            "line": 174,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "f10d705c260f95a19023-a79da2fd613d60a0b441",
+              "file": "hrm-application-management.spec.ts",
+              "line": 168,
+              "column": 7
+            },
+            {
+              "title": "job filter dropdown is present and lists available jobs",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2471,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:48.246Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f10d705c260f95a19023-347eb82e2b714607c8eb",
+              "file": "hrm-application-management.spec.ts",
+              "line": 187,
+              "column": 7
+            },
+            {
+              "title": "test job applications are listed when filtering by test job",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 6764,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:48.274Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f10d705c260f95a19023-65f45f75ab400d5a6676",
+              "file": "hrm-application-management.spec.ts",
+              "line": 202,
+              "column": 7
+            },
+            {
+              "title": "pagination or load-more control is present when many applications exist",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 15,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3305,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:48.858Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f10d705c260f95a19023-dc47219aabb6c9b3ea83",
+              "file": "hrm-application-management.spec.ts",
+              "line": 229,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "hrm-hr-management-actions.spec.ts",
+      "file": "hrm-hr-management-actions.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "HR Management Actions",
+          "file": "hrm-hr-management-actions.spec.ts",
+          "line": 13,
+          "column": 6,
+          "specs": [
+            {
+              "title": "hr-management page is accessible for HR_MANAGER role",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 1140,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:49.136Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a0fbf170fc109340e493-131173f2aa21c05a88ab",
+              "file": "hrm-hr-management-actions.spec.ts",
+              "line": 18,
+              "column": 7
+            },
+            {
+              "title": "WAIT_APPROVED HR users show Approve and Reject action buttons",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No WAIT_APPROVED HR users in the list — skipping action button test",
+                      "location": {
+                        "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-hr-management-actions.spec.ts",
+                        "line": 35,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 14,
+                      "parallelIndex": 4,
+                      "status": "skipped",
+                      "duration": 2268,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:50.202Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No WAIT_APPROVED HR users in the list — skipping action button test",
+                          "location": {
+                            "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-hr-management-actions.spec.ts",
+                            "line": 35,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "a0fbf170fc109340e493-4d0930f85925c198ca7e",
+              "file": "hrm-hr-management-actions.spec.ts",
+              "line": 27,
+              "column": 7
+            },
+            {
+              "title": "Approve HR button fires the correct API request",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No WAIT_APPROVED users — skipping approve API test",
+                      "location": {
+                        "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-hr-management-actions.spec.ts",
+                        "line": 75,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 5,
+                      "status": "skipped",
+                      "duration": 2000,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:50.303Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No WAIT_APPROVED users — skipping approve API test",
+                          "location": {
+                            "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-hr-management-actions.spec.ts",
+                            "line": 75,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "a0fbf170fc109340e493-5fa083c2120fb466cc2f",
+              "file": "hrm-hr-management-actions.spec.ts",
+              "line": 50,
+              "column": 7
+            },
+            {
+              "title": "Reject HR button fires the correct API request",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No WAIT_APPROVED users — skipping reject API test",
+                      "location": {
+                        "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-hr-management-actions.spec.ts",
+                        "line": 111,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 12,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 1919,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:50.412Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No WAIT_APPROVED users — skipping reject API test",
+                          "location": {
+                            "file": "D:\\source\\workfitai\\workfitai\\e2e\\hrm-hr-management-actions.spec.ts",
+                            "line": 111,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "a0fbf170fc109340e493-48546b428efe77a3c369",
+              "file": "hrm-hr-management-actions.spec.ts",
+              "line": 89,
+              "column": 7
+            },
+            {
+              "title": "status badge colours distinguish Active, Waiting, and Blocked users",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2293,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:50.738Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a0fbf170fc109340e493-e3768e3e4dc9de25e8bf",
+              "file": "hrm-hr-management-actions.spec.ts",
+              "line": 124,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "hrm-roles-permissions.spec.ts",
+      "file": "hrm-roles-permissions.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "HRM Roles & Permissions (read-only)",
+          "file": "hrm-roles-permissions.spec.ts",
+          "line": 16,
+          "column": 6,
+          "specs": [
+            {
+              "title": "page loads at /roles-permissions and is accessible for HR_MANAGER",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 15,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1507,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:52.182Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dbe4791e26b12febee9d-14f572334e676e0fd7a8",
+              "file": "hrm-roles-permissions.spec.ts",
+              "line": 21,
+              "column": 7
+            },
+            {
+              "title": "Roles tab loads and shows role rows",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 2887,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:52.332Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dbe4791e26b12febee9d-0b74b9c43d1db8f26d8c",
+              "file": "hrm-roles-permissions.spec.ts",
+              "line": 27,
+              "column": 7
+            },
+            {
+              "title": "clone button is NOT visible for HR_MANAGER",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 12,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3926,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:52.355Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dbe4791e26b12febee9d-d6695b341bdb5c4ba4e1",
+              "file": "hrm-roles-permissions.spec.ts",
+              "line": 38,
+              "column": 7
+            },
+            {
+              "title": "delete button is NOT visible for HR_MANAGER",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 14,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 3892,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:52.499Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dbe4791e26b12febee9d-0b890d528d70ab4e8fa5",
+              "file": "hrm-roles-permissions.spec.ts",
+              "line": 49,
+              "column": 7
+            },
+            {
+              "title": "eye/view icon opens read-only modal without Save Changes button",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2525,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:53.053Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dbe4791e26b12febee9d-90e1b06a4364d7c25da2",
+              "file": "hrm-roles-permissions.spec.ts",
+              "line": 59,
+              "column": 7
+            },
+            {
+              "title": "Permissions tab is accessible for HR_MANAGER",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 15,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2531,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:53.714Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dbe4791e26b12febee9d-5a66e8dc4e5ddc2854a0",
+              "file": "hrm-roles-permissions.spec.ts",
+              "line": 85,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "HR user access control",
+          "file": "hrm-roles-permissions.spec.ts",
+          "line": 97,
+          "column": 6,
+          "specs": [
+            {
+              "title": "HR user navigating to /roles-permissions is redirected to /dashboard",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "e2e-hrm",
+                  "projectName": "e2e-hrm",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 969,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-31T10:14:55.056Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dbe4791e26b12febee9d-2b7d2bd70adfca8d568f",
+              "file": "hrm-roles-permissions.spec.ts",
+              "line": 98,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-05-31T10:12:52.704Z",
+    "duration": 123843.59,
+    "expected": 56,
+    "skipped": 19,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}
