@@ -12,7 +12,6 @@ export const companyService = {
   },
 
   async updateCompany(formData: FormData): Promise<ApiResponse<Company>> {
-    console.log("Updating company with formData:", formData);
     const res = await apiClient.uploadPut<ApiResponse<Company>>(
       "/job/hr/companies",
       formData
