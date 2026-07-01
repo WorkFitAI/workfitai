@@ -219,7 +219,7 @@ export const apiClient = {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    return fetch(`${API_BASE}${path}`, {
+    return fetch(apiUrl(path), {
       method: "PUT",
       body: formData,
       headers,
