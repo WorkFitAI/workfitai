@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -15,6 +16,8 @@ import {
 
 import { Company } from "@/types/company";
 import { companyService } from "@/lib/company/company-service";
+
+import { toast } from "sonner"
 
 interface Props {
   company: Company | null;
@@ -83,7 +86,22 @@ const CompanyDetail = ({ company, canEdit = false }: Props) => {
 
       setPreview(res.data.logoUrl || "");
       setIsEdit(false);
-    } finally {
+      
+      toast.success("Company details updated successfully!");
+     } catch (error: any) {
+        if (error?.status === 403 || error?.response?.status === 403) {
+          toast.error("You do not have permission to edit this company.");
+        } else if (error?.status === 401 || error?.response?.status === 401) {
+          toast.error("Your session has expired. Please sign in again.");
+        } else {
+          toast.error(
+            error?.message ||
+            error?.response?.data?.message ||
+            "Failed to update company."
+          );
+        }
+      }
+    finally {
       setLoading(false);
     }
   };

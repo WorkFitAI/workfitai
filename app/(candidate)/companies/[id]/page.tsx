@@ -13,8 +13,9 @@ type Props = {
 export default async function CompanyDetailPage({ params }: Props) {
   const cookieStore = await cookies();
   const cookieValue = cookieStore.get("auth_session")?.value;
+  const cookieCompanyId = cookieValue ? JSON.parse(cookieValue).companyId : null;
 
-  const canEdit = !!cookieValue;
+  const canEdit = !!cookieValue && cookieCompanyId === (await params).id;
   const { id } = await params;
 
   let company: Company | null = null;
