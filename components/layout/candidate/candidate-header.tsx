@@ -87,6 +87,11 @@ function UserDropdown() {
           <DropdownMenuItem asChild>
             <Link href="/applied-jobs">Applied Jobs</Link>
           </DropdownMenuItem>
+          {user?.companyId && (
+            <DropdownMenuItem asChild>
+              <Link href={`/companies/${user.companyId}`}>My Company</Link>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem className="text-destructive" onClick={logout}>
             Logout
