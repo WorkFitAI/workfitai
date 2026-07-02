@@ -206,5 +206,49 @@ export const apiClient = {
       return response.json() as Promise<T>;
     });
   },
+
+  uploadPut<T>(path: string, formData: FormData): Promise<T> {
+    const token = getAccessToken();
+    const deviceId = getDeviceId();
+
+    const headers: Record<string, string> = {
+      "X-Device-Id": deviceId,
+    };
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    return fetch(apiUrl(path), {
+      method: "PUT",
+      body: formData,
+      headers,
+      credentials: "include",
+    }).then(async (response) => {
+      if (response.status === 401 && token) {
+        const refreshed = await attemptRefresh();
+
+        if (refreshed) {
+          return apiClient.uploadPut<T>(path, formData);
+        }
+
+        throw new AuthError();
+      }
+
+      if (!response.ok) {
+        const error = await response
+          .json()
+          .catch(() => ({ message: "Upload failed" }));
+
+        throw new ApiError(
+          error.message || "Upload failed",
+          response.status,
+          error
+        );
+      }
+
+      return response.json() as Promise<T>;
+    });
+  }
 };
 
