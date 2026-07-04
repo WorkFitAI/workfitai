@@ -23,6 +23,7 @@ import { adminUserService } from "@/lib/admin/admin-user-service"
 import { UserStatusBadge } from "@/components/users/user-status-badge"
 import { UserRoleBadge } from "@/components/users/user-role-badge"
 import { ApprovalQueueButton } from "@/components/users/approval-queue"
+import { LottieLoader } from "@/components/ui/lottie-loader"
 import { useAuth } from "@/contexts/auth-context"
 import { toast } from "sonner"
 import type { AdminUserRole, AdminUserStatus, EsUserHit } from "@/types/admin-user"
@@ -408,7 +409,7 @@ export function UsersList() {
               {loading ? (
                 <tr>
                   <td colSpan={5} className="py-16 text-center">
-                    <Loader2 className="h-6 w-6 animate-spin text-blue-600 mx-auto mb-2" />
+                    <LottieLoader size={80} className="mx-auto mb-2" />
                     <p className="text-sm text-gray-500">Loading users…</p>
                   </td>
                 </tr>

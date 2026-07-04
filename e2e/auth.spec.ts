@@ -75,14 +75,15 @@ test.describe("Register — Candidate flow (E2E)", () => {
     ).toBeVisible({ timeout: 3000 });
   });
 
-  test('E-R3 — register page has "Is Employer?" link to employer route', async ({
+  test("E-R3 — register page switches to HR Staff form via role tabs", async ({
     page,
   }) => {
     await page.goto("/register");
-    const employerLink = page.getByRole("link", { name: /employer/i });
-    await expect(employerLink).toBeVisible();
-    const href = await employerLink.getAttribute("href");
-    expect(href).toContain("type=employer");
+    await page.getByRole("tab", { name: /hr staff/i }).click();
+    await expect(page).toHaveURL(/type=hr/);
+    await expect(
+      page.getByRole("button", { name: /create hr account/i }),
+    ).toBeVisible();
   });
 
   test("E-R4 — verify-otp page with email param shows the email in description", async ({

@@ -140,7 +140,7 @@ export function LoginForm() {
           {oauthLoading === "GOOGLE" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Continue with Google
         </Button>
-        <Button
+        {/* <Button
           type="button"
           variant="outline"
           className="w-full"
@@ -149,7 +149,7 @@ export function LoginForm() {
         >
           {oauthLoading === "GITHUB" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Continue with GitHub
-        </Button>
+        </Button> */}
       </motion.div>
     </form>
   );

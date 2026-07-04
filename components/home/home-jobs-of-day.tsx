@@ -1,117 +1,150 @@
 "use client"
 
-import { useState } from "react"
-import { Bookmark, Building2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { useEffect, useState } from "react"
+import { Sparkles } from "lucide-react"
+import { LottieLoader } from "@/components/ui/lottie-loader"
+import FeaturedJobCard from "@/components/jobs/featured/featured-job-card"
+import { useAuth } from "@/contexts/auth-context"
+import { jobService } from "@/lib/job/job-service"
 import { cn } from "@/lib/utils"
+import { Company } from "@/types/company"
 
-const tabs = [
-  "Browse & Promote",
-  "Content Writer",
-  "Monitoring & Sale",
-  "Customer Help",
-  "Finance",
-  "Human Resources",
-]
+/** Fields shared by `Job` (public job list) and the recommendation endpoint's job shape. */
+interface DisplayJob {
+  postId: string
+  title: string
+  shortDescription: string
+  salaryMin: number
+  salaryMax: number
+  skillNames: string[]
+  company: Company
+  /** 0-100 — only set when sourced from the AI recommendation endpoint. */
+  matchScore?: number
+}
 
-const jobs = [
-  { id: 1, company: "Onda", title: "DevOps Account Executive", tags: ["Full-time", "Remote"], salaryMin: 5700, salaryMax: 12500, category: "browse & promote" },
-  { id: 2, company: "Square", title: "Support Engineer Enterprise", tags: ["Full-time", "On-site"], salaryMin: 3300, salaryMax: 7600, category: "browse & promote" },
-  { id: 3, company: "Stripe", title: "Frontend Software Engineer", tags: ["Contract", "Remote"], salaryMin: 7000, salaryMax: 15000, category: "browse & promote" },
-  { id: 4, company: "Notion", title: "Product Designer", tags: ["Full-time", "Hybrid"], salaryMin: 4500, salaryMax: 9000, category: "browse & promote" },
-  { id: 5, company: "Medium", title: "Content Strategist", tags: ["Part-time", "Remote"], salaryMin: 2500, salaryMax: 5000, category: "content writer" },
-  { id: 6, company: "Mailchimp", title: "Email Marketing Writer", tags: ["Full-time", "On-site"], salaryMin: 3000, salaryMax: 6500, category: "content writer" },
-  { id: 7, company: "Salesforce", title: "Sales Operations Manager", tags: ["Full-time", "On-site"], salaryMin: 6000, salaryMax: 13000, category: "monitoring & sale" },
-  { id: 8, company: "Zendesk", title: "Customer Success Manager", tags: ["Full-time", "Remote"], salaryMin: 4000, salaryMax: 8500, category: "customer help" },
-]
+// Always exactly 10 jobs — 2 full rows of 5 — regardless of source (AI recommendations or latest jobs).
+const MAX_JOBS = 10
 
-/** Jobs of the Day — tabbed grid of job cards */
+/** Jobs of the Day — AI-personalized recommendations for candidates, latest public jobs for everyone else */
 export function HomeJobsOfDay() {
-  const [activeTab, setActiveTab] = useState(tabs[0])
+  const { isAuthenticated, user, isLoading: authLoading } = useAuth()
+  const [jobs, setJobs] = useState<DisplayJob[]>([])
+  const [loading, setLoading] = useState(true)
+  const [usingAi, setUsingAi] = useState(false)
 
-  const filtered =
-    activeTab === tabs[0]
-      ? jobs
-      : jobs.filter((j) => j.category === activeTab.toLowerCase())
+  useEffect(() => {
+    if (authLoading) return
 
-  const displayed = filtered.slice(0, 4)
+    let cancelled = false
+    const isCandidate = isAuthenticated && !!user?.roles.includes("ROLE_CANDIDATE")
+
+    const loadLatestJobs = async () => {
+      const { data } = await jobService.getJobs({
+        page: 1,
+        pageSize: MAX_JOBS,
+        sort: "desc",
+      })
+      if (!cancelled) {
+        setUsingAi(false)
+        setJobs(data.result.slice(0, MAX_JOBS))
+      }
+    }
+
+    const load = async () => {
+      setLoading(true)
+      try {
+        if (isCandidate) {
+          try {
+            const { data } = await jobService.getRecommendedJobs(MAX_JOBS)
+            if (data.recommendations.length > 0) {
+              if (!cancelled) {
+                setUsingAi(true)
+                setJobs(
+                  data.recommendations.slice(0, MAX_JOBS).map((r) => ({
+                    ...r.job,
+                    matchScore: Math.round(r.score * 100),
+                  })),
+                )
+              }
+              return
+            }
+          } catch {
+            // Recommendations unavailable (e.g. no CV on file yet) — fall back below.
+          }
+        }
+        await loadLatestJobs()
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [authLoading, isAuthenticated, user])
 
   return (
-    <section className="py-16 md:py-20">
-      <div className="container mx-auto px-4">
+    <section className="relative overflow-hidden py-16 md:py-20">
+      {usingAi && (
+        <>
+          <div className="pointer-events-none absolute -top-24 left-1/4 h-72 w-72 rounded-full bg-violet-200/40 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-24 right-1/4 h-72 w-72 rounded-full bg-blue-200/40 blur-3xl" />
+        </>
+      )}
+
+      <div className="container relative mx-auto px-4">
         <div className="mb-8 text-center">
+          {usingAi && (
+            <span className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-violet-600 to-blue-600 px-4 py-1.5 text-xs font-semibold text-white shadow-md shadow-violet-200">
+              <Sparkles className="h-3.5 w-3.5" />
+              AI-Powered Picks For You
+            </span>
+          )}
           <h2 className="text-3xl font-bold text-foreground md:text-4xl">Jobs of the Day</h2>
           <p className="mt-2 text-muted-foreground">
-            Find your perfect match from today&apos;s top listings
+            {usingAi
+              ? "Matched by AI from your CV — ranked best-fit first"
+              : "Find your perfect match from today's top listings"}
           </p>
         </div>
 
-        {/* Tabs */}
-        <div className="mb-8 flex flex-wrap justify-center gap-2">
-          {tabs.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={cn(
-                "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
-                activeTab === tab
-                  ? "bg-primary text-white"
-                  : "border border-border text-muted-foreground hover:border-primary hover:text-primary"
-              )}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-
-        {/* Job cards grid */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {displayed.map((job) => (
-            <Card
-              key={job.id}
-              className="cursor-pointer border-border transition-all hover:border-primary/40 hover:shadow-md"
-            >
-              <CardContent className="p-5">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                      <Building2 className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">{job.company}</p>
-                      <p className="text-sm font-semibold text-foreground">{job.title}</p>
-                    </div>
-                  </div>
-                  <Bookmark className="h-4 w-4 shrink-0 text-muted-foreground" />
-                </div>
-
-                <div className="mt-3 flex flex-wrap gap-1">
-                  {job.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                <p className="mt-3 text-sm font-semibold text-foreground">
-                  ${job.salaryMin.toLocaleString()} – ${job.salaryMax.toLocaleString()}
-                  <span className="font-normal text-muted-foreground"> /monthly</span>
-                </p>
-
-                <Button
-                  size="sm"
-                  className="mt-3 w-full bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white hover:border-blue-600 rounded-lg font-medium shadow-none transition-all duration-200"
-                >
-                  Apply Now
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex flex-col items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
+            <LottieLoader size={160} />
+            Loading jobs…
+          </div>
+        ) : jobs.length === 0 ? (
+          <p className="text-center text-muted-foreground">No jobs available right now.</p>
+        ) : (
+          <div
+            className={cn(
+              "grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5",
+              usingAi && "rounded-3xl bg-gradient-to-br from-violet-50/60 via-white to-blue-50/60 p-6 ring-1 ring-violet-100",
+            )}
+          >
+            {jobs.map((job) => (
+              <div key={job.postId} className="relative">
+                {job.matchScore !== undefined && (
+                  <span className="absolute -top-2 -right-2 z-10 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-violet-600 to-blue-600 px-2 py-0.5 text-[10px] font-bold text-white shadow">
+                    <Sparkles className="h-2.5 w-2.5" />
+                    {job.matchScore}% Match
+                  </span>
+                )}
+                <FeaturedJobCard
+                  postId={job.postId}
+                  logo={job.company.logoUrl}
+                  company={job.company.name}
+                  title={job.title}
+                  location={job.company.address}
+                  salary={`$${job.salaryMin.toLocaleString()} – $${job.salaryMax.toLocaleString()}`}
+                  description={job.shortDescription}
+                  skills={job.skillNames}
+                />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )

@@ -12,6 +12,7 @@
 import { test as setup, expect } from '@playwright/test'
 import * as fs from 'fs'
 import * as path from 'path'
+import { buildAuthSessionCookie, readApiBase } from '../helpers/e2e-target'
 
 const DATA_DIR = path.join(__dirname, '../.data')
 const TEST_JOBS_FILE = path.join(DATA_DIR, 'test-jobs.json')
@@ -22,17 +23,6 @@ export interface TestJobEntry {
   jobTitle: string
   hrmKey: 'hrm1' | 'hrm2'
   createdAt: string
-}
-
-function readApiBase(): string {
-  if (process.env.NEXT_PUBLIC_API_BASE_URL) return process.env.NEXT_PUBLIC_API_BASE_URL
-  const envPath = path.join(__dirname, '../../.env.local')
-  if (fs.existsSync(envPath)) {
-    const raw = fs.readFileSync(envPath, 'utf8')
-    const match = raw.match(/^NEXT_PUBLIC_API_BASE_URL=(.+)$/m)
-    if (match) return match[1].trim()
-  }
-  return 'http://localhost:9085'
 }
 
 interface LoginResult {
@@ -91,18 +81,7 @@ async function switchSession(
 
   // Replace auth_session cookie with the new user's session
   await page.context().clearCookies()
-  await page.context().addCookies([
-    {
-      name: 'auth_session',
-      value: encodeURIComponent(JSON.stringify(session)),
-      domain: 'localhost',
-      path: '/',
-      expires: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60,
-      httpOnly: false,
-      secure: false,
-      sameSite: 'Lax',
-    },
-  ])
+  await page.context().addCookies([buildAuthSessionCookie(session)])
 
   // Replace localStorage tokens
   await page.evaluate(
@@ -118,7 +97,13 @@ async function switchSession(
 interface JobFormData {
   title: string
   shortDescription: string
-  fullDescription: string
+  description: string
+  responsibilities: string
+  requirements: string
+  benefits: string
+  employmentType: string
+  experienceLevel: string
+  currency: string
   location: string
   educationLevel: string
   requiredExperience: string
@@ -152,12 +137,27 @@ async function createJobViaUI(
   await page
     .getByPlaceholder('Brief overview for job listing...')
     .fill(jobData.shortDescription)
-  await page
+  await dialog
     .locator("label:has-text('Full Description') ~ textarea")
-    .fill(jobData.fullDescription)
-  await page.getByPlaceholder('City, Country').fill(jobData.location)
+    .fill(jobData.description)
+  await dialog.locator("label:has-text('Responsibilities') ~ textarea").fill(jobData.responsibilities)
+  await dialog.locator("label:has-text('Other Requirements') ~ textarea").fill(jobData.requirements)
+  await dialog.locator("label:has-text('Benefits') ~ textarea").fill(jobData.benefits)
   await page.getByPlaceholder('e.g. Bachelor in CS').fill(jobData.educationLevel)
   await page.getByPlaceholder('e.g. 3-5 years').fill(jobData.requiredExperience)
+
+  // ── Select currency ─────────────────────────────────────────────────────
+  const currencyTrigger = dialog.locator('button[role="combobox"]').filter({ hasText: /^USD$/ }).first()
+  if (await currencyTrigger.isVisible({ timeout: 3_000 }).catch(() => false)) {
+    await currencyTrigger.click()
+    const currencyOption = page.getByRole('option', { name: jobData.currency, exact: true })
+    if (await currencyOption.isVisible({ timeout: 3_000 }).catch(() => false)) {
+      await currencyOption.click()
+    }
+    await page.waitForTimeout(300)
+  }
+
+  await page.getByPlaceholder('City, Country').fill(jobData.location)
 
   // Add skills using the skill input
   const skillInput = page.getByPlaceholder('Type skill and press Enter...')

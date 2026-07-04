@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { buildAuthSessionCookie } from './helpers/e2e-target'
 
 // Run all route-protection tests with no pre-loaded auth state.
 // Tests that need auth add cookies manually via addCookies().
@@ -18,16 +19,11 @@ test.describe('Route protection', () => {
   test('candidate role accessing /dashboard is redirected to /', async ({ page }) => {
     // Set candidate session cookie
     await page.context().addCookies([
-      {
-        name: 'auth_session',
-        value: encodeURIComponent(JSON.stringify({
-          username: 'candidate',
-          roles: ['ROLE_USER'],
-          expiresAt: Date.now() + 3_600_000,
-        })),
-        domain: 'localhost',
-        path: '/',
-      },
+      buildAuthSessionCookie({
+        username: 'candidate',
+        roles: ['ROLE_USER'],
+        expiresAt: Date.now() + 3_600_000,
+      }),
     ])
     await page.goto('/dashboard')
     await expect(page).toHaveURL('/')
@@ -35,16 +31,11 @@ test.describe('Route protection', () => {
 
   test('admin role can access /dashboard', async ({ page }) => {
     await page.context().addCookies([
-      {
-        name: 'auth_session',
-        value: encodeURIComponent(JSON.stringify({
-          username: 'admin',
-          roles: ['ROLE_ADMIN'],
-          expiresAt: Date.now() + 3_600_000,
-        })),
-        domain: 'localhost',
-        path: '/',
-      },
+      buildAuthSessionCookie({
+        username: 'admin',
+        roles: ['ROLE_ADMIN'],
+        expiresAt: Date.now() + 3_600_000,
+      }),
     ])
     await page.goto('/dashboard')
     // Should NOT redirect to login
@@ -53,16 +44,11 @@ test.describe('Route protection', () => {
 
   test('authenticated user is redirected from /login to /', async ({ page }) => {
     await page.context().addCookies([
-      {
-        name: 'auth_session',
-        value: encodeURIComponent(JSON.stringify({
-          username: 'user',
-          roles: ['ROLE_USER'],
-          expiresAt: Date.now() + 3_600_000,
-        })),
-        domain: 'localhost',
-        path: '/',
-      },
+      buildAuthSessionCookie({
+        username: 'user',
+        roles: ['ROLE_USER'],
+        expiresAt: Date.now() + 3_600_000,
+      }),
     ])
     await page.goto('/login')
     await expect(page).toHaveURL('/')

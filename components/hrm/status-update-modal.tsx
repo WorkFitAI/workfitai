@@ -1,8 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { STATUS_FLOW } from "./application-table";
 import type { ApplicationStatus } from "@/types/application";
+
+/** Forward-only transition order. REJECTED is reachable from any non-terminal status. */
+const MAIN_FLOW: ApplicationStatus[] = ["APPLIED", "REVIEWING", "INTERVIEW", "OFFER", "HIRED"];
+
+/** Statuses to show in the modal: current status plus valid forward transitions. Past statuses are hidden. */
+function getVisibleStatuses(current: ApplicationStatus): ApplicationStatus[] {
+  if (current === "HIRED" || current === "REJECTED") return [current];
+  const idx = MAIN_FLOW.indexOf(current);
+  const forward = idx === -1 ? MAIN_FLOW : MAIN_FLOW.slice(idx);
+  return [...forward, "REJECTED"];
+}
 
 interface StatusUpdateModalProps {
   isOpen: boolean;
@@ -40,8 +50,20 @@ export function StatusUpdateModal({
   onClose,
 }: StatusUpdateModalProps) {
   const [selected, setSelected] = useState<string>(currentStatus);
+  // Tracks whether the modal was open on the previous render, so we can detect the
+  // closed→open transition and re-sync `selected` (modal stays mounted between opens).
+  const [wasOpen, setWasOpen] = useState(isOpen);
+
+  if (isOpen && !wasOpen) {
+    setWasOpen(true);
+    setSelected(currentStatus);
+  } else if (!isOpen && wasOpen) {
+    setWasOpen(false);
+  }
 
   if (!isOpen) return null;
+
+  const visibleStatuses = getVisibleStatuses(currentStatus);
 
   const handleConfirm = () => {
     if (!selected || selected === currentStatus) return;
@@ -86,32 +108,42 @@ export function StatusUpdateModal({
         )}
 
         <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
-          {STATUS_FLOW.map((s) => (
-            <label
-              key={s}
-              className={`flex items-start gap-3 rounded-lg border p-3 cursor-pointer transition-colors ${
-                selected === s
-                  ? "border-blue-500 bg-blue-50"
-                  : s === currentStatus
-                  ? "border-gray-300 bg-gray-50 opacity-60 cursor-default"
-                  : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-              }`}
-            >
-              <input
-                type="radio"
-                name="app-status"
-                value={s}
-                checked={selected === s}
-                disabled={s === currentStatus}
-                onChange={() => setSelected(s)}
-                className="mt-0.5 h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-              />
-              <div>
-                <div className="text-sm font-medium text-gray-900">{STATUS_LABELS[s]}</div>
-                <div className="text-xs text-gray-500">{STATUS_DESC[s]}</div>
-              </div>
-            </label>
-          ))}
+          {visibleStatuses.map((s) => {
+            const isCurrent = s === currentStatus;
+            return (
+              <label
+                key={s}
+                className={`flex items-start gap-3 rounded-lg border p-3 cursor-pointer transition-colors ${
+                  isCurrent
+                    ? "border-amber-300 bg-amber-50 cursor-default"
+                    : selected === s
+                    ? "border-blue-500 bg-blue-50"
+                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="app-status"
+                  value={s}
+                  checked={selected === s}
+                  disabled={isCurrent}
+                  onChange={() => setSelected(s)}
+                  className="mt-0.5 h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                />
+                <div>
+                  <div className="flex items-center gap-2 text-sm font-medium text-gray-900">
+                    {STATUS_LABELS[s]}
+                    {isCurrent && (
+                      <span className="rounded-full bg-amber-200 px-2 py-0.5 text-[10px] font-semibold uppercase text-amber-800">
+                        Current
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-500">{STATUS_DESC[s]}</div>
+                </div>
+              </label>
+            );
+          })}
         </div>
 
         <div className="flex gap-3 mt-6">

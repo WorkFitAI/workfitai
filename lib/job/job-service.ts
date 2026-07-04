@@ -1,4 +1,4 @@
-import { CreateJobCategoryRequest, GetJobsParams, Job, JobCategoriesResponse, JobCategory, JobData, JobDetail } from "@/types/job";
+import { CreateJobCategoryRequest, GetJobsParams, Job, JobCategoriesResponse, JobCategory, JobData, JobDetail, JobRecommendationsData } from "@/types/job";
 import { ApiResponse } from "@/types/response";
 import { apiClient } from "@/lib/api-client";
 import { CreateSkillRequest, Skill, SkillResponse } from "@/types/skill";
@@ -72,6 +72,18 @@ export const jobService = {
     const res = await apiClient.get(`/job/public/jobs/featured?page=${pageNumber - 1}&size=${size}`) as unknown as ApiResponse<JobData>;
     if (!res.status || res.status >= 400) {
       throw new Error("Failed to fetch featured jobs");
+    }
+    return res;
+  },
+
+  /**
+   * GET /job/public/recommendations/for-me?topK={topK}
+   * CANDIDATE-only: jobs ranked by similarity to the candidate's CV.
+   */
+  async getRecommendedJobs(topK = 10): Promise<ApiResponse<JobRecommendationsData>> {
+    const res = await apiClient.get(`/job/public/recommendations/for-me?topK=${topK}`) as unknown as ApiResponse<JobRecommendationsData>;
+    if (!res.status || res.status >= 400) {
+      throw new Error("Failed to fetch recommended jobs");
     }
     return res;
   },

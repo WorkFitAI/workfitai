@@ -12,12 +12,10 @@ export default async function RolesPermissionsPage() {
   const session = JSON.parse(decodeURIComponent(cookieValue))
   const roles: string[] = session.roles ?? []
 
-  // Middleware already blocks non-HRM/Admin, but explicit guard as defence-in-depth
-  if (!roles.includes("ROLE_HR_MANAGER") && !roles.includes("ROLE_ADMIN")) {
+  // Middleware already blocks non-Admin, but explicit guard as defence-in-depth
+  if (!roles.includes("ROLE_ADMIN")) {
     redirect("/dashboard")
   }
 
-  const isAdmin = roles.includes("ROLE_ADMIN")
-
-  return <RolesPermissionsClient isAdmin={isAdmin} />
+  return <RolesPermissionsClient isAdmin={true} />
 }

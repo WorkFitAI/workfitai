@@ -1,17 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
   Briefcase,
   Building2,
-  Download,
   ExternalLink,
   MapPin,
   DollarSign,
   Clock,
-  FileText,
   GraduationCap,
   Star,
 } from "lucide-react";
@@ -20,7 +17,7 @@ import ApplicationStatusBadge from "./application-status-badge";
 import ApplicationWithdrawDialog from "./application-withdraw-dialog";
 import { ApplicationStatus } from "@/types/application";
 import { Skeleton } from "@/components/ui/skeleton";
-import { applicationService } from "@/lib/application/application-service";
+import { CvViewer } from "@/components/applications/cv-viewer";
 
 /** Only APPLIED status allows withdrawal */
 const WITHDRAWABLE: ApplicationStatus[] = ["APPLIED"];
@@ -46,24 +43,6 @@ function DetailSkeleton() {
 export default function ApplicationDetailClient({ applicationId }: Props) {
   const { application, statusHistory, loading, error } =
     useApplicationDetail(applicationId);
-  const [cvDownloading, setCvDownloading] = useState(false);
-  const [cvError, setCvError] = useState<string | null>(null);
-
-  const handleDownloadCv = async () => {
-    if (!application) return;
-    setCvDownloading(true);
-    setCvError(null);
-    try {
-      await applicationService.downloadCv(
-        application.id,
-        application.cvFileName,
-      );
-    } catch {
-      setCvError("Download failed. Please try again.");
-    } finally {
-      setCvDownloading(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -162,22 +141,6 @@ export default function ApplicationDetailClient({ applicationId }: Props) {
                 <span className="text-xs text-gray-400">
                   Applied {appliedDate}
                 </span>
-                {/* CV filename + download button */}
-                {application.cvFileName && (
-                  <button
-                    onClick={handleDownloadCv}
-                    disabled={cvDownloading}
-                    title="Download CV"
-                    className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 disabled:opacity-50 transition-colors"
-                  >
-                    <FileText className="h-3.5 w-3.5" />
-                    {application.cvFileName}
-                    <Download className="h-3 w-3 ml-0.5" />
-                  </button>
-                )}
-                {cvError && (
-                  <span className="text-xs text-red-500">{cvError}</span>
-                )}
               </div>
             </div>
           </div>
@@ -274,6 +237,21 @@ export default function ApplicationDetailClient({ applicationId }: Props) {
               <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
                 {application.coverLetter}
               </p>
+            </div>
+          )}
+
+          {/* CV / Resume preview */}
+          {application.cvFileName && (
+            <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+              <h2 className="mb-4 text-base font-semibold text-foreground">
+                Your CV
+              </h2>
+              <div className="h-[700px] flex flex-col">
+                <CvViewer
+                  applicationId={application.id}
+                  fileName={application.cvFileName}
+                />
+              </div>
             </div>
           )}
         </div>

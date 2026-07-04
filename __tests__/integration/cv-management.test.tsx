@@ -133,4 +133,37 @@ describe("MyCVsPageClient", () => {
       ).toBeInTheDocument(),
     );
   });
+
+  it("renders an application-linked CV with null objectName/pdfUrl as view-only, without crashing", async () => {
+    setupSession();
+    const applicationCv = mockCVMetadata({
+      cvId: "cv-app-001",
+      objectName: null,
+      pdfUrl: null,
+      applicationId: "00a50e8e-fe2e-40ba-a2ef-69eb4412bdaf",
+    });
+    server.use(
+      http.get(`${API}/cv/candidate/:username`, () =>
+        HttpResponse.json({
+          data: mockCVListResponse({
+            result: [applicationCv],
+            meta: { page: 0, pageSize: 10, pages: 1, total: 1 },
+          }),
+        }),
+      ),
+    );
+
+    render(<MyCVsPageClient />);
+
+    await waitFor(() =>
+      expect(screen.getByText(/used in applications/i)).toBeInTheDocument(),
+    );
+    expect(screen.getByText(/view only/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /view application/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByTitle(/delete cv/i),
+    ).not.toBeInTheDocument();
+  });
 });

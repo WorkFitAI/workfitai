@@ -15,17 +15,20 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth-context";
 import { useApplyModal } from "@/contexts/apply-modal-context";
 import { applicationService } from "@/lib/application/application-service";
+import { cn } from "@/lib/utils";
 
 interface ApplyNowButtonProps {
   jobId: string;
   jobTitle: string;
   /** Optionally override the button label */
   label?: string;
+  /** Render as a square icon-only button (e.g. compact job cards) — label becomes the aria-label/title */
+  iconOnly?: boolean;
 }
 
 type CheckState = "idle" | "loading" | "applied" | "not-applied";
@@ -34,6 +37,7 @@ export default function ApplyNowButton({
   jobId,
   jobTitle,
   label = "Apply Now",
+  iconOnly = false,
 }: ApplyNowButtonProps) {
   const { isAuthenticated, user, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
@@ -87,9 +91,13 @@ export default function ApplyNowButton({
     return (
       <Button
         disabled
-        className="min-w-36 h-10 rounded-lg bg-blue-50 border border-blue-100 text-transparent animate-pulse select-none shadow-none"
+        aria-label={label}
+        className={cn(
+          "rounded-lg bg-blue-50 border border-blue-100 text-transparent animate-pulse select-none shadow-none",
+          iconOnly ? "h-10 w-10 p-0" : "min-w-36 h-10",
+        )}
       >
-        Apply Now
+        {iconOnly ? <Send className="w-4 h-4" /> : "Apply Now"}
       </Button>
     );
   }
@@ -99,10 +107,15 @@ export default function ApplyNowButton({
     return (
       <Button
         disabled
-        className="min-w-36 h-10 rounded-lg border border-green-200 bg-green-50 text-green-700 font-medium cursor-default shadow-none"
+        aria-label="Applied"
+        title="Applied"
+        className={cn(
+          "rounded-lg border border-green-200 bg-green-50 text-green-700 font-medium cursor-default shadow-none",
+          iconOnly ? "h-10 w-10 p-0" : "min-w-36 h-10",
+        )}
       >
-        <CheckCircle2 className="w-4 h-4 mr-1.5" />
-        Applied
+        <CheckCircle2 className={cn("w-4 h-4", !iconOnly && "mr-1.5")} />
+        {!iconOnly && "Applied"}
       </Button>
     );
   }
@@ -111,9 +124,14 @@ export default function ApplyNowButton({
   return (
     <Button
       onClick={handleClick}
-      className="min-w-36 h-10 rounded-lg bg-blue-50 border border-blue-200 text-blue-600 font-medium hover:bg-blue-600 hover:text-white hover:border-blue-600 shadow-none transition-all duration-200"
+      aria-label={label}
+      title={iconOnly ? label : undefined}
+      className={cn(
+        "rounded-lg bg-blue-50 border border-blue-200 text-blue-600 font-medium hover:bg-blue-600 hover:text-white hover:border-blue-600 shadow-none transition-all duration-200",
+        iconOnly ? "h-10 w-10 p-0" : "min-w-36 h-10",
+      )}
     >
-      {label}
+      {iconOnly ? <Send className="w-4 h-4" /> : label}
     </Button>
   );
 }

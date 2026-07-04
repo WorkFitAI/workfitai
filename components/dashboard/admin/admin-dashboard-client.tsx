@@ -36,8 +36,10 @@ export function AdminDashboardClient() {
       </div>
 
       {/* Row 3: job stats / user breakdown / top skills */}
-      <div className="grid grid-cols-7 gap-3">
-        <AdminUserBreakdownSection stats={data.userStats} />
+      <div className="grid grid-cols-8 gap-3">
+        <div className="col-span-2">
+          <AdminUserBreakdownSection stats={data.userStats} />
+        </div>
         <div className="col-span-2">
           <AdminPipelineSection stats={data.applicationStats} />
         </div>
@@ -54,7 +56,7 @@ export function AdminDashboardClient() {
         <div className="col-span-2">
           <AdminTopJobsSection stats={data.applicationStats} />
         </div>
-        <AdminAuditOverviewSection stats={data.auditStats} />
+        <AdminAuditOverviewSection stats={data.auditStats} recentAuditErrors={data.recentAuditErrors ?? []} />
       </div>
     </div>
   )

@@ -47,23 +47,41 @@ async function loginAndGetToken(
   password: string,
 ): Promise<{ accessToken: string; deviceId: string; username: string } | null> {
   const deviceId = `playwright-e2e-${email.split('@')[0]}`
-  try {
-    const res = await page.request.post(`${apiBase}/auth/login`, {
-      data: { usernameOrEmail: email, password },
-      headers: { 'Content-Type': 'application/json', 'X-Device-Id': deviceId },
-    })
-    if (!res.ok()) {
-      console.warn(`Login failed for ${email}: ${res.status()}`)
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const res = await page.request.post(`${apiBase}/auth/login`, {
+        data: { usernameOrEmail: email, password },
+        headers: { 'Content-Type': 'application/json', 'X-Device-Id': deviceId },
+      })
+      if (!res.ok()) {
+        console.warn(`Login failed for ${email}: ${res.status()} (attempt ${attempt}/3)`)
+        if (res.status() >= 500 && attempt < 3) {
+          await page.waitForTimeout(500 * attempt)
+          continue
+        }
+        return null
+      }
+      const json = await res.json()
+      const { accessToken, username } = json?.data ?? {}
+      if (!accessToken) {
+        console.warn(`Login response for ${email} did not include an access token (attempt ${attempt}/3)`)
+        if (attempt < 3) {
+          await page.waitForTimeout(500 * attempt)
+          continue
+        }
+        return null
+      }
+      return { accessToken, deviceId, username: username ?? email.split('@')[0] }
+    } catch (err) {
+      console.warn(`Login error for ${email} (attempt ${attempt}/3): ${err}`)
+      if (attempt < 3) {
+        await page.waitForTimeout(500 * attempt)
+        continue
+      }
       return null
     }
-    const json = await res.json()
-    const { accessToken, username } = json?.data ?? {}
-    if (!accessToken) return null
-    return { accessToken, deviceId, username: username ?? email.split('@')[0] }
-  } catch (err) {
-    console.warn(`Login error for ${email}: ${err}`)
-    return null
   }
+  return null
 }
 
 async function assignApplication(
@@ -84,6 +102,13 @@ async function assignApplication(
     })
     if (!res.ok()) {
       const body = await res.text().catch(() => '')
+      if (
+        res.status() === 400 &&
+        body.toLowerCase().includes('already assigned') &&
+        body.toLowerCase().includes(hrUsername.toLowerCase())
+      ) {
+        return true
+      }
       console.warn(`Assign ${applicationId} → ${hrUsername} failed (${res.status()}): ${body.substring(0, 150)}`)
       return false
     }
@@ -105,7 +130,11 @@ async function resolveUsername(
   const password = process.env[passwordEnvKey]
   if (!email || !password) return null
   const auth = await loginAndGetToken(page, apiBase, email, password)
-  return auth?.username ?? null
+  if (auth?.username) return auth.username
+
+  const fallbackUsername = email.split('@')[0]
+  console.warn(`Using username fallback for ${emailEnvKey}: ${fallbackUsername}`)
+  return fallbackUsername
 }
 
 setup('assign applications to HR staff', async ({ page }) => {

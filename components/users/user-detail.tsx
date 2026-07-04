@@ -27,6 +27,7 @@ import { useAuth } from "@/contexts/auth-context"
 import { UserStatusBadge } from "@/components/users/user-status-badge"
 import { UserRoleBadge } from "@/components/users/user-role-badge"
 import { UserRolesPanel } from "@/components/roles/user-roles-panel"
+import { LottieLoader } from "@/components/ui/lottie-loader"
 import type { AdminUserStatus } from "@/types/admin-user"
 
 /** Returns true for statuses that should show the Unblock action */
@@ -128,7 +129,7 @@ export function UserDetail({ userId }: UserDetailProps) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-3">
-        <Loader2 className="h-7 w-7 animate-spin text-blue-600" />
+        <LottieLoader size={90} />
         <p className="text-sm text-gray-500">Loading user…</p>
       </div>
     )
@@ -243,8 +244,8 @@ export function UserDetail({ userId }: UserDetailProps) {
         {user.userRole === "CANDIDATE" && (
           <div className="space-y-5">
             {fullProfileLoading ? (
-              <div className="rounded-lg border border-gray-200 bg-white shadow-sm flex items-center justify-center py-12 gap-2">
-                <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+              <div className="rounded-lg border border-gray-200 bg-white shadow-sm flex flex-col items-center justify-center py-12 gap-2">
+                <LottieLoader size={80} />
                 <span className="text-sm text-gray-500">Loading profile…</span>
               </div>
             ) : fullProfile ? (

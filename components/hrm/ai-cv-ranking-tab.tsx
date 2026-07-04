@@ -1,10 +1,16 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { Info } from "lucide-react";
 import { applicationService } from "@/lib/application/application-service";
 import { ApplicationDetailPanel } from "@/components/hrm/application-detail-panel";
+import { AiCvRankingLoader } from "@/components/hrm/ai-cv-ranking-loader";
+import { StatusBadge } from "@/components/hrm/application-table";
 import { useAuth } from "@/contexts/auth-context";
 import type { HRJobItem, CvRankingData, Application } from "@/types/application";
+
+const MAX_RETRIES = 5;
+const RETRY_DELAY_MS = 30000;
 
 const RANKING_STEPS = [
   "Extracting CV content…",
@@ -29,7 +35,6 @@ export function AiCvRankingTab({ jobs }: Props) {
   const { user } = useAuth();
   const [selectedJobId, setSelectedJobId] = useState("");
   const [loading, setLoading] = useState(false);
-  const [retryAttempt, setRetryAttempt] = useState(0);
   const [stepIdx, setStepIdx] = useState(0);
   const [result, setResult] = useState<CvRankingData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -56,9 +61,14 @@ export function AiCvRankingTab({ jobs }: Props) {
     setLoading(true);
     setError(null);
     setResult(null);
-    setRetryAttempt(0);
     try {
-      const res = await applicationService.getCVRanking(selectedJobId, 3, 15000, setRetryAttempt, 120000);
+      const res = await applicationService.getCVRanking(
+        selectedJobId,
+        MAX_RETRIES,
+        RETRY_DELAY_MS,
+        undefined,
+        120000,
+      );
       setResult(res.data);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ranking failed. Please try again.");
@@ -69,6 +79,17 @@ export function AiCvRankingTab({ jobs }: Props) {
 
   return (
     <div className="space-y-4">
+      {/* Accuracy disclaimer */}
+      <div className="flex items-start gap-2.5 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-xs text-blue-800">
+        <Info className="h-4 w-4 shrink-0 mt-0.5 text-blue-500" />
+        <p>
+          AI ranking quality depends on complete input: candidate CVs should follow the{" "}
+          <strong>Harvard formal resume template</strong> with all sections filled in (education,
+          experience, skills, etc.), and the job post should have <strong>every field on the job form
+          completed</strong>. Missing sections on either side may leave a candidate unranked.
+        </p>
+      </div>
+
       {/* Job selector + trigger */}
       <div className="flex items-center gap-3">
         <select
@@ -79,7 +100,7 @@ export function AiCvRankingTab({ jobs }: Props) {
             setError(null);
           }}
           disabled={loading}
-          className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 disabled:opacity-60"
+          className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-60"
         >
           <option value="">Select a job to rank CVs…</option>
           {jobs.map((j) => (
@@ -91,7 +112,7 @@ export function AiCvRankingTab({ jobs }: Props) {
         <button
           onClick={handleRank}
           disabled={!selectedJobId || loading}
-          className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 disabled:opacity-50 flex items-center gap-2 whitespace-nowrap transition-colors"
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50 flex items-center gap-2 whitespace-nowrap transition-colors"
         >
           {loading ? (
             <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -109,32 +130,11 @@ export function AiCvRankingTab({ jobs }: Props) {
 
       {/* Loading animation */}
       {loading && (
-        <div className="rounded-xl border border-violet-100 bg-violet-50 p-6 flex flex-col items-center gap-4">
-          <div className="relative h-14 w-14">
-            <svg className="h-14 w-14 animate-spin text-violet-300" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-30" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
-              <path className="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-            </svg>
-            <span className="absolute inset-0 flex items-center justify-center text-violet-600 text-2xl select-none">
-              ✦
-            </span>
-          </div>
+        <div className="rounded-xl border border-primary/20 bg-primary/5 p-6 flex flex-col items-center gap-2">
+          <AiCvRankingLoader />
           <div className="text-center space-y-1">
-            <p className="text-sm font-medium text-violet-800 animate-pulse">{RANKING_STEPS[stepIdx]}</p>
-            {retryAttempt > 0 && (
-              <p className="text-xs text-violet-500">Server busy — retry {retryAttempt} of 3…</p>
-            )}
-            <p className="text-xs text-violet-400">AI is analyzing each CV against the job requirements</p>
-          </div>
-          <div className="flex gap-1.5">
-            {RANKING_STEPS.map((_, i) => (
-              <span
-                key={i}
-                className={`h-1.5 w-6 rounded-full transition-colors duration-700 ${
-                  i <= stepIdx ? "bg-violet-500" : "bg-violet-200"
-                }`}
-              />
-            ))}
+            <p className="text-sm font-medium text-primary animate-pulse">{RANKING_STEPS[stepIdx]}</p>
+            <p className="text-xs text-primary/70">AI is analyzing each CV against the job requirements</p>
           </div>
         </div>
       )}
@@ -175,16 +175,27 @@ export function AiCvRankingTab({ jobs }: Props) {
                   <th className="px-4 py-3 text-left font-medium text-gray-500 whitespace-nowrap">Rank</th>
                   <th className="px-4 py-3 text-left font-medium text-gray-500 whitespace-nowrap">Candidate</th>
                   <th className="px-4 py-3 text-left font-medium text-gray-500 whitespace-nowrap">Fit</th>
-                  <th className="px-4 py-3 text-left font-medium text-gray-500 whitespace-nowrap">Score</th>
                   <th className="px-4 py-3 text-left font-medium text-gray-500">Explanation</th>
                   <th className="px-4 py-3 text-right font-medium text-gray-500 whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 bg-white">
-                {result.applications.map((item) => (
+                {result.applications.map((item) => {
+                  const isHired = item.application.status === "HIRED";
+                  const isOffered = item.application.status === "OFFER";
+                  const isPastRanking = isHired || isOffered;
+                  return (
                   <tr
                     key={item.application.id}
-                    className={`hover:bg-gray-50 transition-colors ${!item.ranked ? "opacity-60" : ""}`}
+                    className={`hover:bg-gray-50 transition-colors ${
+                      isHired
+                        ? "bg-green-50/40"
+                        : isOffered
+                        ? "bg-emerald-50/40"
+                        : !item.ranked
+                        ? "bg-amber-50/30"
+                        : ""
+                    }`}
                   >
                     <td className="px-4 py-3 whitespace-nowrap">
                       {item.ranked ? (
@@ -206,11 +217,19 @@ export function AiCvRankingTab({ jobs }: Props) {
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="font-medium text-gray-900">{item.application.username}</div>
+                      <div className="flex items-center gap-2">
+                        <div className="font-medium text-gray-900">{item.application.username}</div>
+                        {isHired && <StatusBadge status="HIRED" />}
+                        {isOffered && <StatusBadge status="OFFER" />}
+                      </div>
                       <div className="text-xs text-gray-500">{item.application.email}</div>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      {item.label ? (
+                      {isHired ? (
+                        <span className="text-xs text-gray-400 italic">Already hired — no longer ranking</span>
+                      ) : isOffered ? (
+                        <span className="text-xs text-gray-400 italic">Offer extended — no longer ranking</span>
+                      ) : item.label ? (
                         <span
                           className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                             LABEL_STYLE[item.label] ?? "bg-gray-100 text-gray-600"
@@ -218,24 +237,32 @@ export function AiCvRankingTab({ jobs }: Props) {
                         >
                           {item.label}
                         </span>
-                      ) : (
-                        <span className="text-gray-300">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      {item.ranked && item.score !== null ? (
-                        <div>
-                          <span className="font-semibold text-gray-800">{item.score.toFixed(1)}</span>
-                          <div className="text-xs text-gray-400">
-                            sim {item.similarityScore?.toFixed(1)} · cross {item.crossScore?.toFixed(1)}
-                          </div>
-                        </div>
+                      ) : !item.ranked ? (
+                        <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-200">
+                          Unranked
+                        </span>
                       ) : (
                         <span className="text-gray-300">—</span>
                       )}
                     </td>
                     <td className="px-4 py-3 max-w-xs">
-                      <p className="text-xs text-gray-600 line-clamp-2">{item.explanation ?? "—"}</p>
+                      {item.explanation ? (
+                        <p
+                          className={`text-xs line-clamp-2 ${
+                            !item.ranked && !isPastRanking ? "text-amber-700" : "text-gray-600"
+                          }`}
+                        >
+                          {item.explanation}
+                        </p>
+                      ) : !item.ranked && !isPastRanking ? (
+                        <p className="text-xs text-amber-700 italic">
+                          Could not rank — CV or job description may be missing required sections
+                          (e.g. education, experience, skills). Confirm the CV follows the Harvard
+                          formal template and all job fields are filled in.
+                        </p>
+                      ) : (
+                        <p className="text-xs text-gray-300">—</p>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <button
@@ -246,14 +273,11 @@ export function AiCvRankingTab({ jobs }: Props) {
                       </button>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
-
-          <p className="text-xs text-gray-400 text-right">
-            Processed in {(result.processing_time_ms / 1000).toFixed(2)}s
-          </p>
         </>
       )}
 

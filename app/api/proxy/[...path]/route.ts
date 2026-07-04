@@ -12,7 +12,9 @@ const BE_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:9085'
 // accept-encoding is stripped so Node.js fetch receives uncompressed content;
 // forwarding it would cause the proxy to receive gzip and return it with the
 // content-encoding header intact, causing ERR_CONTENT_DECODING_FAILED in the browser.
-const BLOCKED_REQ_HEADERS = new Set(['host', 'connection', 'transfer-encoding', 'accept-encoding'])
+// origin/referer are stripped because this is a server-to-server call — forwarding the
+// browser's Origin (e.g. http://localhost:3000) makes the backend's WAF/CORS layer 403 it.
+const BLOCKED_REQ_HEADERS = new Set(['host', 'connection', 'transfer-encoding', 'accept-encoding', 'origin', 'referer'])
 const BLOCKED_RES_HEADERS = new Set(['connection', 'transfer-encoding', 'keep-alive'])
 
 // Strip Domain attribute from Set-Cookie so the browser stores the cookie

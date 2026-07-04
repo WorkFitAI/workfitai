@@ -45,3 +45,4 @@ playwright-report/
 test-results/
 e2e/.data/test-application.json
 e2e/.data/test-job.json
+e2e/.data/apply-modal-job.json

@@ -1,21 +1,11 @@
 import { test as setup } from "@playwright/test";
-import * as fs from "fs";
 import * as path from "path";
+import { buildAuthSessionCookie, readApiBase } from "../helpers/e2e-target";
 
 export const HRMANAGER1_AUTH_FILE = path.join(
   __dirname,
   "../.auth/hrmanager1.json",
 );
-
-function readApiBase(): string {
-  if (process.env.NEXT_PUBLIC_API_BASE_URL) return process.env.NEXT_PUBLIC_API_BASE_URL;
-  const envPath = path.join(__dirname, "../../.env.local");
-  if (fs.existsSync(envPath)) {
-    const match = fs.readFileSync(envPath, "utf8").match(/^NEXT_PUBLIC_API_BASE_URL=(.+)$/m);
-    if (match) return match[1].trim();
-  }
-  return "http://localhost:9085";
-}
 
 setup("authenticate as hrmanager1", async ({ page }) => {
   const email = process.env.TEST_HRMANAGER1_EMAIL!;
@@ -47,18 +37,7 @@ setup("authenticate as hrmanager1", async ({ page }) => {
     expiresAt,
   };
 
-  await page.context().addCookies([
-    {
-      name: "auth_session",
-      value: encodeURIComponent(JSON.stringify(session)),
-      domain: "localhost",
-      path: "/",
-      expires: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60,
-      httpOnly: false,
-      secure: false,
-      sameSite: "Lax",
-    },
-  ]);
+  await page.context().addCookies([buildAuthSessionCookie(session)]);
 
   // Store token in localStorage — token-store.ts reads from localStorage, not sessionStorage
   await page.evaluate(
