@@ -69,6 +69,15 @@ export default defineConfig({
         storageState: 'e2e/.auth/candidate1.json',
       },
     },
+    {
+      name: 'candidate1-apply-modal-job-setup',
+      testMatch: 'e2e/setup/candidate1-apply-modal-job.setup.ts',
+      dependencies: ['candidate1-setup', 'hrmanager1-setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'e2e/.auth/hrmanager1.json',
+      },
+    },
     // ── Multi-job data setup (HRM1 + HRM2 create diverse published jobs) ────
     {
       name: 'hrm-multi-job-data-setup',
@@ -106,6 +115,7 @@ export default defineConfig({
       dependencies: [
         'candidate1-setup',
         'hrm-job-data-setup',
+        'candidate1-apply-modal-job-setup',
         'candidate1-apply-data-setup',
         'hrm-multi-job-data-setup',
         'multi-candidate-apply-data-setup',
@@ -152,10 +162,14 @@ export default defineConfig({
     // those are run under their own role-based projects above with the correct
     // storage state. Running them here with candidate.json would cause auth
     // redirects and false failures.
+    // Keep both legacy browser projects because auth/homepage/route-protection
+    // and OAuth callback edge paths are cross-browser smoke coverage not
+    // duplicated by the role-based projects.
     {
       name: 'e2e-chromium',
       testMatch: [
         'e2e/application-flow.spec.ts',
+        'e2e/auth-oauth-callback.spec.ts',
         'e2e/auth.spec.ts',
         'e2e/homepage.spec.ts',
         'e2e/route-protection.spec.ts',
@@ -170,6 +184,7 @@ export default defineConfig({
       name: 'e2e-firefox',
       testMatch: [
         'e2e/application-flow.spec.ts',
+        'e2e/auth-oauth-callback.spec.ts',
         'e2e/auth.spec.ts',
         'e2e/homepage.spec.ts',
         'e2e/route-protection.spec.ts',

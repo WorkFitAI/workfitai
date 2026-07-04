@@ -2,20 +2,29 @@
  * E2E spec — Apply Now Modal (Candidate)
  * Runs under the e2e-candidate project (storageState: candidate1.json).
  * Playwright config matches: testMatch: 'e2e/candidate-*.spec.ts'
- * Depends on: candidate1-setup, hrm-job-data-setup, candidate1-apply-data-setup
+ * Depends on: candidate1-setup, hrm-job-data-setup,
+ * candidate1-apply-modal-job-setup, candidate1-apply-data-setup
  */
 import { test, expect } from '@playwright/test'
 import * as fs from 'fs'
 import * as path from 'path'
 import { injectAuthToken } from './helpers/inject-auth-token'
 
-function getTestJob(): { jobId: string; jobTitle: string } | null {
-  const jobFile = path.join(__dirname, '.data/test-job.json')
+function readJobFile(fileName: string): { jobId: string; jobTitle: string } | null {
+  const jobFile = path.join(__dirname, `.data/${fileName}`)
   try {
     return JSON.parse(fs.readFileSync(jobFile, 'utf-8'))
   } catch {
     return null
   }
+}
+
+function getTestJob(): { jobId: string; jobTitle: string } | null {
+  return readJobFile('apply-modal-job.json')
+}
+
+function getAppliedTestJob(): { jobId: string; jobTitle: string } | null {
+  return readJobFile('test-job.json')
 }
 
 /** Minimal valid single-page PDF as a Buffer. */
@@ -28,41 +37,6 @@ function minimalPdfBuffer(): Buffer {
       '0000000058 00000 n \n0000000115 00000 n \n' +
       'trailer\n<</Size 4 /Root 1 0 R>>\nstartxref\n190\n%%EOF\n',
   )
-}
-
-/** Navigate to the test job and open the Apply modal. Returns false if not possible. */
-async function openApplyModal(page: import('@playwright/test').Page): Promise<boolean> {
-  const job = getTestJob()
-  if (!job) return false
-
-  await page.goto(`/jobs/${job.jobId}`)
-  await page.waitForLoadState('load')
-
-  // Use .first() to avoid strict-mode violation when multiple Apply Now buttons exist
-  const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
-  if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
-    return false
-  }
-  if (!(await applyBtn.isEnabled().catch(() => false))) {
-    return false
-  }
-
-  await applyBtn.click()
-  await expect(page.getByRole('dialog')).toBeVisible({ timeout: 8_000 })
-  return true
-}
-
-/** Skip test if modal shows "Already Applied" state. Returns true if skipped. */
-async function skipIfAlreadyApplied(
-  page: import('@playwright/test').Page,
-  reason: string,
-): Promise<boolean> {
-  const dialog = page.getByRole('dialog')
-  if (await dialog.getByText(/already applied/i).isVisible({ timeout: 2_000 }).catch(() => false)) {
-    test.skip(true, reason)
-    return true
-  }
-  return false
 }
 
 test.describe('Apply Now Modal', () => {
@@ -81,25 +55,17 @@ test.describe('Apply Now Modal', () => {
     await page.waitForLoadState('load')
 
     const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
-    if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
-      test.skip(true, 'Apply Now button not visible — candidate may have already applied')
-      return
-    }
-
-    // Skip if button is visible but disabled (candidate already applied, button shows disabled "Apply Now")
-    if (!(await applyBtn.isEnabled().catch(() => false))) {
-      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
-      return
-    }
+    await expect(applyBtn).toBeVisible({ timeout: 8_000 })
+    await expect(applyBtn).toBeEnabled({ timeout: 5_000 })
 
     await applyBtn.click()
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 8_000 })
   })
 
   test('modal shows Already Applied state when candidate has already submitted', async ({ page }) => {
-    const job = getTestJob()
+    const job = getAppliedTestJob()
     if (!job) {
-      test.skip(true, 'No test job available')
+      test.skip(true, 'No applied test job available')
       return
     }
 
@@ -107,37 +73,7 @@ test.describe('Apply Now Modal', () => {
     await page.waitForLoadState('load')
 
     const alreadyAppliedBtn = page.getByRole('button', { name: /applied/i }).first()
-    const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
-
-    const isApplyVisible = await applyBtn.isVisible({ timeout: 5_000 }).catch(() => false)
-    const isAlreadyApplied = await alreadyAppliedBtn.isVisible({ timeout: 3_000 }).catch(() => false)
-
-    if (isAlreadyApplied) {
-      await expect(alreadyAppliedBtn).toBeVisible()
-      return
-    }
-
-    if (!isApplyVisible) {
-      test.skip(true, 'Neither Apply Now nor Applied button found')
-      return
-    }
-    if (!(await applyBtn.isEnabled().catch(() => false))) {
-      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
-      return
-    }
-
-    await applyBtn.click()
-    const dialog = page.getByRole('dialog')
-    await expect(dialog).toBeVisible({ timeout: 8_000 })
-
-    const alreadyAppliedInModal = await dialog
-      .getByText(/already applied/i)
-      .isVisible({ timeout: 3_000 })
-      .catch(() => false)
-
-    if (!alreadyAppliedInModal) {
-      test.skip(true, 'Candidate has not yet applied — already-applied state not shown')
-    }
+    await expect(alreadyAppliedBtn).toBeVisible({ timeout: 8_000 })
   })
 
   test('modal shows email field and CV upload zone when candidate has not applied', async ({ page }) => {
@@ -151,20 +87,13 @@ test.describe('Apply Now Modal', () => {
     await page.waitForLoadState('load')
 
     const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
-    if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
-      test.skip(true, 'Apply Now button not visible')
-      return
-    }
-    if (!(await applyBtn.isEnabled().catch(() => false))) {
-      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
-      return
-    }
+    await expect(applyBtn).toBeVisible({ timeout: 8_000 })
+    await expect(applyBtn).toBeEnabled({ timeout: 5_000 })
 
     await applyBtn.click()
     const dialog = page.getByRole('dialog')
     await expect(dialog).toBeVisible({ timeout: 8_000 })
-
-    if (await skipIfAlreadyApplied(page, 'Modal shows already-applied state — form fields not rendered')) return
+    await expect(dialog.getByText(/already applied/i)).not.toBeVisible({ timeout: 2_000 })
 
     // Email field should be auto-populated
     await expect(dialog.locator('#apply-email')).toBeVisible({ timeout: 5_000 })
@@ -189,20 +118,13 @@ test.describe('Apply Now Modal', () => {
     await page.waitForLoadState('load')
 
     const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
-    if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
-      test.skip(true, 'Apply Now button not visible')
-      return
-    }
-    if (!(await applyBtn.isEnabled().catch(() => false))) {
-      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
-      return
-    }
+    await expect(applyBtn).toBeVisible({ timeout: 8_000 })
+    await expect(applyBtn).toBeEnabled({ timeout: 5_000 })
 
     await applyBtn.click()
     const dialog = page.getByRole('dialog')
     await expect(dialog).toBeVisible({ timeout: 8_000 })
-
-    if (await skipIfAlreadyApplied(page, 'Already applied state shown — skipping file validation test')) return
+    await expect(dialog.getByText(/already applied/i)).not.toBeVisible({ timeout: 2_000 })
 
     // Upload a non-PDF file — plain text
     await page.locator('#cv-upload').setInputFiles({
@@ -225,20 +147,13 @@ test.describe('Apply Now Modal', () => {
     await page.waitForLoadState('load')
 
     const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
-    if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
-      test.skip(true, 'Apply Now button not visible')
-      return
-    }
-    if (!(await applyBtn.isEnabled().catch(() => false))) {
-      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
-      return
-    }
+    await expect(applyBtn).toBeVisible({ timeout: 8_000 })
+    await expect(applyBtn).toBeEnabled({ timeout: 5_000 })
 
     await applyBtn.click()
     const dialog = page.getByRole('dialog')
     await expect(dialog).toBeVisible({ timeout: 8_000 })
-
-    if (await skipIfAlreadyApplied(page, 'Already applied — skipping image file type test')) return
+    await expect(dialog.getByText(/already applied/i)).not.toBeVisible({ timeout: 2_000 })
 
     // Upload a PNG file (1×1 red pixel)
     const pngBuffer = Buffer.from(
@@ -266,20 +181,13 @@ test.describe('Apply Now Modal', () => {
     await page.waitForLoadState('load')
 
     const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
-    if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
-      test.skip(true, 'Apply Now button not visible')
-      return
-    }
-    if (!(await applyBtn.isEnabled().catch(() => false))) {
-      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
-      return
-    }
+    await expect(applyBtn).toBeVisible({ timeout: 8_000 })
+    await expect(applyBtn).toBeEnabled({ timeout: 5_000 })
 
     await applyBtn.click()
     const dialog = page.getByRole('dialog')
     await expect(dialog).toBeVisible({ timeout: 8_000 })
-
-    if (await skipIfAlreadyApplied(page, 'Already applied — skipping PDF upload test')) return
+    await expect(dialog.getByText(/already applied/i)).not.toBeVisible({ timeout: 2_000 })
 
     await page.locator('#cv-upload').setInputFiles({
       name: 'my-resume.pdf',
@@ -307,20 +215,13 @@ test.describe('Apply Now Modal', () => {
     await page.waitForLoadState('load')
 
     const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
-    if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
-      test.skip(true, 'Apply Now button not visible')
-      return
-    }
-    if (!(await applyBtn.isEnabled().catch(() => false))) {
-      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
-      return
-    }
+    await expect(applyBtn).toBeVisible({ timeout: 8_000 })
+    await expect(applyBtn).toBeEnabled({ timeout: 5_000 })
 
     await applyBtn.click()
     const dialog = page.getByRole('dialog')
     await expect(dialog).toBeVisible({ timeout: 8_000 })
-
-    if (await skipIfAlreadyApplied(page, 'Already applied — skipping file replacement test')) return
+    await expect(dialog.getByText(/already applied/i)).not.toBeVisible({ timeout: 2_000 })
 
     // Upload first file
     await page.locator('#cv-upload').setInputFiles({
@@ -350,20 +251,13 @@ test.describe('Apply Now Modal', () => {
     await page.waitForLoadState('load')
 
     const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
-    if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
-      test.skip(true, 'Apply Now button not visible')
-      return
-    }
-    if (!(await applyBtn.isEnabled().catch(() => false))) {
-      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
-      return
-    }
+    await expect(applyBtn).toBeVisible({ timeout: 8_000 })
+    await expect(applyBtn).toBeEnabled({ timeout: 5_000 })
 
     await applyBtn.click()
     const dialog = page.getByRole('dialog')
     await expect(dialog).toBeVisible({ timeout: 8_000 })
-
-    if (await skipIfAlreadyApplied(page, 'Already applied — skipping submit-without-CV test')) return
+    await expect(dialog.getByText(/already applied/i)).not.toBeVisible({ timeout: 2_000 })
 
     // Submit button is disabled when no CV
     const submitBtn = dialog.getByRole('button', { name: /submit application/i })
@@ -381,20 +275,13 @@ test.describe('Apply Now Modal', () => {
     await page.waitForLoadState('load')
 
     const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
-    if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
-      test.skip(true, 'Apply Now button not visible')
-      return
-    }
-    if (!(await applyBtn.isEnabled().catch(() => false))) {
-      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
-      return
-    }
+    await expect(applyBtn).toBeVisible({ timeout: 8_000 })
+    await expect(applyBtn).toBeEnabled({ timeout: 5_000 })
 
     await applyBtn.click()
     const dialog = page.getByRole('dialog')
     await expect(dialog).toBeVisible({ timeout: 8_000 })
-
-    if (await skipIfAlreadyApplied(page, 'Already applied — skipping cover letter test')) return
+    await expect(dialog.getByText(/already applied/i)).not.toBeVisible({ timeout: 2_000 })
 
     const coverLetter = dialog.locator('#cover-letter')
     await expect(coverLetter).toBeVisible({ timeout: 5_000 })
@@ -414,26 +301,16 @@ test.describe('Apply Now Modal', () => {
     await page.waitForLoadState('load')
 
     const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
-    if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
-      test.skip(true, 'Apply Now button not visible')
-      return
-    }
-    if (!(await applyBtn.isEnabled().catch(() => false))) {
-      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
-      return
-    }
+    await expect(applyBtn).toBeVisible({ timeout: 8_000 })
+    await expect(applyBtn).toBeEnabled({ timeout: 5_000 })
 
     await applyBtn.click()
     const dialog = page.getByRole('dialog')
     await expect(dialog).toBeVisible({ timeout: 8_000 })
-
-    if (await skipIfAlreadyApplied(page, 'Already applied — skipping detailed cover letter test')) return
+    await expect(dialog.getByText(/already applied/i)).not.toBeVisible({ timeout: 2_000 })
 
     const coverLetter = dialog.locator('#cover-letter')
-    if (!(await coverLetter.isVisible({ timeout: 5_000 }).catch(() => false))) {
-      test.skip(true, 'No cover letter field found')
-      return
-    }
+    await expect(coverLetter).toBeVisible({ timeout: 5_000 })
 
     const detailedText =
       'Dear Hiring Manager,\n\n' +
@@ -462,26 +339,16 @@ test.describe('Apply Now Modal', () => {
     await page.waitForLoadState('load')
 
     const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
-    if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
-      test.skip(true, 'Apply Now button not visible')
-      return
-    }
-    if (!(await applyBtn.isEnabled().catch(() => false))) {
-      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
-      return
-    }
+    await expect(applyBtn).toBeVisible({ timeout: 8_000 })
+    await expect(applyBtn).toBeEnabled({ timeout: 5_000 })
 
     await applyBtn.click()
     const dialog = page.getByRole('dialog')
     await expect(dialog).toBeVisible({ timeout: 8_000 })
-
-    if (await skipIfAlreadyApplied(page, 'Already applied — skipping unicode cover letter test')) return
+    await expect(dialog.getByText(/already applied/i)).not.toBeVisible({ timeout: 2_000 })
 
     const coverLetter = dialog.locator('#cover-letter')
-    if (!(await coverLetter.isVisible({ timeout: 5_000 }).catch(() => false))) {
-      test.skip(true, 'No cover letter field found')
-      return
-    }
+    await expect(coverLetter).toBeVisible({ timeout: 5_000 })
 
     // Unicode, accented characters, and tech symbols commonly used in cover letters
     const unicodeText =
@@ -504,14 +371,8 @@ test.describe('Apply Now Modal', () => {
     await page.waitForLoadState('load')
 
     const applyBtn = page.getByRole('button', { name: /apply now/i }).first()
-    if (!(await applyBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
-      test.skip(true, 'Apply Now button not visible')
-      return
-    }
-    if (!(await applyBtn.isEnabled().catch(() => false))) {
-      test.skip(true, 'Apply Now button is disabled — candidate may have already applied')
-      return
-    }
+    await expect(applyBtn).toBeVisible({ timeout: 8_000 })
+    await expect(applyBtn).toBeEnabled({ timeout: 5_000 })
 
     await applyBtn.click()
     const dialog = page.getByRole('dialog')

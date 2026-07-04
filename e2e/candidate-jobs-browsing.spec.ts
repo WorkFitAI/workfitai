@@ -9,6 +9,15 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { injectAuthToken } from './helpers/inject-auth-token'
 
+async function waitForJobsList(page: import('@playwright/test').Page) {
+  await page.waitForLoadState('load')
+  await page
+    .getByText(/loading jobs/i)
+    .first()
+    .waitFor({ state: 'hidden', timeout: 15_000 })
+    .catch(() => undefined)
+}
+
 function getTestJob(): { jobId: string; jobTitle: string } | null {
   const jobFile = path.join(__dirname, '.data/test-job.json')
   try {
@@ -35,7 +44,7 @@ test.describe('Jobs Browsing — Candidate', () => {
 
   test('job cards or empty state is visible after load', async ({ page }) => {
     await page.goto('/jobs')
-    await page.waitForLoadState('load')
+    await waitForJobsList(page)
 
     const hasCards = await page
       .locator('main h2')
@@ -44,7 +53,7 @@ test.describe('Jobs Browsing — Candidate', () => {
       .catch(() => false)
 
     const hasJobCount = await page
-      .getByText(/showing.*jobs|of \d+ jobs/i)
+      .getByText(/showing.*jobs|of \d+ jobs|\d+\s+jobs\s*available/i)
       .first()
       .isVisible({ timeout: 5_000 })
       .catch(() => false)
@@ -197,7 +206,7 @@ test.describe('Jobs Browsing — Candidate', () => {
 
   test('clicking a job card navigates to the job detail page', async ({ page }) => {
     await page.goto('/jobs')
-    await page.waitForLoadState('load')
+    await waitForJobsList(page)
 
     const jobLink = page.locator('a[href*="/jobs/"]').first()
     if (!(await jobLink.isVisible({ timeout: 8_000 }).catch(() => false))) {
@@ -211,7 +220,7 @@ test.describe('Jobs Browsing — Candidate', () => {
 
   test('job detail page shows the job title heading', async ({ page }) => {
     await page.goto('/jobs')
-    await page.waitForLoadState('load')
+    await waitForJobsList(page)
 
     const jobLink = page.locator('a[href*="/jobs/"]').first()
     if (!(await jobLink.isVisible({ timeout: 8_000 }).catch(() => false))) {
@@ -233,7 +242,7 @@ test.describe('Jobs Browsing — Candidate', () => {
 
   test('job detail page shows key sections (description, requirements or overview)', async ({ page }) => {
     await page.goto('/jobs')
-    await page.waitForLoadState('load')
+    await waitForJobsList(page)
 
     const jobLink = page.locator('a[href*="/jobs/"]').first()
     if (!(await jobLink.isVisible({ timeout: 8_000 }).catch(() => false))) {
@@ -264,7 +273,7 @@ test.describe('Jobs Browsing — Candidate', () => {
 
   test('job detail page shows location information', async ({ page }) => {
     await page.goto('/jobs')
-    await page.waitForLoadState('load')
+    await waitForJobsList(page)
 
     const jobLink = page.locator('a[href*="/jobs/"]').first()
     if (!(await jobLink.isVisible({ timeout: 8_000 }).catch(() => false))) {
@@ -355,7 +364,7 @@ test.describe('Jobs Browsing — Candidate', () => {
 
   test('back navigation from job detail returns to jobs list', async ({ page }) => {
     await page.goto('/jobs')
-    await page.waitForLoadState('load')
+    await waitForJobsList(page)
 
     const jobLink = page.locator('a[href*="/jobs/"]').first()
     if (!(await jobLink.isVisible({ timeout: 8_000 }).catch(() => false))) {

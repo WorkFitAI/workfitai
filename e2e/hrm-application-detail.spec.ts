@@ -11,7 +11,7 @@ import { injectAuthToken } from './helpers/inject-auth-token'
  *  Returns null if no applications exist (caller should skip). */
 async function openFirstDetailPanel(page: import('@playwright/test').Page) {
   await page.goto('/applications')
-  await page.waitForLoadState('load')
+  await page.waitForLoadState('networkidle')
 
   const viewBtn = page.getByRole('button', { name: /^view$/i }).first()
   if (!(await viewBtn.isVisible({ timeout: 8_000 }).catch(() => false))) {
@@ -166,7 +166,7 @@ test.describe('HRM Application Detail Panel', () => {
 /** Opens /applications as HRM2, clicks View on the first row, returns the panel or null. */
 async function openFirstDetailPanelAsHrm2(page: import('@playwright/test').Page) {
   await page.goto('/applications')
-  await page.waitForLoadState('load')
+  await page.waitForLoadState('networkidle')
   const viewBtn = page.getByRole('button', { name: /^view$/i }).first()
   if (!(await viewBtn.isVisible({ timeout: 8_000 }).catch(() => false))) return null
   await viewBtn.click()
