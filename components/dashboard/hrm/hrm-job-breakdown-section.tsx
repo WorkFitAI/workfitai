@@ -82,11 +82,11 @@ export function HrmJobBreakdownSection({ stats }: HrmJobBreakdownSectionProps) {
               {stats.expiringInWeek} expiring in 7d
             </span>
           )}
-          {stats.pendingReports > 0 && (
+          {/* {stats.pendingReports > 0 && (
             <span className="text-xs font-medium text-red-600 bg-red-50 rounded px-1.5 py-0.5">
               {stats.pendingReports} pending report{stats.pendingReports !== 1 ? "s" : ""}
             </span>
-          )}
+          )} */}
         </div>
       </CardContent>
     </Card>

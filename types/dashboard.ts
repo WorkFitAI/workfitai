@@ -114,14 +114,6 @@ export interface AdminDashboardData {
 
 // ── HRM Dashboard ──────────────────────────────────────────────────────────
 
-export interface HrmTeamPerformanceRow {
-  hrUsername: string
-  assigned: number
-  reviewed: number
-  avgTimeToReviewDays: number
-  conversionRate: number
-}
-
 export interface HrmTopJob {
   jobId: string
   jobTitle: string
@@ -138,7 +130,6 @@ export interface HrmTopJobByViews {
 export interface HrmApplicationStats {
   totalApplications: number
   byStatus: Record<string, number>
-  teamPerformance: HrmTeamPerformanceRow[]
   topJobs: HrmTopJob[]
   stuckApplicationsCount: number
   conversionRates: Record<string, number>
@@ -154,6 +145,7 @@ export interface HrmJobStats {
   expiringInWeek: number
   pendingReports: number
   byEmploymentType: Record<string, number>
+  byJobCategory: Record<string, number>
   byExperienceLevel: Record<string, number>
   topJobsByViews: HrmTopJobByViews[]
 }
@@ -162,6 +154,7 @@ export interface HrmDashboardData {
   applicationStats: HrmApplicationStats | null
   jobStats: HrmJobStats | null
   auditStats: AuditStats | null
+  recentAuditErrors: AuditEventItem[]
 }
 
 // ── Supplementary types (audit events + activity) ─────────────────────────

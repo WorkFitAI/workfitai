@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { userService } from "@/lib/user/user-service";
 import { useProfileSettings } from "@/hooks/use-profile-settings";
@@ -538,11 +538,18 @@ export function ControlSettingsPageClient() {
   const isAdmin = settings?.role === "ADMIN";
 
   const TABS: { id: Tab; label: string; icon: React.ElementType; hidden?: boolean }[] = [
-    { id: "notifications", label: "Notifications", icon: Bell },
-    { id: "privacy", label: "Privacy", icon: Lock },
+    { id: "notifications", label: "Notifications", icon: Bell, hidden: isAdmin },
+    { id: "privacy", label: "Privacy", icon: Lock, hidden: isAdmin },
     { id: "hr-notifications", label: "HR Notifications", icon: ClipboardList, hidden: !isHrm },
     { id: "features", label: "Features", icon: Sparkles, hidden: !isAdmin },
   ];
+
+  // Admin has no "notifications"/"privacy" tabs — land on the first tab it can actually see.
+  useEffect(() => {
+    if (isAdmin && (activeTab === "notifications" || activeTab === "privacy")) {
+      setActiveTab("features");
+    }
+  }, [isAdmin, activeTab]);
 
   return (
     <div className="space-y-6">

@@ -6,7 +6,7 @@ import { LottieLoader } from "@/components/ui/lottie-loader"
 import FeaturedJobCard from "@/components/jobs/featured/featured-job-card"
 import { useAuth } from "@/contexts/auth-context"
 import { jobService } from "@/lib/job/job-service"
-import { cn } from "@/lib/utils"
+import { cn, formatSalary } from "@/lib/utils"
 import { Company } from "@/types/company"
 
 /** Fields shared by `Job` (public job list) and the recommendation endpoint's job shape. */
@@ -18,6 +18,8 @@ interface DisplayJob {
   salaryMax: number
   skillNames: string[]
   company: Company
+  /** Absent on recommendation-endpoint jobs (`RecommendedJob` has no currency) — defaults to VND display. */
+  currency?: string
   /** 0-100 — only set when sourced from the AI recommendation endpoint. */
   matchScore?: number
 }
@@ -137,9 +139,10 @@ export function HomeJobsOfDay() {
                   company={job.company.name}
                   title={job.title}
                   location={job.company.address}
-                  salary={`$${job.salaryMin.toLocaleString()} – $${job.salaryMax.toLocaleString()}`}
+                  salary={`${job.currency === "USD" ? "$" : "đ"}${formatSalary(job.salaryMin)} - ${job.currency === "USD" ? "$" : "đ"}${formatSalary(job.salaryMax)}`}
                   description={job.shortDescription}
                   skills={job.skillNames}
+                  compact={!usingAi}
                 />
               </div>
             ))}
