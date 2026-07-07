@@ -35,5 +35,5 @@ export const controlNavItems: NavItem[] = [
   { title: "Roles & Permissions", href: "/roles-permissions", icon: ShieldCheck, roles: ["ROLE_ADMIN"] },
   { title: "Audit Logs", href: "/audit-logs", icon: ClipboardCheck, roles: ["ROLE_ADMIN"] },
   { title: "Report", href: "/report", icon: BarChart2, roles: ["ROLE_ADMIN"] },
-  { title: "Settings", href: "/settings", icon: Settings },
+  { title: "Settings", href: "/settings", icon: Settings, roles: ["ROLE_ADMIN", "ROLE_HR"] },
 ]

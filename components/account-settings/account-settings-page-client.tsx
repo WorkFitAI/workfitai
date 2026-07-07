@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import ProfileView from "./profile-view";
 import NotificationsForm from "./notifications-form";
-import PrivacyForm from "./privacy-form";
+// import PrivacyForm from "./privacy-form";
 import ChangePasswordForm from "./change-password-form";
-import TwoFactorForm from "./two-factor-form";
+// import TwoFactorForm from "./two-factor-form";
 import DangerZone from "./danger-zone";
 import SessionsPanel from "./sessions-panel";
 
@@ -141,11 +141,11 @@ export default function AccountSettingsPageClient() {
                   </p>
                 </div>
                 <ChangePasswordForm />
-                <TwoFactorForm />
-                <div className="rounded-lg border border-border bg-white p-6 shadow-sm">
+                {/* <TwoFactorForm /> */}
+                {/* <div className="rounded-lg border border-border bg-white p-6 shadow-sm">
                   <h3 className="text-sm font-semibold mb-4">Profile Visibility</h3>
                   <PrivacyForm />
-                </div>
+                </div> */}
               </div>
             )}
             {activeTab === "sessions" && <SessionsPanel />}
