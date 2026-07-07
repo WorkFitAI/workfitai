@@ -13,7 +13,7 @@ interface AdminTopJobsSectionProps {
 export function AdminTopJobsSection({ stats }: AdminTopJobsSectionProps) {
   if (!stats) return <SectionFallback title="Top Jobs" />
 
-  const jobs = stats.topJobs.slice(0, 5)
+  const jobs = stats.topJobs.slice(0, 10)
 
   return (
     <Card>

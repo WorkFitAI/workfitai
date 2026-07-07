@@ -5,9 +5,9 @@ import { getDefaultRouteForRoles } from '@/lib/auth/default-route'
 // Routes accessible to any control role (HR, HRM, Admin)
 const CONTROL_ROUTES = ['/dashboard', '/job-posts', '/settings', '/applications']
 // Routes restricted to HR Manager and Admin only
-const HRM_ROUTES = ['/hr-management']
+const HRM_ROUTES = ['/hr-management', '/audit-logs']
 // Routes restricted to Admin only
-const ADMIN_ROUTES = ['/users', '/audit-logs', '/roles-permissions']
+const ADMIN_ROUTES = ['/users', '/roles-permissions']
 // Routes that require any authenticated user
 const CANDIDATE_ROUTES = ['/applied-jobs', '/my-cvs', '/account-settings']
 // Candidate-only feature routes — control roles (HR/HRM/Admin) get sent to their own area instead

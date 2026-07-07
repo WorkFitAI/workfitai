@@ -18,7 +18,7 @@ interface HrmTopJobsSectionProps {
 export function HrmTopJobsSection({ stats, jobWarnings }: HrmTopJobsSectionProps) {
   if (!stats) return <SectionFallback title="Top Jobs" />
 
-  const jobs = stats.topJobs.slice(0, 5)
+  const jobs = stats.topJobs.slice(0, 8)
 
   return (
     <Card>
@@ -58,11 +58,11 @@ export function HrmTopJobsSection({ stats, jobWarnings }: HrmTopJobsSectionProps
                 {jobWarnings.expiringInWeek} expiring in 7d
               </span>
             )}
-            {jobWarnings.pendingReports > 0 && (
+            {/* {jobWarnings.pendingReports > 0 && (
               <span className="text-xs font-medium text-red-600 bg-red-50 rounded px-1.5 py-0.5">
                 {jobWarnings.pendingReports} pending report{jobWarnings.pendingReports !== 1 ? "s" : ""}
               </span>
-            )}
+            )} */}
           </div>
         )}
       </CardContent>

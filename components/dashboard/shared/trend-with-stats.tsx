@@ -12,12 +12,35 @@ interface TrendStats {
   yearOverYear: number   // 0.45 = +45%
 }
 
+/** Generic stat pill for the row below the chart (used when `stats` isn't applicable). */
+export interface StatPill {
+  label: string
+  value: string
+  /** Optional secondary line (e.g. a delta like "+12.0%"). */
+  sub?: string
+  subTone?: "up" | "down" | "neutral"
+}
+
 interface TrendWithStatsProps {
   data: VolumeTrendPoint[]
   title: string
-  stats: TrendStats
+  stats?: TrendStats
+  /** Custom pill row rendered below the chart. Supports 2–4 pills. */
+  pills?: StatPill[]
   color?: string
   height?: number
+}
+
+function toneClass(tone?: "up" | "down" | "neutral") {
+  if (tone === "up") return "text-green-600"
+  if (tone === "down") return "text-red-500"
+  return "text-muted-foreground"
+}
+
+const pillGridCols: Record<number, string> = {
+  2: "grid-cols-2",
+  3: "grid-cols-3",
+  4: "grid-cols-4",
 }
 
 function formatDate(dateStr: string) {
@@ -37,6 +60,7 @@ export function TrendWithStats({
   data,
   title,
   stats,
+  pills,
   color = "#7c5cbf",
   height = 160,
 }: TrendWithStatsProps) {
@@ -97,28 +121,45 @@ export function TrendWithStats({
         )}
 
         {/* 4-pill stat row */}
-        <div className="grid grid-cols-4 gap-2">
-          <div className="bg-muted/50 rounded-lg p-2 text-center">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Last 7d</p>
-            <p className="text-sm font-bold">{stats.last7Days.toLocaleString()}</p>
+        {stats && (
+          <div className="grid grid-cols-4 gap-2">
+            <div className="bg-muted/50 rounded-lg p-2 text-center">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Last 7d</p>
+              <p className="text-sm font-bold">{stats.last7Days.toLocaleString()}</p>
+            </div>
+            <div className="bg-muted/50 rounded-lg p-2 text-center">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Last 30d</p>
+              <p className="text-sm font-bold">{stats.last30Days.toLocaleString()}</p>
+            </div>
+            <div className="bg-muted/50 rounded-lg p-2 text-center">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">MoM</p>
+              <p className={cn("text-sm font-bold", pctColor(stats.monthOverMonth))}>
+                {pctLabel(stats.monthOverMonth)}
+              </p>
+            </div>
+            <div className="bg-muted/50 rounded-lg p-2 text-center">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">YoY</p>
+              <p className={cn("text-sm font-bold", pctColor(stats.yearOverYear))}>
+                {pctLabel(stats.yearOverYear)}
+              </p>
+            </div>
           </div>
-          <div className="bg-muted/50 rounded-lg p-2 text-center">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Last 30d</p>
-            <p className="text-sm font-bold">{stats.last30Days.toLocaleString()}</p>
+        )}
+
+        {/* Custom pill row (2–4 pills) */}
+        {pills && pills.length > 0 && (
+          <div className={cn("grid gap-2", pillGridCols[pills.length] ?? "grid-cols-4")}>
+            {pills.map((p) => (
+              <div key={p.label} className="bg-muted/50 rounded-lg p-2 text-center">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wide">{p.label}</p>
+                <p className="text-sm font-bold">{p.value}</p>
+                {p.sub && (
+                  <p className={cn("text-[10px] font-medium", toneClass(p.subTone))}>{p.sub}</p>
+                )}
+              </div>
+            ))}
           </div>
-          <div className="bg-muted/50 rounded-lg p-2 text-center">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wide">MoM</p>
-            <p className={cn("text-sm font-bold", pctColor(stats.monthOverMonth))}>
-              {pctLabel(stats.monthOverMonth)}
-            </p>
-          </div>
-          <div className="bg-muted/50 rounded-lg p-2 text-center">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wide">YoY</p>
-            <p className={cn("text-sm font-bold", pctColor(stats.yearOverYear))}>
-              {pctLabel(stats.yearOverYear)}
-            </p>
-          </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   )
