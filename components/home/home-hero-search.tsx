@@ -31,8 +31,6 @@ export function HomeHeroSearch() {
     if (debouncedKeyword) params.set("title", debouncedKeyword);
     else params.delete("title");
 
-    params.set("page", String(page));
-
     router.push(`/jobs?${params.toString()}`);
   };
   

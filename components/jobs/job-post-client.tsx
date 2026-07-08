@@ -151,7 +151,6 @@ export default function JobAdminPage({ roles, companyId }: { roles: string[]; co
           companyNo: companyId,
           skillIds: skillIdsToSave,
         };
-
         delete newData.skillNames;
         delete newData.jobCategoryName;
         delete newData.postId;

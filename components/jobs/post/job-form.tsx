@@ -232,14 +232,16 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                     <FormField
                       control={form.control}
                       name="skillNames"
-                      render={({ field }) => (
+                      render={({ field }) => {
+                        const skills = field.value ?? [];
+                        return(
                         <FormItem className="relative">
                           <FormLabel className="font-bold uppercase text-xs">Required Skills (Tags)</FormLabel>
                           <div className="flex flex-wrap gap-2 p-2.5 border rounded-lg bg-slate-50/50 min-h-[44px]">
-                            {field.value.map((skill: string) => (
+                            {skills.map((skill: string) => (
                               <span key={skill} className="flex items-center gap-1.5 px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-full">
                                 {skill}
-                                <button type="button" onClick={() => field.onChange(field.value.filter((s: string) => s !== skill))} className="hover:text-red-200">✕</button>
+                                <button type="button" onClick={() => field.onChange(skills.filter((s: string) => s !== skill))} className="hover:text-red-200">✕</button>
                               </span>
                             ))}
                             <input
@@ -250,10 +252,10 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                               onKeyDown={(e) => {
                                 if (e.key === "Enter" && query.trim()) {
                                   e.preventDefault();
-                                  if (!field.value.includes(query)) field.onChange([...field.value, query]);
+                                  if (!skills.includes(query)) field.onChange([...skills, query]);
                                   setQuery("");
                                 }
-                                if (e.key === "Backspace" && !query) field.onChange(field.value.slice(0, -1));
+                                if (e.key === "Backspace" && !query) field.onChange(skills.slice(0, -1));
                               }}
                             />
                           </div>
@@ -261,14 +263,14 @@ export const JobForm = ({ initialData, onSubmit, onSuccess }: Props) => {
                             <Card className="absolute z-50 w-full mt-1 shadow-xl max-h-48 overflow-y-auto">
                               {filtered.map((skill) => (
                                 <div key={skill.skillId} className="p-3 hover:bg-blue-50 cursor-pointer text-sm border-b last:border-none" onClick={() => {
-                                  if (!field.value.includes(skill.name)) field.onChange([...field.value, skill.name]);
+                                  if (!skills.includes(skill.name)) field.onChange([...skills, skill.name]);
                                   setQuery("");
                                 }}>{skill.name}</div>
                               ))}
                             </Card>
                           )}
                         </FormItem>
-                      )}
+                      )}}
                     />
 
                     <JobCategorySelect form={form} job={initialData} />

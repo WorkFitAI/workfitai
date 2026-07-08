@@ -100,6 +100,7 @@ export type GetJobsParams = {
   pageSize?: number;
   sort?: string;
   filter?: string;
+  keyword?: string;
   role?: string;
 };
 

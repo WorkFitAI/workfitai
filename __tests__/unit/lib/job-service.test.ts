@@ -70,6 +70,15 @@ describe("jobService.getJobs", () => {
     expect(url).toContain("filter=");
   });
 
+  it("appends keyword to query string when provided", async () => {
+    mockedApiClient.get.mockResolvedValue(ok200(mockJobData));
+
+    await jobService.getJobs({ page: 1, pageSize: 12, keyword: "engineer" });
+
+    const url: string = mockedApiClient.get.mock.calls[0][0] as string;
+    expect(url).toContain("keyword=engineer");
+  });
+
   it("throws when status >= 400", async () => {
     mockedApiClient.get.mockResolvedValue(err400);
     await expect(jobService.getJobs({ page: 1, pageSize: 12 })).rejects.toThrow("Failed to fetch jobs");

@@ -10,6 +10,7 @@ export const jobService = {
     pageSize = 12,
     sort = "desc",
     filter,
+    keyword,
     role,
   }: GetJobsParams): Promise<ApiResponse<JobData>> {
     const params = new URLSearchParams();
@@ -22,9 +23,12 @@ export const jobService = {
 
     if (filter) {
       params.append("filter", filter);
-
-      console.log("Filter string:", filter);
     }
+
+    if (keyword) {
+      params.append("keyword", keyword);
+    }
+
     const endpoint = getEndpoint(role as string, params);
 
     const res = await apiClient.get(endpoint) as ApiResponse<JobData>;

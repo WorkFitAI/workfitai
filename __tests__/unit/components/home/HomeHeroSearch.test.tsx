@@ -88,8 +88,9 @@ describe("HomeHeroSearch", () => {
   it("Should show a fixed Technology label instead of an industry combobox", () => {
     render(<HomeHeroSearch />);
 
-    expect(screen.getByText("Technology")).toBeInTheDocument();
+    expect(screen.queryByText("Technology")).not.toBeInTheDocument();
     expect(screen.getAllByRole("combobox")).toHaveLength(1);
+    expect(screen.getByLabelText(/Filter by location/i)).toBeInTheDocument();
   });
 
   it("Should trigger search when blurring the input", () => {
