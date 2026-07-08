@@ -78,11 +78,18 @@ describe("HomeHeroSearch", () => {
   it("Should call replace when selecting a location", () => {
     render(<HomeHeroSearch />);
 
-    const selects = screen.getAllByRole("combobox");
+    const select = screen.getByRole("combobox");
 
-    fireEvent.change(selects[1], { target: { value: "hcm" } });
+    fireEvent.change(select, { target: { value: "hcm" } });
 
     expect(replaceMock).toHaveBeenCalled();
+  });
+
+  it("Should show a fixed Technology label instead of an industry combobox", () => {
+    render(<HomeHeroSearch />);
+
+    expect(screen.getByText("Technology")).toBeInTheDocument();
+    expect(screen.getAllByRole("combobox")).toHaveLength(1);
   });
 
   it("Should trigger search when blurring the input", () => {

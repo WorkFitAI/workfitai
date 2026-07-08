@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { controlNavItems } from "@/lib/navigation"
 import { useAuth } from "@/contexts/auth-context"
+import { getDefaultRouteForRoles } from "@/lib/auth/default-route"
 
 interface BreadcrumbSegment {
   label: string
@@ -45,6 +46,7 @@ export function ControlHeader() {
   const { user, logout } = useAuth()
   const initials = user?.username?.charAt(0).toUpperCase() ?? "U"
   const breadcrumbs = buildBreadcrumbs(pathname)
+  const homeHref = getDefaultRouteForRoles(user?.roles ?? [])
 
   return (
     <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6 gap-4">
@@ -52,9 +54,9 @@ export function ControlHeader() {
       <nav aria-label="Breadcrumb" className="flex items-center gap-1 shrink-0 min-w-0">
         {/* Home anchor */}
         <Link
-          href="/dashboard"
+          href={homeHref}
           className="flex h-7 w-7 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
-          aria-label="Dashboard home"
+          aria-label="Home"
         >
           <Home className="h-3.5 w-3.5" />
         </Link>
@@ -78,28 +80,8 @@ export function ControlHeader() {
         ))}
       </nav>
 
-      {/* Center: Search */}
-      <div className="flex-1 max-w-sm">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <input
-            type="search"
-            placeholder="Search..."
-            className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-9 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors"
-          />
-        </div>
-      </div>
-
       {/* Right: Actions + Avatar */}
       <div className="flex items-center gap-1 shrink-0">
-        {/* Calendar icon */}
-        <button
-          aria-label="Calendar"
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-        >
-          <Calendar className="h-5 w-5" />
-        </button>
-
         <NotificationBell />
 
         {/* User avatar dropdown */}

@@ -2,13 +2,25 @@ import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { SectionFallback } from "@/components/dashboard/shared/section-fallback"
 import { cn } from "@/lib/utils"
-import type { AuditStats } from "@/types/dashboard"
+import type { AuditStats, AuditEventItem } from "@/types/dashboard"
 
 interface HrmCompanyAuditSectionProps {
   auditStats: AuditStats | null
+  recentAuditErrors?: AuditEventItem[]
 }
 
-export function HrmCompanyAuditSection({ auditStats }: HrmCompanyAuditSectionProps) {
+function formatTime(iso: string) {
+  const d = new Date(iso)
+  return d.toLocaleString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  })
+}
+
+export function HrmCompanyAuditSection({ auditStats, recentAuditErrors = [] }: HrmCompanyAuditSectionProps) {
   if (!auditStats) return <SectionFallback title="Company Audit" />
 
   const successPct = (auditStats.successRate * 100).toFixed(1)
@@ -37,7 +49,7 @@ export function HrmCompanyAuditSection({ auditStats }: HrmCompanyAuditSectionPro
         </div>
 
         {/* Top actions from byAction */}
-        {topActions.length > 0 && (
+        {/* {topActions.length > 0 && (
           <div className="space-y-1.5">
             <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
               Top actions
@@ -49,11 +61,39 @@ export function HrmCompanyAuditSection({ auditStats }: HrmCompanyAuditSectionPro
               </div>
             ))}
           </div>
-        )}
+        )} */}
+
+        {/* Recent error logs */}
+        <div className="space-y-1">
+          <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
+            Recent errors ({auditStats.failedEvents} total)
+          </p>
+          {recentAuditErrors.length === 0 ? (
+            <p className="text-xs text-muted-foreground py-2 text-center">No recent errors</p>
+          ) : (
+            <div className="space-y-1.5 max-h-[200px] overflow-y-auto pr-0.5">
+              {recentAuditErrors.map((evt) => (
+                <div
+                  key={evt.eventId}
+                  className="rounded-md border border-destructive/20 bg-destructive/5 px-2.5 py-1.5 space-y-0.5"
+                >
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="text-[11px] font-semibold truncate">{evt.actorUsername}</span>
+                    <span className="text-[10px] text-muted-foreground shrink-0">{formatTime(evt.occurredAt)}</span>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground font-mono truncate">{evt.action}</p>
+                  {evt.errorMessage && (
+                    <p className="text-[10px] text-destructive leading-tight line-clamp-2">{evt.errorMessage}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* View log button */}
         <Link
-          href="/audit"
+          href="/audit-logs"
           className="block w-full text-center text-xs font-medium text-violet-700 bg-violet-50 hover:bg-violet-100 rounded-lg py-2 transition-colors border border-violet-200"
         >
           View company audit log →

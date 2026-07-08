@@ -37,8 +37,14 @@ describe('middleware — route protection', () => {
     expect(res?.headers.get('location')).toBeNull()
   })
 
-  it('allows ROLE_HR to access /dashboard', () => {
+  it('redirects ROLE_HR from /dashboard to /applications/my', () => {
     const req = makeRequest('/dashboard', makeSession(['ROLE_HR']))
+    const res = middleware(req)
+    expect(res?.headers.get('location')).toContain('/applications/my')
+  })
+
+  it('allows ROLE_HR_MANAGER to access /dashboard', () => {
+    const req = makeRequest('/dashboard', makeSession(['ROLE_HR_MANAGER']))
     const res = middleware(req)
     expect(res?.headers.get('location')).toBeNull()
   })
@@ -60,14 +66,40 @@ describe('middleware — admin routes (/users)', () => {
     expect(res?.headers.get('location')).toContain('/login')
   })
 
-  it('redirects authenticated non-admin (ROLE_HR) from /users to /dashboard', () => {
+  it('redirects authenticated non-admin (ROLE_HR) from /users to /applications/my', () => {
     const req = makeRequest('/users', makeSession(['ROLE_HR']))
     const res = middleware(req)
-    expect(res?.headers.get('location')).toContain('/dashboard')
+    expect(res?.headers.get('location')).toContain('/applications/my')
   })
 
   it('allows ROLE_ADMIN to access /users', () => {
     const req = makeRequest('/users', makeSession(['ROLE_ADMIN']))
+    const res = middleware(req)
+    expect(res?.headers.get('location')).toBeNull()
+  })
+})
+
+describe('middleware — admin routes (/roles-permissions)', () => {
+  it('redirects unauthenticated user from /roles-permissions to /login', () => {
+    const req = makeRequest('/roles-permissions')
+    const res = middleware(req)
+    expect(res?.headers.get('location')).toContain('/login')
+  })
+
+  it('redirects ROLE_HR_MANAGER (not Admin) from /roles-permissions to /dashboard', () => {
+    const req = makeRequest('/roles-permissions', makeSession(['ROLE_HR_MANAGER']))
+    const res = middleware(req)
+    expect(res?.headers.get('location')).toContain('/dashboard')
+  })
+
+  it('redirects ROLE_HR from /roles-permissions to /applications/my', () => {
+    const req = makeRequest('/roles-permissions', makeSession(['ROLE_HR']))
+    const res = middleware(req)
+    expect(res?.headers.get('location')).toContain('/applications/my')
+  })
+
+  it('allows ROLE_ADMIN to access /roles-permissions', () => {
+    const req = makeRequest('/roles-permissions', makeSession(['ROLE_ADMIN']))
     const res = middleware(req)
     expect(res?.headers.get('location')).toBeNull()
   })
@@ -80,10 +112,10 @@ describe('middleware — HRM routes (/hr-management)', () => {
     expect(res?.headers.get('location')).toContain('/login')
   })
 
-  it('redirects ROLE_HR (not HRM/Admin) from /hr-management to /dashboard', () => {
+  it('redirects ROLE_HR (not HRM/Admin) from /hr-management to /applications/my', () => {
     const req = makeRequest('/hr-management', makeSession(['ROLE_HR']))
     const res = middleware(req)
-    expect(res?.headers.get('location')).toContain('/dashboard')
+    expect(res?.headers.get('location')).toContain('/applications/my')
   })
 
   it('allows ROLE_HR_MANAGER to access /hr-management', () => {
@@ -111,6 +143,26 @@ describe('middleware — candidate routes (/applied-jobs)', () => {
 
   it('allows authenticated user to access /applied-jobs', () => {
     const req = makeRequest('/applied-jobs', makeSession(['ROLE_USER']))
+    const res = middleware(req)
+    expect(res?.headers.get('location')).toBeNull()
+  })
+})
+
+describe('middleware — candidate-only routes blocked for control roles', () => {
+  it('redirects ROLE_HR from /applied-jobs to /applications/my', () => {
+    const req = makeRequest('/applied-jobs', makeSession(['ROLE_HR']))
+    const res = middleware(req)
+    expect(res?.headers.get('location')).toContain('/applications/my')
+  })
+
+  it('redirects ROLE_ADMIN from /my-cvs to /dashboard', () => {
+    const req = makeRequest('/my-cvs', makeSession(['ROLE_ADMIN']))
+    const res = middleware(req)
+    expect(res?.headers.get('location')).toContain('/dashboard')
+  })
+
+  it('allows a candidate (ROLE_USER) to access /my-cvs', () => {
+    const req = makeRequest('/my-cvs', makeSession(['ROLE_USER']))
     const res = middleware(req)
     expect(res?.headers.get('location')).toBeNull()
   })

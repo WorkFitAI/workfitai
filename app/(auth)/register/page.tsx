@@ -108,14 +108,6 @@ function RegisterContent() {
             Sign In
           </Link>
         </p>
-        <p>
-          <Link
-            href="/register?type=employer"
-            className="font-medium text-foreground underline"
-          >
-            Register as Employer
-          </Link>
-        </p>
       </motion.div>
     </AuthShell>
   );

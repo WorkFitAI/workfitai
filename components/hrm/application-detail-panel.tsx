@@ -5,7 +5,7 @@ import { StatusBadge } from "./application-table";
 import { StatusUpdateModal } from "./status-update-modal";
 import { NotesPanel } from "./notes-panel";
 import { StatusTimeline } from "./status-timeline";
-import { CvViewer } from "./cv-viewer";
+import { CvViewer } from "@/components/applications/cv-viewer";
 import { useApplicationNotes, useStatusUpdate, useStatusHistory } from "@/hooks/useApplicationManagement";
 import type { Application } from "@/types/application";
 

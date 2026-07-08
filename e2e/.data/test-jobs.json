@@ -1,64 +1,100 @@
 {
   "jobs": [
     {
-      "jobId": "1fdd7143-ba11-468a-9d3e-daf6b7994acf",
+      "jobId": "295b627f-80ff-4e58-9bc3-417d21b84160",
       "jobTitle": "Senior Backend Engineer - NodeJS / NestJS",
       "hrmKey": "hrm1",
-      "createdAt": "2026-06-13T16:24:57.044Z"
+      "createdAt": "2026-07-04T14:30:27.706Z"
     },
     {
-      "jobId": "2e96deb3-401c-4aa6-9d01-15e3148b2b02",
+      "jobId": "1012aebf-8a2b-4e84-b3f9-1c4bbe32fd12",
       "jobTitle": "Frontend Developer - React / TypeScript",
       "hrmKey": "hrm1",
-      "createdAt": "2026-06-13T16:25:14.537Z"
+      "createdAt": "2026-07-04T14:30:46.855Z"
     },
     {
-      "jobId": "40d93b8e-59ff-42f0-89cf-8ff77d719874",
+      "jobId": "ea782f69-ae80-4f66-a4fa-30cb752c3dc2",
       "jobTitle": "Fullstack Engineer - Next.js / NodeJS",
       "hrmKey": "hrm1",
-      "createdAt": "2026-06-13T16:25:33.016Z"
+      "createdAt": "2026-07-04T14:31:07.436Z"
     },
     {
-      "jobId": "753a1ed5-adcf-4d29-a05b-e6fa1fa8c3a4",
+      "jobId": "87955cda-0e1f-43a0-970b-f016ff2e73c6",
       "jobTitle": "Mobile Developer - React Native",
       "hrmKey": "hrm1",
-      "createdAt": "2026-06-13T16:25:51.356Z"
+      "createdAt": "2026-07-04T14:31:27.765Z"
     },
     {
-      "jobId": "88caaefb-bd7e-49d3-a158-2452ceb8f38e",
+      "jobId": "60c297e6-7565-40b7-a1bf-d6e5e661045e",
       "jobTitle": "DevOps Engineer - AWS / Kubernetes",
       "hrmKey": "hrm1",
-      "createdAt": "2026-06-13T16:26:10.283Z"
+      "createdAt": "2026-07-04T14:31:47.890Z"
     },
     {
-      "jobId": "aa891075-170d-418c-814b-bf317256ae2f",
+      "jobId": "c1fd14a0-22f3-4396-8497-4c329f3b3d51",
       "jobTitle": "Cloud Solutions Architect - AWS / GCP",
       "hrmKey": "hrm2",
-      "createdAt": "2026-06-13T16:26:28.376Z"
+      "createdAt": "2026-07-04T14:32:07.330Z"
     },
     {
-      "jobId": "fdcbc965-5f54-4857-9363-6328f0fb1a27",
+      "jobId": "510f9eb5-0082-4219-b000-d7f576911962",
       "jobTitle": "Data Engineer - Apache Spark / Airflow",
       "hrmKey": "hrm2",
-      "createdAt": "2026-06-13T16:26:46.557Z"
+      "createdAt": "2026-07-04T14:32:26.675Z"
     },
     {
-      "jobId": "0ee9f521-101f-43de-adf1-2146432395bf",
+      "jobId": "3ee2bc8d-4097-436b-b9ca-75250acefe78",
       "jobTitle": "Data Scientist - Machine Learning",
       "hrmKey": "hrm2",
-      "createdAt": "2026-06-13T16:27:04.642Z"
+      "createdAt": "2026-07-04T14:32:45.896Z"
     },
     {
-      "jobId": "f963b0c9-be4a-4e30-a2fe-ed4b6c9afb57",
+      "jobId": "5d7ba9d3-39a6-47d7-a431-c78ab0842a2c",
       "jobTitle": "Cybersecurity Engineer - Application Security",
       "hrmKey": "hrm2",
-      "createdAt": "2026-06-13T16:27:22.798Z"
+      "createdAt": "2026-07-04T14:33:05.368Z"
     },
     {
-      "jobId": "9d82879e-2e64-4e80-b5ec-13255f9762dc",
+      "jobId": "b647ff94-5899-4a17-baae-6f10ce2ea6eb",
       "jobTitle": "AI Engineer - LLM & Generative AI",
       "hrmKey": "hrm2",
-      "createdAt": "2026-06-13T16:27:40.922Z"
+      "createdAt": "2026-07-04T14:33:24.614Z"
+    },
+    {
+      "jobId": "5e52a587-4d19-4d4a-839e-0758b9c1fbe4",
+      "jobTitle": "Junior Backend Engineer - NodeJS (Internship)",
+      "hrmKey": "hrm1",
+      "createdAt": "2026-07-04T14:33:44.879Z"
+    },
+    {
+      "jobId": "2be902a6-7c0e-401f-81b2-b6dd2c7b26ee",
+      "jobTitle": "Frontend Software Engineer - React (Contract)",
+      "hrmKey": "hrm1",
+      "createdAt": "2026-07-04T14:34:03.954Z"
+    },
+    {
+      "jobId": "fbde6a61-b706-429a-a230-f277840c1ca7",
+      "jobTitle": "Lead Data Engineer - Data Platform",
+      "hrmKey": "hrm1",
+      "createdAt": "2026-07-04T14:34:23.375Z"
+    },
+    {
+      "jobId": "bc5f99ff-37d7-4fae-932a-5aa5248dfb6c",
+      "jobTitle": "Associate Cloud Solutions Engineer - AWS Support (Part-Time)",
+      "hrmKey": "hrm1",
+      "createdAt": "2026-07-04T14:34:41.396Z"
+    },
+    {
+      "jobId": "dae43df6-18b6-4600-93a3-df60ccf7b71b",
+      "jobTitle": "Machine Learning Engineer - NLP",
+      "hrmKey": "hrm1",
+      "createdAt": "2026-07-04T14:35:00.812Z"
+    },
+    {
+      "jobId": "1a8983f8-0341-4e73-8c15-edbebab161e2",
+      "jobTitle": "Security Analyst Intern - AppSec (Internship)",
+      "hrmKey": "hrm1",
+      "createdAt": "2026-07-04T14:35:19.770Z"
     }
   ]
 }

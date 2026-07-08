@@ -7,20 +7,11 @@
 import { test as setup } from '@playwright/test'
 import * as fs from 'fs'
 import * as path from 'path'
+import { E2E_BASE_URL, readApiBase } from '../helpers/e2e-target'
 
 const DATA_DIR = path.join(__dirname, '../.data')
 const TEST_JOB_FILE = path.join(DATA_DIR, 'test-job.json')
 const TEST_APPLICATION_FILE = path.join(DATA_DIR, 'test-application.json')
-
-function readApiBase(): string {
-  if (process.env.NEXT_PUBLIC_API_BASE_URL) return process.env.NEXT_PUBLIC_API_BASE_URL;
-  const envPath = path.join(__dirname, '../../.env.local');
-  if (fs.existsSync(envPath)) {
-    const match = fs.readFileSync(envPath, 'utf8').match(/^NEXT_PUBLIC_API_BASE_URL=(.+)$/m);
-    if (match) return match[1].trim();
-  }
-  return 'http://localhost:9085';
-}
 
 function minimalPdfBuffer(): Buffer {
   return Buffer.from(
@@ -55,7 +46,7 @@ setup('candidate1 applies to test job', async ({ page }) => {
   try {
     const storageState = JSON.parse(fs.readFileSync(AUTH_FILE, 'utf-8'))
     const found = storageState.origins
-      ?.find((o: { origin: string }) => o.origin === 'http://localhost:3000')
+      ?.find((o: { origin: string }) => o.origin === E2E_BASE_URL)
       ?.localStorage?.find((item: { name: string }) => item.name === 'wfa_device_id')?.value
     if (found) deviceId = found
   } catch { /* use default */ }

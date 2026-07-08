@@ -117,6 +117,35 @@ export interface JobCategory {
   name: string;
 }
 
+export interface RecommendedJob {
+  postId: string;
+  title: string;
+  shortDescription: string;
+  employmentType: string;
+  experienceLevel: string;
+  salaryMin: number;
+  salaryMax: number;
+  expiresAt: string;
+  skillNames: string[];
+  jobCategoryName: string;
+  company: Company;
+  createdDate: string;
+  status: string;
+  deleted: boolean;
+}
+
+export interface JobRecommendation {
+  job: RecommendedJob;
+  score: number;
+  rank: number;
+}
+
+export interface JobRecommendationsData {
+  recommendations: JobRecommendation[];
+  totalResults: number;
+  processingTime: string;
+}
+
 export interface JobCategoryStats {
   jobCategoryId: string;
   name: string;

@@ -1,6 +1,8 @@
 import { MapPin } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import ApplyNowButton from "@/components/applications/apply-now-button";
+import { cn } from "@/lib/utils";
 
 type Props = {
   postId: string;
@@ -11,6 +13,8 @@ type Props = {
   salary: string;
   description: string;
   skills: string[];
+  /** Tighter spacing/padding — used by the homepage's non-AI "latest jobs" grid. Defaults to the standard, roomier layout. */
+  compact?: boolean;
 };
 
 export default function FeaturedJobCard({
@@ -21,12 +25,18 @@ export default function FeaturedJobCard({
   location,
   salary,
   description,
-  skills
+  skills,
+  compact = false,
 }: Props) {
   return (
-    <div className="bg-white border rounded-xl p-5 hover:shadow-md transition mx-auto">
+    <div
+      className={cn(
+        "bg-white border rounded-xl hover:shadow-md transition mx-auto h-full flex flex-col",
+        compact ? "p-4" : "p-5",
+      )}
+    >
       {/* company */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className={cn("flex items-center gap-3", compact ? "mb-3" : "mb-4")}>
         <Image
           src={logo??"/placeholder-logo.png"}
           alt="logo"
@@ -44,15 +54,19 @@ export default function FeaturedJobCard({
       </div>
 
       {/* title */}
-      <h3 className="font-semibold text-sm mb-4">{title}</h3>
+      <Link href={`/jobs/${postId}`}>
+        <h3 className={cn("font-semibold text-sm line-clamp-2 hover:text-blue-600 hover:underline", compact ? "mb-2" : "mb-4")}>
+          {title}
+        </h3>
+      </Link>
 
       {/* description */}
-      <p className="text-xs text-gray-500 mb-8 line-clamp-3">
+      <p className={cn("text-xs text-gray-500 line-clamp-2", compact ? "mb-3" : "mb-8")}>
         {description}
       </p>
 
       {/* tags */}
-      <div className="flex gap-2 mb-8 items-center">
+      <div className={cn("flex gap-2 items-center", compact ? "mb-3" : "mb-8")}>
         {skills.slice(0, 3).map((skill, index) => (
           <span
             key={index}
@@ -79,7 +93,7 @@ export default function FeaturedJobCard({
           {salary}
         </span>
 
-        <ApplyNowButton jobId={postId} jobTitle={title} />
+        <ApplyNowButton jobId={postId} jobTitle={title} iconOnly />
       </div>
     </div>
   );

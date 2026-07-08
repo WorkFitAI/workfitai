@@ -1,6 +1,7 @@
 import { test as setup, expect } from "@playwright/test";
 import * as fs from "fs";
 import * as path from "path";
+import { E2E_BASE_URL, readApiBase } from "../helpers/e2e-target";
 
 const DATA_DIR = path.join(__dirname, "../.data");
 const TEST_JOB_FILE = path.join(DATA_DIR, "test-job.json");
@@ -12,11 +13,17 @@ setup("create and publish test job as HRM1", async ({ page }) => {
   const jobDef = JSON.parse(fs.readFileSync(FIXTURE_FILE, "utf-8")) as {
     title: string
     shortDescription: string
-    fullDescription: string
+    description: string
+    responsibilities: string
+    requirements: string
+    benefits: string
+    employmentType: string
+    experienceLevel: string
+    currency: string
     location: string
     educationLevel: string
     requiredExperience: string
-    skillFallbacks: string[]
+    skills: string[]
     salaryMin: number
     salaryMax: number
     quantity: number
@@ -26,7 +33,7 @@ setup("create and publish test job as HRM1", async ({ page }) => {
   // storageState restores cookies (auth_session) and localStorage (including wfa_access_token).
   // Do a fresh login to guarantee a non-expired token — backend binds tokens to device IDs
   // via X-Device-Id header, so we read the persisted device ID from the auth storageState.
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:9085";
+  const API_BASE = readApiBase();
   const hrmanager1Email = process.env.TEST_HRMANAGER1_EMAIL!;
   const hrmanager1Password = process.env.TEST_HRMANAGER1_PASSWORD!;
 
@@ -39,7 +46,7 @@ setup("create and publish test job as HRM1", async ({ page }) => {
     const storageState = JSON.parse(fs.readFileSync(AUTH_FILE, "utf-8"));
     deviceId =
       storageState.origins
-        ?.find((o: { origin: string }) => o.origin === "http://localhost:3000")
+        ?.find((o: { origin: string }) => o.origin === E2E_BASE_URL)
         ?.localStorage?.find((item: { name: string }) => item.name === "wfa_device_id")
         ?.value ?? "playwright-e2e-hrm1";
 
@@ -82,15 +89,30 @@ setup("create and publish test job as HRM1", async ({ page }) => {
   // ── Fill required fields ────────────────────────────────────────────────
   await page.getByLabel("Job Title").fill(jobDef.title);
   await page.getByPlaceholder("Brief overview for job listing...").fill(jobDef.shortDescription);
-  await page.locator("label:has-text('Full Description') ~ textarea").fill(jobDef.fullDescription);
-  await page.getByPlaceholder("City, Country").fill(jobDef.location);
+  await dialog.locator("label:has-text('Full Description') ~ textarea").fill(jobDef.description);
+  await dialog.locator("label:has-text('Responsibilities') ~ textarea").fill(jobDef.responsibilities);
+  await dialog.locator("label:has-text('Other Requirements') ~ textarea").fill(jobDef.requirements);
+  await dialog.locator("label:has-text('Benefits') ~ textarea").fill(jobDef.benefits);
   await page.getByPlaceholder("e.g. Bachelor in CS").fill(jobDef.educationLevel);
   await page.getByPlaceholder("e.g. 3-5 years").fill(jobDef.requiredExperience);
 
+  // ── Select currency ─────────────────────────────────────────────────────
+  const currencyTrigger = dialog.locator('button[role="combobox"]').filter({ hasText: /^USD$/ }).first();
+  if (await currencyTrigger.isVisible({ timeout: 3_000 }).catch(() => false)) {
+    await currencyTrigger.click();
+    const currencyOption = page.getByRole("option", { name: jobDef.currency, exact: true });
+    if (await currencyOption.isVisible({ timeout: 3_000 }).catch(() => false)) {
+      await currencyOption.click();
+    }
+    await page.waitForTimeout(300);
+  }
+
+  await page.getByPlaceholder("City, Country").fill(jobDef.location);
+
   // ── Add skills (backend requires skillIds to be non-empty) ────────────────
   // Fetch real skill names so they match what the job-post-client has in its dropdown state.
-  const skillFallbacks = jobDef.skillFallbacks;
-  let availableSkills: string[] = skillFallbacks;
+  const skillFallbacks = jobDef.skills;
+  let availableSkills: string[] = skillFallbacks ?? [];
   try {
     const skillsRes = await page.request.get(`${API_BASE}/job/public/skills`);
     if (skillsRes.ok()) {

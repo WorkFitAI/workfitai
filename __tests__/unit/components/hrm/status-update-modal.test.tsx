@@ -93,7 +93,7 @@ describe('StatusUpdateModal', () => {
     expect(screen.getByText('Something went wrong')).toBeInTheDocument()
   })
 
-  it('renders all six statuses from STATUS_FLOW as radio options', () => {
+  it('renders all six statuses when current is APPLIED (nothing precedes it)', () => {
     render(<StatusUpdateModal {...baseProps} />)
     const expectedStatuses = ['APPLIED', 'REVIEWING', 'INTERVIEW', 'OFFER', 'HIRED', 'REJECTED']
     const radios = screen.getAllByRole('radio')
@@ -101,5 +101,36 @@ describe('StatusUpdateModal', () => {
     for (const status of expectedStatuses) {
       expect(values).toContain(status)
     }
+  })
+
+  it('hides statuses before the current one (forward-only flow)', () => {
+    render(<StatusUpdateModal {...baseProps} currentStatus="INTERVIEW" />)
+    const radios = screen.getAllByRole('radio')
+    const values = radios.map((r) => (r as HTMLInputElement).value)
+    expect(values).not.toContain('APPLIED')
+    expect(values).not.toContain('REVIEWING')
+    expect(values).toEqual(['INTERVIEW', 'OFFER', 'HIRED', 'REJECTED'])
+  })
+
+  it('shows only the current status when HIRED (terminal, cannot revert or reject)', () => {
+    render(<StatusUpdateModal {...baseProps} currentStatus="HIRED" />)
+    const radios = screen.getAllByRole('radio')
+    expect(radios).toHaveLength(1)
+    expect((radios[0] as HTMLInputElement).value).toBe('HIRED')
+  })
+
+  it('shows only the current status when REJECTED (terminal)', () => {
+    render(<StatusUpdateModal {...baseProps} currentStatus="REJECTED" />)
+    const radios = screen.getAllByRole('radio')
+    expect(radios).toHaveLength(1)
+    expect((radios[0] as HTMLInputElement).value).toBe('REJECTED')
+  })
+
+  it('re-syncs the selection when reopened with a different current status', () => {
+    const { rerender } = render(<StatusUpdateModal {...baseProps} currentStatus="APPLIED" isOpen={false} />)
+    rerender(<StatusUpdateModal {...baseProps} currentStatus="REVIEWING" isOpen={true} />)
+    const updateBtn = screen.getByRole('button', { name: /Update Status/i })
+    // selected should match the new currentStatus, so the button stays disabled until a change is made
+    expect(updateBtn).toBeDisabled()
   })
 })

@@ -1,8 +1,13 @@
 import { defineConfig, devices } from '@playwright/test'
 import dotenv from 'dotenv'
 import path from 'path'
+import { E2E_BASE_URL } from './e2e/helpers/e2e-target'
 
 dotenv.config({ path: path.join(__dirname, '.env.local') })
+
+// Set E2E_BASE_URL (e.g. https://workfitai.uk) to run the suite against a deployed
+// environment instead of the local dev server — see e2e/helpers/e2e-target.ts.
+const isRemoteTarget = !!process.env.E2E_BASE_URL
 
 export default defineConfig({
   testDir: './e2e',
@@ -13,7 +18,7 @@ export default defineConfig({
   timeout: 60_000,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: E2E_BASE_URL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     channel: 'chrome',
@@ -64,6 +69,15 @@ export default defineConfig({
         storageState: 'e2e/.auth/candidate1.json',
       },
     },
+    {
+      name: 'candidate1-apply-modal-job-setup',
+      testMatch: 'e2e/setup/candidate1-apply-modal-job.setup.ts',
+      dependencies: ['candidate1-setup', 'hrmanager1-setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'e2e/.auth/hrmanager1.json',
+      },
+    },
     // ── Multi-job data setup (HRM1 + HRM2 create diverse published jobs) ────
     {
       name: 'hrm-multi-job-data-setup',
@@ -101,6 +115,7 @@ export default defineConfig({
       dependencies: [
         'candidate1-setup',
         'hrm-job-data-setup',
+        'candidate1-apply-modal-job-setup',
         'candidate1-apply-data-setup',
         'hrm-multi-job-data-setup',
         'multi-candidate-apply-data-setup',
@@ -147,10 +162,14 @@ export default defineConfig({
     // those are run under their own role-based projects above with the correct
     // storage state. Running them here with candidate.json would cause auth
     // redirects and false failures.
+    // Keep both legacy browser projects because auth/homepage/route-protection
+    // and OAuth callback edge paths are cross-browser smoke coverage not
+    // duplicated by the role-based projects.
     {
       name: 'e2e-chromium',
       testMatch: [
         'e2e/application-flow.spec.ts',
+        'e2e/auth-oauth-callback.spec.ts',
         'e2e/auth.spec.ts',
         'e2e/homepage.spec.ts',
         'e2e/route-protection.spec.ts',
@@ -165,6 +184,7 @@ export default defineConfig({
       name: 'e2e-firefox',
       testMatch: [
         'e2e/application-flow.spec.ts',
+        'e2e/auth-oauth-callback.spec.ts',
         'e2e/auth.spec.ts',
         'e2e/homepage.spec.ts',
         'e2e/route-protection.spec.ts',
@@ -184,13 +204,18 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
-    env: {
-      NODE_OPTIONS: '--max-old-space-size=4096',
-    },
-  },
+  // Skip launching the local dev server when targeting a deployed environment.
+  ...(isRemoteTarget
+    ? {}
+    : {
+        webServer: {
+          command: 'npm run dev',
+          url: 'http://localhost:3000',
+          reuseExistingServer: !process.env.CI,
+          timeout: 180_000,
+          env: {
+            NODE_OPTIONS: '--max-old-space-size=4096',
+          },
+        },
+      }),
 })

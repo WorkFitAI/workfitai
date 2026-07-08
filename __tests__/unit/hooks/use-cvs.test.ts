@@ -23,6 +23,7 @@ function mockCVMetadata(overrides: Partial<CVMetadata> = {}): CVMetadata {
       "http://minio:9000/cvs-files/dae8124e-9878-4582-9497-ac4ff22258b9-resume.pdf",
     belongTo: "testuser",
     templateType: "UPLOAD",
+    applicationId: null,
     sections: {
       skills: [],
       projects: [],

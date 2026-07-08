@@ -15,15 +15,13 @@ export function HomeHeroSearch() {
   const { page } = useJobFilters();
 
   const urlKeyword = searchParams.get("title") || "";
-  const urlIndustry = searchParams.get("industry") || "";
   const urlLocation = searchParams.get("location") || "";
-  
+
   const [keyword, setKeyword] = useState(urlKeyword);
 
   const debouncedKeyword = useDebounce(keyword, 500);
 
-  // computed value 
-  const industry = urlIndustry;
+  // computed value
   const location = urlLocation;
 
   // update URL khi keyword đổi
@@ -41,7 +39,6 @@ export function HomeHeroSearch() {
 
   return (
     <div className="flex items-center rounded-lg border bg-white shadow-md">
-
       <div className="flex flex-1 items-center gap-2 px-4 py-3">
         <MapPin className="h-4 w-4 text-muted-foreground" />
         <select

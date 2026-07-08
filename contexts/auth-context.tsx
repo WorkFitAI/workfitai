@@ -16,14 +16,12 @@ import { getAccessToken, isTokenExpired } from "@/lib/auth/token-store";
 import { getSessionCookie } from "@/lib/auth/session-cookie";
 import { useAppDispatch } from "@/store/hooks";
 import { setCredentials, clearCredentials } from "@/store/auth-slice";
+import { getDefaultRouteForRoles } from "@/lib/auth/default-route";
 import type { LoginRequest, UserSession } from "@/types/auth";
 
 const BROADCAST_CHANNEL = "wfa-auth-channel";
 // Schedule next refresh 60s before token expiry
 const REFRESH_BUFFER_MS = 60 * 1000;
-
-// Roles that can access the control (HR/Admin) dashboard
-const CONTROL_ROLES = ["ROLE_HR", "ROLE_HR_MANAGER", "ROLE_ADMIN"];
 
 interface AuthContextValue {
   user: UserSession | null;
@@ -234,11 +232,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // BroadcastChannel not supported
       }
 
-      // Role-based redirect: ADMIN / HR → /dashboard, candidates → /
-      const isControlUser = normalizedRoles.some((r) =>
-        CONTROL_ROLES.includes(r),
-      );
-      routerRef.current.push(isControlUser ? "/dashboard" : "/");
+      // Role-based redirect: ADMIN/HR_MANAGER → /dashboard, HR → /applications/my, candidates → /
+      routerRef.current.push(getDefaultRouteForRoles(normalizedRoles));
     },
     [applyUser, scheduleRefresh],
   );

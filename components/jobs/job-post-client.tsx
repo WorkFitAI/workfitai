@@ -4,10 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { useJobs } from "@/hooks/useJobs";
 import { useJobFilters } from "@/hooks/useJobFilters";
 
-import { Plus, Pencil, Loader2, Briefcase, Clock, Search, LockOpen, MousePointerClick } from "lucide-react";
+import { Plus, Pencil, Briefcase, Clock, Search, LockOpen, MousePointerClick } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { JobDialog } from "@/components/jobs/post/job-dialog";
+import { LottieLoader } from "@/components/ui/lottie-loader";
 import { toast } from "sonner";
 import { Job, JobCategory } from "@/types/job";
 import { JobFormValues } from "@/lib/schemas/job-schemas";
@@ -236,7 +237,7 @@ export default function JobAdminPage({ roles, companyId }: { roles: string[]; co
         {/* LOADING STATE */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-32 bg-white rounded-3xl border border-dashed">
-            <Loader2 className="animate-spin text-blue-600 mb-4" size={48} />
+            <LottieLoader size={140} className="mb-4" />
             <p className="text-slate-400 font-medium">Fetching your job posts...</p>
           </div>
         ) : (

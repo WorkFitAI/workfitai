@@ -119,6 +119,71 @@ export interface DisableTwoFactorRequest {
   code: string;
 }
 
+// ─── Unified Profile Settings (GET /user/profile/settings) ─────────────────
+
+export interface UserEmailNotifications {
+  jobAlerts: boolean;
+  applicationUpdates: boolean;
+  messages: boolean;
+  newsletter: boolean;
+  marketingEmails: boolean;
+  securityAlerts: boolean;
+}
+
+export interface UserPushNotifications {
+  jobAlerts: boolean;
+  applicationUpdates: boolean;
+  messages: boolean;
+  reminders: boolean;
+}
+
+export interface UserNotifications {
+  email: UserEmailNotifications;
+  push: UserPushNotifications;
+}
+
+export interface UserPrivacySettings {
+  profileVisibility: "PUBLIC" | "PRIVATE" | "RECRUITERS_ONLY";
+  showEmail: boolean;
+  showPhone: boolean;
+  showLocation: boolean;
+  allowMessaging: boolean;
+  showActivityStatus: boolean;
+  showOnlineStatus: boolean;
+  searchIndexing: boolean;
+  aiJobRecommendationEnabled: boolean;
+}
+
+export interface HrNotificationSettings {
+  notifyOnNewApplication: boolean;
+  notifyOnJobExpiry: boolean;
+}
+
+export interface FeatureSetting {
+  featureKey: string;
+  enabled: boolean;
+  updatedAt: string;
+  updatedBy: string;
+}
+
+export interface UserProfileSettings {
+  role: "CANDIDATE" | "HR_MANAGER" | "ADMIN";
+  notifications: UserNotifications;
+  privacy: UserPrivacySettings;
+  hrNotifications: HrNotificationSettings | null;
+  features: FeatureSetting[] | null;
+}
+
+export interface UpdateProfileSettingsRequest {
+  notifications?: {
+    email?: Partial<UserEmailNotifications>;
+    push?: Partial<UserPushNotifications>;
+  };
+  privacy?: UserPrivacySettings;
+  hrNotifications?: HrNotificationSettings;
+  features?: { featureKey: string; enabled: boolean }[];
+}
+
 // ─── Account danger-zone ──────────────────────────────────────────────────
 
 export interface DeactivateRequest {

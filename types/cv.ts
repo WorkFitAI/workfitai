@@ -10,12 +10,14 @@ export interface CVSections {
 
 export interface CVMetadata {
   cvId: string;
-  objectName: string;
+  objectName: string | null;
   headline: string | null;
   summary: string | null;
-  pdfUrl: string;
+  pdfUrl: string | null;
   belongTo: string;
   templateType: CVTemplateType;
+  /** Set when this CV was uploaded as part of a job application; such CVs are view-only. Null for CVs self-uploaded on the My CVs page. */
+  applicationId: string | null;
   sections: CVSections;
   createdAt: string;
   createdBy: string;

@@ -1,11 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { Loader2, ShieldAlert } from "lucide-react"
+import { ShieldAlert } from "lucide-react"
 import { useAuditLogs } from "@/hooks/useAuditLogs"
 import { AuditLogFilters, type AuditFilters } from "@/components/audit-logs/audit-log-filters"
 import { AuditLogTable } from "@/components/audit-logs/audit-log-table"
 import { Button } from "@/components/ui/button"
+import { LottieLoader } from "@/components/ui/lottie-loader"
 
 const PAGE_SIZE = 50
 const EMPTY_FILTERS: AuditFilters = { companyId: "", from: "", to: "", actorUsername: "", entityType: "", actorRole: "" }
@@ -63,8 +64,8 @@ export function AuditLogsClient() {
       />
 
       {loading ? (
-        <div className="flex items-center justify-center py-16 text-muted-foreground gap-2">
-          <Loader2 size={20} className="animate-spin" />
+        <div className="flex flex-col items-center justify-center py-16 text-muted-foreground gap-2">
+          <LottieLoader size={90} />
           <span>Loading audit logs…</span>
         </div>
       ) : error ? (

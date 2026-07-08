@@ -37,7 +37,7 @@ export function AdminUserBreakdownSection({ stats }: AdminUserBreakdownSectionPr
           colors={ROLE_COLORS}
         />
 
-        {eduEntries.length > 0 && (
+        {/* {eduEntries.length > 0 && (
           <div className="space-y-1.5">
             <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
               By education level
@@ -57,7 +57,7 @@ export function AdminUserBreakdownSection({ stats }: AdminUserBreakdownSectionPr
               </div>
             ))}
           </div>
-        )}
+        )} */}
       </CardContent>
     </Card>
   )

@@ -68,23 +68,41 @@ async function loginAndGetToken(
   password: string,
 ): Promise<{ accessToken: string; deviceId: string } | null> {
   const deviceId = `playwright-e2e-${email.split('@')[0]}`
-  try {
-    const res = await page.request.post(`${apiBase}/auth/login`, {
-      data: { usernameOrEmail: email, password },
-      headers: { 'Content-Type': 'application/json', 'X-Device-Id': deviceId },
-    })
-    if (!res.ok()) {
-      console.warn(`Login failed for ${email}: ${res.status()}`)
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const res = await page.request.post(`${apiBase}/auth/login`, {
+        data: { usernameOrEmail: email, password },
+        headers: { 'Content-Type': 'application/json', 'X-Device-Id': deviceId },
+      })
+      if (!res.ok()) {
+        console.warn(`Login failed for ${email}: ${res.status()} (attempt ${attempt}/3)`)
+        if (res.status() >= 500 && attempt < 3) {
+          await page.waitForTimeout(500 * attempt)
+          continue
+        }
+        return null
+      }
+      const json = await res.json()
+      const { accessToken } = json?.data ?? {}
+      if (!accessToken) {
+        console.warn(`Login response for ${email} did not include an access token (attempt ${attempt}/3)`)
+        if (attempt < 3) {
+          await page.waitForTimeout(500 * attempt)
+          continue
+        }
+        return null
+      }
+      return { accessToken, deviceId }
+    } catch (err) {
+      console.warn(`Login error for ${email} (attempt ${attempt}/3): ${err}`)
+      if (attempt < 3) {
+        await page.waitForTimeout(500 * attempt)
+        continue
+      }
       return null
     }
-    const json = await res.json()
-    const { accessToken } = json?.data ?? {}
-    if (!accessToken) return null
-    return { accessToken, deviceId }
-  } catch (err) {
-    console.warn(`Login error for ${email}: ${err}`)
-    return null
   }
+  return null
 }
 
 async function getExistingApplicationId(
@@ -193,6 +211,9 @@ setup('apply to jobs with all candidates', async ({ page }) => {
 
   const API_BASE = readApiBase()
   const results: TestApplicationEntry[] = []
+  const previousApplications: TestApplicationEntry[] = fs.existsSync(TEST_APPLICATIONS_FILE)
+    ? JSON.parse(fs.readFileSync(TEST_APPLICATIONS_FILE, 'utf-8')).applications ?? []
+    : []
 
   for (const appDef of appDefs) {
     const { candidateNum: num, jobRef, coverLetter } = appDef
@@ -216,7 +237,16 @@ setup('apply to jobs with all candidates', async ({ page }) => {
     }
 
     const auth = await loginAndGetToken(page, API_BASE, email, password)
-    if (!auth) continue
+    if (!auth) {
+      const previousEntry = previousApplications.find(
+        (entry) => entry.candidateNum === num && entry.jobId === job.jobId && entry.hrmKey === job.hrmKey,
+      )
+      if (previousEntry) {
+        console.warn(`Reusing previous application record for candidate${num} -> ${job.jobTitle}`)
+        results.push({ ...previousEntry, createdAt: new Date().toISOString() })
+      }
+      continue
+    }
 
     const existingId = await getExistingApplicationId(page, API_BASE, job.jobId, auth)
     if (existingId !== null) {
