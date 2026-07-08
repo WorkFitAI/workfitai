@@ -116,3 +116,9 @@ export interface JobCategory {
   id: string;
   name: string;
 }
+
+export interface JobCategoryStats {
+  jobCategoryId: string;
+  name: string;
+  totalJobs: number;
+}

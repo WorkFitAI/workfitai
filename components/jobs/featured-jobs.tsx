@@ -66,7 +66,7 @@ export default function FeaturedJobs() {
               company={job.company.name}
               title={job.title}
               location={job.company.address}
-              salary={`${symbol}${formatSalary(job.salaryMin*1000000)} - ${symbol}${formatSalary(job.salaryMax*1000000)}`}
+              salary={`${symbol}${formatSalary(job.salaryMin)} - ${symbol}${formatSalary(job.salaryMax)}`}
               description={job.shortDescription}
               skills={job.skillNames}
             />

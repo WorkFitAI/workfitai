@@ -41,31 +41,7 @@ export function HomeHeroSearch() {
 
   return (
     <div className="flex items-center rounded-lg border bg-white shadow-md">
-      
-      {/* Industry */}
-      <div className="flex flex-1 items-center gap-2 px-4 py-3">
-        <Briefcase className="h-4 w-4 text-muted-foreground" />
-        <select
-          aria-label="Filter by industry"
-          value={industry}
-          onChange={(e) => {
-            const params = new URLSearchParams(searchParams.toString());
-            if (e.target.value) params.set("industry", e.target.value);
-            else params.delete("industry");
 
-            router.replace(`?${params.toString()}`);
-          }}
-          className="w-full bg-transparent text-sm outline-none"
-        >
-          <option value="">Industry</option>
-          <option value="tech">Technology</option>
-          <option value="finance">Finance</option>
-        </select>
-      </div>
-
-      <div className="h-8 w-px bg-border" />
-
-      {/* Location */}
       <div className="flex flex-1 items-center gap-2 px-4 py-3">
         <MapPin className="h-4 w-4 text-muted-foreground" />
         <select

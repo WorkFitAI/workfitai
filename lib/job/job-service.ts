@@ -1,4 +1,4 @@
-import { CreateJobCategoryRequest, GetJobsParams, Job, JobCategoriesResponse, JobCategory, JobData, JobDetail } from "@/types/job";
+import { CreateJobCategoryRequest, GetJobsParams, Job, JobCategoriesResponse, JobCategory, JobCategoryStats, JobData, JobDetail } from "@/types/job";
 import { ApiResponse } from "@/types/response";
 import { apiClient } from "@/lib/api-client";
 import { CreateSkillRequest, Skill, SkillResponse } from "@/types/skill";
@@ -155,6 +155,14 @@ export const jobService = {
 
     return res;
   },
+
+  async getTopCategories(limit: number): Promise<ApiResponse<JobCategoryStats[]>> {
+    const res = await apiClient.get(`/job/public/jobs/job-categories/statistics/top?top=${limit}`) as ApiResponse<JobCategoryStats[]>;
+    if (!res.status || res.status >= 400) {
+      throw new Error("Failed to fetch top categories");
+    }
+    return res;
+  }
 
 }
 
