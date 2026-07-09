@@ -47,7 +47,7 @@ export function HomeHeroSearch() {
             if (e.target.value) params.set("location", e.target.value);
             else params.delete("location");
 
-            router.replace(`?${params.toString()}`);
+            router.replace(`/jobs?${params.toString()}`);
           }}
           className="w-full bg-transparent text-sm outline-none"
         >
