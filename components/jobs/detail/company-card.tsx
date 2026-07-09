@@ -5,6 +5,7 @@ import { Company } from "@/types/company";
 
 import JobLocationMap from "@/components/jobs/detail/job-location-map";
 import Link from "next/link";
+import { cleanText } from "@/lib/utils";
 
 interface CompanyCardProps {
   company: Company;
@@ -21,7 +22,7 @@ const CompanyCard = ({
     <div className="border rounded-xl p-6 mb-6">
       <div className="flex items-center gap-4 mb-4">
         <Image
-          src={company.logoUrl || "/placeholder-logo.png"}
+          src={ "/imgs/brands/brand-1.png"}
           alt="Company"
           width={50}
           height={50}
@@ -30,14 +31,14 @@ const CompanyCard = ({
 
         <div>
           <h3 className="font-semibold text-gray-900">{company.name}</h3>
-          <p className="text-sm text-gray-500">{company.description}</p>
+          <p className="text-sm text-gray-500 line-clamp-1">{cleanText(company.description)}</p>
         </div>
       </div>
 
       <div className="text-sm text-gray-600 space-y-2">
         <div className="flex items-center gap-2">
           <Pin size={13} />
-          <span>{company.address}</span>
+          <span>{cleanText(company.address)}</span>
         </div>
 
         <div className="flex items-center gap-2">

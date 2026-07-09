@@ -18,6 +18,7 @@ import { Company } from "@/types/company";
 import { companyService } from "@/lib/company/company-service";
 
 import { toast } from "sonner"
+import { cleanText } from "@/lib/utils";
 
 interface Props {
   company: Company | null;
@@ -217,7 +218,7 @@ const CompanyDetail = ({ company, canEdit = false }: Props) => {
               />
             ) : (
               <p className="text-sm text-gray-700 whitespace-pre-line">
-                {form.description}
+                {cleanText(form.description)}
               </p>
             )}
           </div>

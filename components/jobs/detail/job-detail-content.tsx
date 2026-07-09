@@ -5,6 +5,7 @@ import ApplyNowButton from "@/components/applications/apply-now-button";
 import { ReportDialog } from "@/components/report/ReportButton";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { cleanText } from "@/lib/utils";
 
 type JobContentProps = Pick<
   JobDetail,
@@ -31,14 +32,14 @@ const JobDetailContent = ({
     <div className="space-y-8">
       {/* About */}
       <div>
-        <h2 className="text-lg font-semibold mb-4">About the job</h2>
+        <h2 className="text-lg font-semibold mb-4 whitespace-pre-line">About the job</h2>
 
-        <p className="text-gray-600 leading-relaxed">{description}</p>
+        <p className="text-gray-600 leading-relaxed whitespace-pre-line">{cleanText(description)}</p>
       </div>
 
       {/* Skills */}
       <div>
-        <h2 className="text-lg font-semibold mb-4">
+        <h2 className="text-lg font-semibold mb-4 whitespace-pre-line">
           Essential Knowledge, Skills and Experience
         </h2>
 
@@ -53,21 +54,21 @@ const JobDetailContent = ({
       <div>
         <h2 className="text-lg font-semibold mb-4">Preferred Experience</h2>
 
-        <p className="text-gray-600 leading-relaxed">{requirements}</p>
+        <p className="text-gray-600 leading-relaxed whitespace-pre-line">{cleanText(requirements)}</p>
       </div>
 
       {/* Responsibilities */}
       <div>
-        <h2 className="text-lg font-semibold mb-4">Responsibilities</h2>
+        <h2 className="text-lg font-semibold mb-4 whitespace-pre-line">Responsibilities</h2>
 
-        <p className="text-gray-600 leading-relaxed">{responsibilities}</p>
+        <p className="text-gray-600 leading-relaxed whitespace-pre-line">{cleanText(responsibilities)}</p>
       </div>
 
       {/* Benefits */}
       <div>
         <h2 className="text-lg font-semibold mb-4">Benefits</h2>
 
-        <p className="text-gray-600 leading-relaxed">{benefits}</p>
+        <p className="text-gray-600 leading-relaxed whitespace-pre-line">{cleanText(benefits)}</p>
       </div>
 
       <div className="flex justify-start mt-10 mx-auto gap-2">

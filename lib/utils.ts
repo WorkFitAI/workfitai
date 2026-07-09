@@ -5,27 +5,28 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const formatPostedTime = (createdDate: string): string => {
-  const now = new Date();
+export const formatPostedTime = (createdDate?: string | null): string => {
+  if (!createdDate) return "";
+
   const posted = new Date(createdDate);
+
+  if (isNaN(posted.getTime())) return "";
+
+  const now = new Date();
 
   const diffMs = now.getTime() - posted.getTime();
   const diffMinutes = Math.floor(diffMs / (1000 * 60));
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-  // dưới 1 giờ
   if (diffMinutes < 60) {
-    return `${diffMinutes}`;
+    return `${Math.max(diffMinutes, 0)} ago`;
   }
 
-  // dưới 1 ngày
   if (diffHours < 24) {
-    return `${diffHours}`;
+    return `${diffHours} hours ago`;
   }
 
-  // >= 1 ngày → hiển thị ngày đăng
-  return `${posted.toLocaleDateString("vi-VN")}`;
+  return posted.toLocaleDateString("vi-VN");
 };
 
 export const getCoordinates = async (address: string) => {
@@ -84,3 +85,15 @@ export const formatSalary = (salary: number) => {
 
   return salary.toLocaleString("vi-VN");
 };
+
+export function cleanText(text?: string | null): string {
+  if (!text) return "";
+
+  return text
+    .replace(/\\n/g, "\n")          // \n -> newline
+    .replace(/\r\n/g, "\n")         // normalize Windows newline
+    .replace(/[ \t]+/g, " ")        // nhiều space -> 1 space
+    .replace(/ *\n */g, "\n")       // trim space quanh newline
+    .replace(/\n{3,}/g, "\n\n")     // max 1 dòng trống
+    .trim();
+}

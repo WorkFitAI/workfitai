@@ -44,11 +44,6 @@ export default function SimilarJobCard({
           {/* Time + location */}
           <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
             <div className="flex items-center gap-1">
-              <Clock size={12} />
-              <span>3 mins ago</span>
-            </div>
-
-            <div className="flex items-center gap-1">
               <MapPin size={12} />
               <span>{location}</span>
             </div>
