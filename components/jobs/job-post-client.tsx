@@ -126,16 +126,16 @@ export default function JobAdminPage({ roles, companyId }: { roles: string[]; co
 
   const handleSubmit = async (data: JobFormValues) => {
     try {
-      const skillIdsToSave = data.skillNames
+      const skillIdsToSave = (data.skillNames ?? [])
         .map((name) => skills.find((s) => s.name === name)?.skillId)
-        .filter((id): id is number => id !== undefined);
+        .filter((id): id is string => id !== undefined);
 
       const categoryRes = await jobService.getAllCategories();
 
       const category = categoryRes.data.result.find(
         (c: JobCategory) =>
           c.name.trim().toLowerCase() ===
-          data.jobCategoryName.trim().toLowerCase()
+          data.jobCategoryName?.trim().toLowerCase()
       );
 
       if (!category) {
@@ -151,6 +151,9 @@ export default function JobAdminPage({ roles, companyId }: { roles: string[]; co
           companyNo: companyId,
           skillIds: skillIdsToSave,
         };
+        delete newData.skillNames;
+        delete newData.jobCategoryName;
+        delete newData.postId;
 
         await jobService.updateJob(newData);
         toast.success("Updated job successfully");
@@ -161,6 +164,9 @@ export default function JobAdminPage({ roles, companyId }: { roles: string[]; co
           jobCategoryId: category.id,
           skillIds: skillIdsToSave,
         };
+
+        delete newData.skillNames;
+        delete newData.jobCategoryName;
 
         await jobService.createJob(newData);
         toast.success("Created new job successfully");

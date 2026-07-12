@@ -54,10 +54,6 @@ export const useJobs = (
     buildCondition("employmentType", filters?.employmentType);
     buildCondition("skills.name", filters?.skillNames);
 
-    if (filters?.title) {
-      conditions.push(`title~~'${filters.title}'`);
-    }
-
     if (filters?.salaryMin) {
       conditions.push(`salaryMin >: ${filters.salaryMin}`);
     }
@@ -95,6 +91,7 @@ export const useJobs = (
         page,
         pageSize,
         filter,
+        keyword: filters?.title,
         role,
         sort: filters?.sort
       });

@@ -33,7 +33,7 @@ const JobListCard = ({ job }: Props) => {
           <div>
             <p className="text-md font-semibold text-blue-400">{job.company.name}</p>
 
-            <p className="flex items-center text-xs text-gray-500 gap-1">
+            <p className="flex items-center text-xs text-gray-500 gap-1 line-clamp-1 ">
               <MapPin className="w-3 h-3 text-gray-400" />
               {job.company.address}
             </p>
@@ -41,10 +41,10 @@ const JobListCard = ({ job }: Props) => {
         </div>
 
         <div className="flex gap-2">
-          {job.skillNames.slice(0, 6).map((skill, index) => (
+          {job.skillNames.slice(0, 3).map((skill, index) => (
             <span
               key={index}
-              className={`text-xs px-2 py-1 rounded ${
+              className={`text-xs px-2 py-1 rounded line-clamp-2 ${
                 index === 0 ? "text-green-700 bg-green-100 shadow-sm border border-green-200" : "bg-gray-100"
               }`}
             >
@@ -73,7 +73,7 @@ const JobListCard = ({ job }: Props) => {
 
         <span className="flex items-center gap-1">
           <Clock className="w-3 h-3 text-gray-400" />
-          {new Date(job.createdDate).toLocaleDateString("vn-VN")}
+          {job.createdDate && new Date(job.createdDate).toLocaleDateString("vn-VN")}
         </span>
       </div>
 

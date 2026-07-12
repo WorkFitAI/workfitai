@@ -31,24 +31,12 @@ export function HomeHeroSearch() {
     if (debouncedKeyword) params.set("title", debouncedKeyword);
     else params.delete("title");
 
-    params.set("page", String(page));
-
     router.push(`/jobs?${params.toString()}`);
   };
   
 
   return (
     <div className="flex items-center rounded-lg border bg-white shadow-md">
-      
-      {/* Industry — fixed to Technology, no selection needed */}
-      <div className="flex flex-1 items-center gap-2 px-4 py-3">
-        <Briefcase className="h-4 w-4 text-muted-foreground" />
-        <span className="w-full text-sm text-foreground">Technology</span>
-      </div>
-
-      <div className="h-8 w-px bg-border" />
-
-      {/* Location */}
       <div className="flex flex-1 items-center gap-2 px-4 py-3">
         <MapPin className="h-4 w-4 text-muted-foreground" />
         <select
@@ -59,7 +47,7 @@ export function HomeHeroSearch() {
             if (e.target.value) params.set("location", e.target.value);
             else params.delete("location");
 
-            router.replace(`?${params.toString()}`);
+            router.replace(`/jobs?${params.toString()}`);
           }}
           className="w-full bg-transparent text-sm outline-none"
         >

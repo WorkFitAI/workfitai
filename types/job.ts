@@ -100,6 +100,7 @@ export type GetJobsParams = {
   pageSize?: number;
   sort?: string;
   filter?: string;
+  keyword?: string;
   role?: string;
 };
 
@@ -117,7 +118,6 @@ export interface JobCategory {
   name: string;
 }
 
-/** Job shape returned by the recommendations endpoint — a subset of Job's fields. */
 export interface RecommendedJob {
   postId: string;
   title: string;
@@ -145,4 +145,10 @@ export interface JobRecommendationsData {
   recommendations: JobRecommendation[];
   totalResults: number;
   processingTime: string;
+}
+
+export interface JobCategoryStats {
+  jobCategoryId: string;
+  name: string;
+  totalJobs: number;
 }

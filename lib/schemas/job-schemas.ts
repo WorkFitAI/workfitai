@@ -19,9 +19,9 @@ export const jobSchema = z.object({
   responsibilities: z.string().max(5000, "Responsibilities can be at most 5000 characters"),
   requiredExperience: z.string().min(2, "Required experience has to be at least 2 characters").max(120, "Required experience can be at most 120 characters"),
   companyNo: z.string(),
-  skillNames: z.array(z.string()).default([]),
+  skillNames: z.array(z.string()).optional(),
   status: z.string(),
-  jobCategoryName: z.string(),
+  jobCategoryName: z.string().optional(),
 });
 
 export type JobFormValues = z.infer<typeof jobSchema>;
