@@ -64,7 +64,7 @@ export default function JobAdminPage({ roles, companyId }: { roles: string[]; co
   useEffect(() => {
     const fetchSkills = async () => {
       try {
-        const res = await jobService.getAllSkills();
+        const res = await jobService.getAllSkills(0, 1000);
         setSkills(res.data.result);
       } catch (err) {
         console.error("Error fetching skills", err);
