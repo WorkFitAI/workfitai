@@ -25,7 +25,7 @@ export default function JobsPageClient() {
 
   return (
     <div className="container mx-auto max-w-[1278px] px-4 py-10">
-      <JobsHeadPage />
+      <JobsHeadPage total={total} />
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-10">
         {/* Sidebar */}
