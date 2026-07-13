@@ -1,7 +1,7 @@
 import { CreateJobCategoryRequest, GetJobsParams, Job, JobCategoriesResponse, JobCategory, JobCategoryStats, JobData, JobDetail, JobRecommendationsData } from "@/types/job";
 import { ApiResponse } from "@/types/response";
 import { apiClient } from "@/lib/api-client";
-import { CreateSkillRequest, Skill, SkillResponse } from "@/types/skill";
+import { CreateSkillRequest, FetchSkillsParams, Skill, SkillResponse } from "@/types/skill";
 import { JobFormValues } from "@/lib/schemas/job-schemas";
 
 export const jobService = {
@@ -40,11 +40,19 @@ export const jobService = {
     return res;
   },
 
-  async getAllSkills(): Promise<ApiResponse<SkillResponse>> {
-    const res = await apiClient.get(`/job/public/skills`) as ApiResponse<SkillResponse>;
+  async getAllSkills(page = 0, size = 10, filter?: string) {
+    let url = `/job/public/skills?page=${page}&size=${size}`;
+
+    if (filter) {
+      url += `&filter=name~~'${encodeURIComponent(filter)}'`;
+    }
+
+    const res = await apiClient.get(url) as ApiResponse<SkillResponse>;
+
     if (!res.status || res.status >= 400) {
       throw new Error("Failed to fetch skills");
     }
+
     return res;
   },
 

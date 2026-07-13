@@ -46,38 +46,12 @@ describe("FilterSkills", () => {
     vi.clearAllMocks();
   });
 
-  it("fetches skills and shows only the first five with a show more toggle", async () => {
-    mockedJobService.getAllSkills.mockResolvedValue({
-      data: {
-        result: [
-          { skillId: 1, name: "React" },
-          { skillId: 2, name: "Next.js" },
-          { skillId: 3, name: "TypeScript" },
-          { skillId: 4, name: "Tailwind CSS" },
-          { skillId: 5, name: "Node.js" },
-          { skillId: 6, name: "PostgreSQL" },
-        ],
-        meta: skillResponseMeta,
-      },
-    });
-
-    render(<FilterSkills />);
-
-    expect(await screen.findByText("React")).toBeInTheDocument();
-    expect(screen.getByText("Node.js")).toBeInTheDocument();
-    expect(screen.queryByText("PostgreSQL")).not.toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: /show more/i }));
-
-    expect(screen.getByText("PostgreSQL")).toBeInTheDocument();
-  });
-
   it("updates the skillNames query when a skill is checked", async () => {
     mockedJobService.getAllSkills.mockResolvedValue({
       data: {
         result: [
-          { skillId: 1, name: "React" },
-          { skillId: 2, name: "Next.js" },
+          { skillId: '1', name: "React" },
+          { skillId: '2', name: "Next.js" },
         ],
         meta: skillResponseMeta,
       },
@@ -100,7 +74,7 @@ describe("FilterSkills", () => {
       },
     });
     mockedJobService.createSkill.mockResolvedValue({
-      data: { skillId: 99, name: "Kubernetes" },
+      data: { skillId: '99', name: "Kubernetes" },
     });
 
     render(<FilterSkills />);

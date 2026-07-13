@@ -79,7 +79,7 @@ describe("JobsPageClient", () => {
     render(<JobsPageClient />);
 
     // Loading text appears immediately
-    expect(screen.getByText(/loading/i)).toBeInTheDocument();
+    expect(screen.getByText(/loading jobs/i)).toBeInTheDocument();
 
     // Jobs appear after fetch
     await waitFor(() =>

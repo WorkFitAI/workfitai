@@ -15,3 +15,9 @@ export type SkillResponse = {
 export type CreateSkillRequest = {
   name: string;
 };
+
+export type FetchSkillsParams = {
+  page?: number;
+  size?: number;
+  filter?: string;
+};
