@@ -4,27 +4,62 @@ import { useEffect, useState } from "react";
 import FilterCheckboxGroup from "@/components/jobs/filters/filter-checkbox-group";
 import { jobService } from "@/lib/job/job-service";
 import { Skill } from "@/types/skill";
-
 import { toast } from "sonner";
+import { useDebounce } from "@/hooks/useDebounce";
 
-const LIMIT = 5;
+
+
+const LIMIT = 10;
 
 const FilterSkills = () => {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [search, setSearch] = useState("");
-  const [showAll, setShowAll] = useState(false);
+
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+
   const [loading, setLoading] = useState(false);
+  const [adding, setAdding] = useState(false);
+
+  const debouncedSearch = useDebounce(search, 500);
+
 
   useEffect(() => {
-    fetchSkills();
+    fetchSkills(0, "", false);
   }, []);
 
-  const fetchSkills = async () => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchSkills(0, debouncedSearch, false);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [debouncedSearch]);
+
+  const fetchSkills = async (
+    pageNumber: number,
+    keyword: string,
+    append: boolean
+  ) => {
     try {
-      const res = await jobService.getAllSkills();
-      setSkills(res.data.result);
+      setLoading(true);
+
+      const res = await jobService.getAllSkills(
+        pageNumber,
+        LIMIT,
+        keyword.trim() || undefined
+      );
+
+      const { meta, result } = res.data;
+
+      setSkills((prev) => (append ? [...prev, ...result] : result));
+
+      setPage(pageNumber);
+      setHasMore(meta.page < meta.pages);
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -32,16 +67,15 @@ const FilterSkills = () => {
     if (!search.trim()) return;
 
     try {
-      setLoading(true);
+      setAdding(true);
 
-      // API create skill
       const res = await jobService.createSkill({
         name: search.trim(),
       });
 
-      const newSkill = res.data;
+      // Nếu createSkill trả về skill mới
+      setSkills((prev) => [res.data?? res.data, ...prev]);
 
-      setSkills((prev) => [...prev, newSkill]);
       setSearch("");
 
       toast.success("Skill added successfully!");
@@ -49,20 +83,9 @@ const FilterSkills = () => {
       console.error(err);
       toast.error("Failed to add skill.");
     } finally {
-      setLoading(false);
+      setAdding(false);
     }
   };
-
-  const filtered = skills.filter((s) =>
-    s.name.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const visibleSkills = showAll ? filtered : filtered.slice(0, LIMIT);
-
-  const items = visibleSkills.map((s) => ({
-    label: s.name,
-    count: 0,
-  }));
 
   return (
     <div className="border-t pt-4 mt-4">
@@ -76,16 +99,18 @@ const FilterSkills = () => {
         className="w-full border rounded px-2 py-1 text-sm mb-3"
       />
 
-      {filtered.length > 0 && (
+      {skills.length > 0 && (
         <FilterCheckboxGroup
           title=""
-          items={items}
           queryKey="skillNames"
+          items={skills.map((skill) => ({
+            label: skill.name,
+            count: 0,
+          }))}
         />
       )}
 
-      {/* Không tìm thấy */}
-      {search.trim() !== "" && filtered.length === 0 && (
+      {!loading && skills.length === 0 && search.trim() !== "" && (
         <div className="text-sm">
           <p className="text-gray-500 mb-2">
             No skill found.
@@ -93,20 +118,21 @@ const FilterSkills = () => {
 
           <button
             onClick={handleAddSkill}
-            disabled={loading}
+            disabled={adding}
             className="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
           >
-            {loading ? "Adding..." : `+ Add "${search}"`}
+            {adding ? "Adding..." : `+ Add "${search}"`}
           </button>
         </div>
       )}
 
-      {filtered.length > LIMIT && (
+      {hasMore && (
         <button
-          onClick={() => setShowAll(!showAll)}
+          onClick={() => fetchSkills(page + 1, search, true)}
+          disabled={loading}
           className="text-sm text-blue-500 mt-2 hover:underline"
         >
-          {showAll ? "Show less" : "Show more"}
+          {loading ? "Loading..." : "Show more"}
         </button>
       )}
     </div>

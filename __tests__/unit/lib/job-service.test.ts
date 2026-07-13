@@ -88,15 +88,42 @@ describe("jobService.getJobs", () => {
 // ── getAllSkills ───────────────────────────────────────────────────────────────
 
 describe("jobService.getAllSkills", () => {
-  it("calls /job/public/skills", async () => {
-    mockedApiClient.get.mockResolvedValue(ok200({ skills: [] }));
+  it("calls /job/public/skills with default pagination", async () => {
+    mockedApiClient.get.mockResolvedValue(ok200({}));
+
     await jobService.getAllSkills();
-    expect(mockedApiClient.get).toHaveBeenCalledWith("/job/public/skills");
+
+    expect(mockedApiClient.get).toHaveBeenCalledWith(
+      "/job/public/skills?page=0&size=10"
+    );
+  });
+
+  it("calls /job/public/skills with page and size", async () => {
+    mockedApiClient.get.mockResolvedValue(ok200({}));
+
+    await jobService.getAllSkills(2, 20);
+
+    expect(mockedApiClient.get).toHaveBeenCalledWith(
+      "/job/public/skills?page=2&size=20"
+    );
+  });
+
+  it("calls /job/public/skills with filter", async () => {
+    mockedApiClient.get.mockResolvedValue(ok200({}));
+
+    await jobService.getAllSkills(0, 10, "Java");
+
+    expect(mockedApiClient.get).toHaveBeenCalledWith(
+      "/job/public/skills?page=0&size=10&filter=name~~'Java'"
+    );
   });
 
   it("throws when status >= 400", async () => {
     mockedApiClient.get.mockResolvedValue(err400);
-    await expect(jobService.getAllSkills()).rejects.toThrow("Failed to fetch skills");
+
+    await expect(jobService.getAllSkills()).rejects.toThrow(
+      "Failed to fetch skills"
+    );
   });
 });
 
