@@ -43,6 +43,10 @@ setup("authenticate as candidate", async ({ page }) => {
       localStorage.setItem("wfa_device_id", id);
       localStorage.setItem("wfa_access_token", token);
       localStorage.setItem("wfa_token_expiry", expiry);
+      localStorage.setItem(
+        "wfa:job-preferences",
+        JSON.stringify({ status: "dismissed", prefs: null, declaredAt: Date.now() }),
+      );
     },
     { token: accessToken, expiry: String(expiresAt), id: deviceId },
   );

@@ -1,6 +1,6 @@
 /**
- * Data setup — candidates submit applications driven by e2e/fixtures/application-definitions.json.
- * Add or remove entries in that file to control how many applications are created.
+ * Data setup — candidates submit applications to every job in e2e/.data/test-jobs.json.
+ * Matching fixture definitions provide role-specific CVs and cover letters.
  * CV files are read from e2e/fixtures/cv/<username>.pdf; falls back to a blank PDF if missing.
  *
  * Writes e2e/.data/test-applications.json for downstream assignment setup and spec assertions.
@@ -9,6 +9,13 @@
 import { test as setup } from '@playwright/test'
 import * as fs from 'fs'
 import * as path from 'path'
+import {
+  buildApplicationPlan,
+  validateTestJobsDocument,
+  type ApplicationDefinition,
+  type HrmKey,
+  type TestJobsDocument,
+} from '../helpers/hrm-test-data'
 
 const DATA_DIR = path.join(__dirname, '../.data')
 const TEST_JOBS_FILE = path.join(DATA_DIR, 'test-jobs.json')
@@ -22,7 +29,7 @@ export interface TestApplicationEntry {
   jobTitle: string
   candidateEmail: string
   candidateNum: number
-  hrmKey: 'hrm1' | 'hrm2'
+  hrmKey: HrmKey
   createdAt: string
 }
 
@@ -119,16 +126,29 @@ async function getExistingApplicationId(
     if (!checkRes.ok()) return null
     const checkJson = await checkRes.json()
     if (!checkJson?.data?.applied) return null
+    if (checkJson?.data?.applicationId) return checkJson.data.applicationId
 
-    // Fetch existing application to get its ID
-    const listRes = await page.request.get(`${apiBase}/application/my?page=0&size=50`, {
-      headers: { Authorization: `Bearer ${auth.accessToken}`, 'X-Device-Id': auth.deviceId },
-    })
-    if (!listRes.ok()) return 'already-applied-unknown-id'
-    const listJson = await listRes.json()
-    const apps: Array<{ id?: string; jobId?: string }> = listJson?.data?.items ?? []
-    const match = Array.isArray(apps) ? apps.find((a) => a.jobId === jobId) : null
-    return match?.id ?? 'already-applied-unknown-id'
+    // Fetch every page until the existing application is found. The CSV-backed
+    // setup can create more than 50 applications per candidate.
+    const pageSize = 50
+    for (let pageIndex = 0; pageIndex < 100; pageIndex++) {
+      const listRes = await page.request.get(
+        `${apiBase}/application/my?page=${pageIndex}&size=${pageSize}`,
+        { headers: { Authorization: `Bearer ${auth.accessToken}`, 'X-Device-Id': auth.deviceId } },
+      )
+      if (!listRes.ok()) return 'already-applied-unknown-id'
+
+      const listJson = await listRes.json()
+      const apps: Array<{ id?: string; jobId?: string }> = listJson?.data?.items ?? []
+      const match = Array.isArray(apps) ? apps.find((application) => application.jobId === jobId) : null
+      if (match?.id) return match.id
+
+      const meta = listJson?.data?.meta
+      if (meta?.hasNext === false || pageIndex + 1 >= (meta?.totalPages ?? 1) || apps.length < pageSize) {
+        break
+      }
+    }
+    return 'already-applied-unknown-id'
   } catch {
     return null
   }
@@ -175,7 +195,8 @@ async function submitApplication(
 }
 
 setup('apply to jobs with all candidates', async ({ page }) => {
-  setup.setTimeout(180_000)
+  // Applications are generated from actual jobs; candidate logins are cached.
+  setup.setTimeout(4_500_000)
 
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true })
 
@@ -184,29 +205,18 @@ setup('apply to jobs with all candidates', async ({ page }) => {
     return
   }
 
-  const { jobs } = JSON.parse(fs.readFileSync(TEST_JOBS_FILE, 'utf-8')) as {
-    jobs: Array<{ jobId: string; jobTitle: string; hrmKey: 'hrm1' | 'hrm2' }>
-  }
+  const testJobsDocument = JSON.parse(fs.readFileSync(TEST_JOBS_FILE, 'utf-8')) as TestJobsDocument
+  validateTestJobsDocument(testJobsDocument)
+  const { jobs } = testJobsDocument
 
   if (!jobs?.length) {
     console.warn('No jobs in test-jobs.json — skipping')
     return
   }
 
-  // Index jobs by hrmKey for O(1) lookup by { hrmKey, index }
-  const jobsByKey: Record<string, Array<{ jobId: string; jobTitle: string; hrmKey: 'hrm1' | 'hrm2' }>> = {
-    hrm1: jobs.filter((j) => j.hrmKey === 'hrm1'),
-    hrm2: jobs.filter((j) => j.hrmKey === 'hrm2'),
-  }
-
-  // Load application definitions from fixture — controls quantity and mapping
+  // Definitions provide role-specific CVs and cover letters for matching fixture jobs.
   const { applications: appDefs } = JSON.parse(fs.readFileSync(FIXTURES_FILE, 'utf-8')) as {
-    applications: Array<{
-      candidateNum: number
-      jobRef: { hrmKey: 'hrm1' | 'hrm2'; index: number }
-      cvFile?: string
-      coverLetter: string
-    }>
+    applications: ApplicationDefinition[]
   }
 
   const API_BASE = readApiBase()
@@ -215,17 +225,14 @@ setup('apply to jobs with all candidates', async ({ page }) => {
     ? JSON.parse(fs.readFileSync(TEST_APPLICATIONS_FILE, 'utf-8')).applications ?? []
     : []
 
-  for (const appDef of appDefs) {
-    const { candidateNum: num, jobRef, coverLetter } = appDef
+  const applicationPlan = buildApplicationPlan(jobs, appDefs)
+  const candidateNumbers = [...new Set(applicationPlan.map((entry) => entry.candidateNum))]
+  const candidateSessions = new Map<
+    number,
+    { email: string; auth: { accessToken: string; deviceId: string } } | null
+  >()
 
-    const jobPool = jobsByKey[jobRef.hrmKey] ?? []
-    // Fallback to first job in the pool if the index doesn't exist
-    const job = jobPool[jobRef.index] ?? jobPool[0]
-    if (!job) {
-      console.warn(`No job for ref { hrmKey: ${jobRef.hrmKey}, index: ${jobRef.index} } — skipping candidate${num}`)
-      continue
-    }
-
+  for (const num of candidateNumbers) {
     const emailKey = `TEST_CANDIDATE${num}_EMAIL`
     const passwordKey = `TEST_CANDIDATE${num}_PASSWORD`
     const email = process.env[emailKey]
@@ -233,11 +240,18 @@ setup('apply to jobs with all candidates', async ({ page }) => {
 
     if (!email || !password) {
       console.warn(`No env vars for candidate${num} — skipping`)
+      candidateSessions.set(num, null)
       continue
     }
 
     const auth = await loginAndGetToken(page, API_BASE, email, password)
-    if (!auth) {
+    candidateSessions.set(num, auth ? { email, auth } : null)
+  }
+
+  for (const plannedApplication of applicationPlan) {
+    const { candidateNum: num, job, coverLetter, cvFile } = plannedApplication
+    const session = candidateSessions.get(num)
+    if (!session) {
       const previousEntry = previousApplications.find(
         (entry) => entry.candidateNum === num && entry.jobId === job.jobId && entry.hrmKey === job.hrmKey,
       )
@@ -247,6 +261,8 @@ setup('apply to jobs with all candidates', async ({ page }) => {
       }
       continue
     }
+
+    const { email, auth } = session
 
     const existingId = await getExistingApplicationId(page, API_BASE, job.jobId, auth)
     if (existingId !== null) {
@@ -263,11 +279,21 @@ setup('apply to jobs with all candidates', async ({ page }) => {
       continue
     }
 
-    const cvBuffer = resolveCvBuffer(email, appDef.cvFile)
-    const applicationId = await submitApplication(page, API_BASE, job.jobId, email, coverLetter, auth, cvBuffer)
+    const cvBuffer = resolveCvBuffer(email, cvFile)
+    const submittedApplicationId = await submitApplication(
+      page,
+      API_BASE,
+      job.jobId,
+      email,
+      coverLetter,
+      auth,
+      cvBuffer,
+    )
+    const applicationId =
+      submittedApplicationId ?? (await getExistingApplicationId(page, API_BASE, job.jobId, auth))
 
     results.push({
-      applicationId,
+      applicationId: applicationId === 'already-applied-unknown-id' ? null : applicationId,
       jobId: job.jobId,
       jobTitle: job.jobTitle,
       candidateEmail: email,

@@ -23,7 +23,7 @@ function formatTime(iso: string) {
 export function HrmCompanyAuditSection({ auditStats, recentAuditErrors = [] }: HrmCompanyAuditSectionProps) {
   if (!auditStats) return <SectionFallback title="Company Audit" />
 
-  const successPct = (auditStats.successRate * 100).toFixed(1)
+  const successPct = (auditStats.successRate).toFixed(1)
   const topActions = Object.entries(auditStats.byAction)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 3)

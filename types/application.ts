@@ -279,6 +279,12 @@ export interface CvRankedApplication {
   explanation: string | null;
   similarityScore: number | null;
   crossScore: number | null;
+  /** Requirements the candidate's CV satisfies, per the AI ranking model. */
+  matchPoints: string[];
+  /** Requirements the candidate's CV does not satisfy, per the AI ranking model. */
+  missPoints: string[];
+  /** Ratio (0-1) of job input fields the AI had available when ranking; null if not reported. */
+  inputCoverage: number | null;
 }
 
 /** Response `data` block from the AI CV ranking endpoint */

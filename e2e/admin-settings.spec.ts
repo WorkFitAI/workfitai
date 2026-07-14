@@ -3,7 +3,7 @@ import { injectAuthToken } from './helpers/inject-auth-token'
 
 test.describe('Admin settings', () => {
   test.beforeEach(async ({ page }) => {
-    await injectAuthToken(page, 'admin@gmail.com', 'password@123', 'admin.json')
+    await injectAuthToken(page, 'admin@workfitai.com', 'admin123', 'admin.json')
   })
 
   test('admin settings renders feature switches', async ({ page }) => {

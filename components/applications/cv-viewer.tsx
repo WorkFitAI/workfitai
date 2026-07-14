@@ -1,10 +1,15 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import dynamic from "next/dynamic";
 import { AlertCircle, Download } from "lucide-react";
 import { applicationService } from "@/lib/application/application-service";
 import { cvService } from "@/lib/cv/cv-service";
 import { LottieLoader } from "@/components/ui/lottie-loader";
+
+const CvPdfHighlightViewer = dynamic(() => import("@/components/applications/cv-pdf-highlight-viewer"), {
+  ssr: false,
+});
 
 interface CvViewerProps {
   /** Use for CVs linked to an application (HRM panel, applied-jobs detail). */
@@ -12,9 +17,11 @@ interface CvViewerProps {
   /** Use for self-uploaded CVs on the My CVs page. */
   objectName?: string;
   fileName?: string;
+  /** AI-matched terms to highlight in the rendered PDF (HRM ranking panel only). */
+  highlightTerms?: string[];
 }
 
-export function CvViewer({ applicationId, objectName, fileName }: CvViewerProps) {
+export function CvViewer({ applicationId, objectName, fileName, highlightTerms }: CvViewerProps) {
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
@@ -99,7 +106,12 @@ export function CvViewer({ applicationId, objectName, fileName }: CvViewerProps)
           {previewError}
         </div>
       )}
-      {blobUrl && !previewError && (
+      {blobUrl && !previewError && highlightTerms && highlightTerms.length > 0 && (
+        <div className="flex-1 min-h-0">
+          <CvPdfHighlightViewer key={blobUrl} blobUrl={blobUrl} highlightTerms={highlightTerms} />
+        </div>
+      )}
+      {blobUrl && !previewError && (!highlightTerms || highlightTerms.length === 0) && (
         <div className="flex-1 min-h-0 rounded-xl border border-gray-200 overflow-hidden">
           <iframe
             src={blobUrl}

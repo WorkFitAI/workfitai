@@ -6,8 +6,9 @@ import { applicationService } from "@/lib/application/application-service";
 import { ApplicationDetailPanel } from "@/components/hrm/application-detail-panel";
 import { AiCvRankingLoader } from "@/components/hrm/ai-cv-ranking-loader";
 import { StatusBadge } from "@/components/hrm/application-table";
+import { CvMatchAnalysis, FIT_LABEL_STYLE } from "@/components/hrm/cv-match-analysis";
 import { useAuth } from "@/contexts/auth-context";
-import type { HRJobItem, CvRankingData, Application } from "@/types/application";
+import type { HRJobItem, CvRankingData, CvRankedApplication } from "@/types/application";
 
 const MAX_RETRIES = 5;
 const RETRY_DELAY_MS = 30000;
@@ -20,13 +21,6 @@ const RANKING_STEPS = [
   "Ranking candidates by fit…",
 ];
 
-const LABEL_STYLE: Record<string, string> = {
-  "Strong Fit": "bg-green-100 text-green-800",
-  "Good Fit": "bg-teal-100 text-teal-800",
-  "Potential Fit": "bg-amber-100 text-amber-800",
-  "No Fit": "bg-gray-100 text-gray-600",
-};
-
 interface Props {
   jobs: HRJobItem[];
 }
@@ -38,7 +32,7 @@ export function AiCvRankingTab({ jobs }: Props) {
   const [stepIdx, setStepIdx] = useState(0);
   const [result, setResult] = useState<CvRankingData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [selectedApp, setSelectedApp] = useState<Application | null>(null);
+  const [selectedItem, setSelectedItem] = useState<CvRankedApplication | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -175,7 +169,7 @@ export function AiCvRankingTab({ jobs }: Props) {
                   <th className="px-4 py-3 text-left font-medium text-gray-500 whitespace-nowrap">Rank</th>
                   <th className="px-4 py-3 text-left font-medium text-gray-500 whitespace-nowrap">Candidate</th>
                   <th className="px-4 py-3 text-left font-medium text-gray-500 whitespace-nowrap">Fit</th>
-                  <th className="px-4 py-3 text-left font-medium text-gray-500">Explanation</th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-500">Match Analysis</th>
                   <th className="px-4 py-3 text-right font-medium text-gray-500 whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
@@ -232,7 +226,7 @@ export function AiCvRankingTab({ jobs }: Props) {
                       ) : item.label ? (
                         <span
                           className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                            LABEL_STYLE[item.label] ?? "bg-gray-100 text-gray-600"
+                            FIT_LABEL_STYLE[item.label] ?? "bg-gray-100 text-gray-600"
                           }`}
                         >
                           {item.label}
@@ -246,7 +240,23 @@ export function AiCvRankingTab({ jobs }: Props) {
                       )}
                     </td>
                     <td className="px-4 py-3 max-w-xs">
-                      {item.explanation ? (
+                      {item.ranked && !isPastRanking ? (
+                        <>
+                          <CvMatchAnalysis
+                            score={item.score}
+                            label={item.label}
+                            similarityScore={item.similarityScore}
+                            crossScore={item.crossScore}
+                            inputCoverage={item.inputCoverage}
+                            matchPoints={item.matchPoints ?? []}
+                            missPoints={item.missPoints ?? []}
+                            variant="table"
+                          />
+                          {item.explanation && (
+                            <p className="mt-1.5 text-[11px] text-gray-400 line-clamp-1">{item.explanation}</p>
+                          )}
+                        </>
+                      ) : item.explanation ? (
                         <p
                           className={`text-xs line-clamp-2 ${
                             !item.ranked && !isPastRanking ? "text-amber-700" : "text-gray-600"
@@ -266,7 +276,7 @@ export function AiCvRankingTab({ jobs }: Props) {
                     </td>
                     <td className="px-4 py-3 text-right">
                       <button
-                        onClick={() => setSelectedApp(item.application)}
+                        onClick={() => setSelectedItem(item)}
                         className="rounded px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors"
                       >
                         View
@@ -291,12 +301,13 @@ export function AiCvRankingTab({ jobs }: Props) {
         </div>
       )}
 
-      {selectedApp && (
+      {selectedItem && (
         <ApplicationDetailPanel
-          application={selectedApp}
+          application={selectedItem.application}
+          rankingInfo={selectedItem}
           currentUsername={user?.username ?? ""}
-          onClose={() => setSelectedApp(null)}
-          onRefresh={() => setSelectedApp(null)}
+          onClose={() => setSelectedItem(null)}
+          onRefresh={() => setSelectedItem(null)}
         />
       )}
     </div>

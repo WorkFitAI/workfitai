@@ -36,8 +36,17 @@ export const jobService = {
     return res;
   },
 
-  async getAllSkills(): Promise<ApiResponse<SkillResponse>> {
-    const res = await apiClient.get(`/job/public/skills`) as ApiResponse<SkillResponse>;
+  async getAllSkills(page = 0, size = 10, search?: string): Promise<ApiResponse<SkillResponse>> {
+    const params = new URLSearchParams();
+    params.append("page", String(page));
+    params.append("size", String(size));
+    if (search?.trim()) {
+      params.append("filter", `name~~'${search.trim()}'`);
+    }
+    const query = params.toString();
+    const res = await apiClient.get(
+      `/job/public/skills${query ? `?${query}` : ""}`
+    ) as ApiResponse<SkillResponse>;
     if (!res.status || res.status >= 400) {
       throw new Error("Failed to fetch skills");
     }

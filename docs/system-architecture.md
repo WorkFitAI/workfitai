@@ -663,6 +663,24 @@ Triggers file download (anchor.download = cv.filename)
 Browser saves PDF locally
 ```
 
+### PDF Rendering & AI Highlighting (HR Review Only)
+
+**Component** (`components/applications/cv-pdf-highlight-viewer.tsx`):
+- Dynamically imported with `ssr: false` (client-only)
+- Renders PDF using react-pdf (v10.4.1)
+- Highlights AI-matched keywords via `lib/cv/highlight-matcher.ts`
+- Integrates into `CvViewer` when `highlightTerms` prop is supplied
+
+**External Dependency**:
+- **PDF.js Worker**: Loaded from CDN (cdnjs.cloudflare.com) at runtime
+- Worker URL derived dynamically from `pdfjs.version` (never hardcoded)
+- No CSP blocks confirmed (no headers() in next.config.ts, no CSP in middleware.ts)
+
+**Highlight Matcher** (`lib/cv/highlight-matcher.ts`):
+- Pure utility for substring matching (case-insensitive, longest-first)
+- Splits text into segments flagging matched/unmatched parts
+- Single text-run matching (multi-run matches across PDF splits require caller coordination)
+
 ## Architecture Decision Records (ADRs)
 
 ### ADR-001: TailwindCSS v4 CSS-First Approach

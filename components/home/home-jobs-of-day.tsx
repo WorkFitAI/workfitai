@@ -64,7 +64,8 @@ export function HomeJobsOfDay() {
                 setJobs(
                   data.recommendations.slice(0, MAX_JOBS).map((r) => ({
                     ...r.job,
-                    matchScore: Math.round(r.score * 100),
+                    matchScore: Math.round((1 / (1 + Math.exp(-r.score / 4.0))) * 100)
+                    // matchScore: Math.round(r.score * 100 - r.score * 22),
                   })),
                 )
               }

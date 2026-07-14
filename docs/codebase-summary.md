@@ -147,6 +147,7 @@ workfitai/
 | tailwind-merge | ^3.4.0 | Merge TailwindCSS class names |
 | tw-animate-css | ^1.4.0 | Animation utilities for TailwindCSS |
 | next-themes | ^0.4.6 | Dark/light mode theme provider |
+| react-pdf | ^10.4.1 | HR-only PDF preview with AI match-term highlighting (client-side rendering) |
 
 ### Forms & Validation
 

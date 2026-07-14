@@ -108,10 +108,48 @@ async function ensurePublished(
   return publishRes.ok()
 }
 
+// Ensure fixture skills exist on this environment — job-form.tsx fetches the
+// skill list once when the dialog mounts and only accepts names present in
+// that list, silently dropping unmatched ones (backend then rejects the job
+// with "Job must have at least one skill").
+async function ensureSkillsExist(
+  page: import('@playwright/test').Page,
+  apiBase: string,
+  auth: LoginResult,
+  skillNames: string[],
+): Promise<void> {
+  try {
+    const existingSkillsRes = await page.request.get(`${apiBase}/job/public/skills`)
+    const existingNames = new Set<string>()
+    if (existingSkillsRes.ok()) {
+      const json = await existingSkillsRes.json()
+      const list: Array<{ name: string }> = json?.data?.result ?? json?.result ?? []
+      list.forEach((s) => existingNames.add(s.name))
+    }
+    for (const name of skillNames) {
+      if (existingNames.has(name)) continue
+      await page.request
+        .post(`${apiBase}/job/public/skills`, {
+          data: { name },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.accessToken}`,
+            'X-Device-Id': auth.deviceId,
+          },
+        })
+        .catch(() => {/* best-effort — form falls back to a free-text tag if this fails */})
+      existingNames.add(name)
+    }
+  } catch {
+    // best-effort — form falls back to a free-text tag if this fails
+  }
+}
+
 async function createJobViaUi(
   page: import('@playwright/test').Page,
   jobData: JobFormData,
   auth: LoginResult,
+  apiBase: string,
 ): Promise<string> {
   const expiresAt = String(Date.now() + auth.expiryInMs)
   await page.addInitScript(
@@ -125,6 +163,7 @@ async function createJobViaUi(
 
   await page.goto('/job-posts')
   await expect(page).toHaveURL(/job-posts/, { timeout: 15_000 })
+  await ensureSkillsExist(page, apiBase, auth, jobData.skills)
 
   const createBtn = page.getByRole('button', { name: /create new job/i })
   await expect(createBtn).toBeVisible({ timeout: 20_000 })
@@ -173,6 +212,14 @@ async function createJobViaUi(
     const categoryOption = page.getByRole('option', { name: jobData.categoryName }).first()
     if (await categoryOption.isVisible({ timeout: 3_000 }).catch(() => false)) {
       await categoryOption.click()
+    } else {
+      // Category doesn't exist on this environment yet — create it inline via the
+      // same "Create <name>" affordance real HR users use (job-category-select.tsx).
+      await page.getByPlaceholder('Search category...').fill(jobData.categoryName)
+      const createOption = page.getByText(`Create "${jobData.categoryName}"`, { exact: true })
+      if (await createOption.isVisible({ timeout: 3_000 }).catch(() => false)) {
+        await createOption.click()
+      }
     }
     await page.waitForTimeout(300)
   }
@@ -277,7 +324,7 @@ setup('create reserved apply-modal job', async ({ page }) => {
   }
 
   const jobDef = JSON.parse(fs.readFileSync(FIXTURE_FILE, 'utf-8')) as JobFormData
-  const jobId = await createJobViaUi(page, jobDef, hrmAuth)
+  const jobId = await createJobViaUi(page, jobDef, hrmAuth, apiBase)
 
   const published = await ensurePublished(page, apiBase, jobId, hrmAuth)
   if (!published) throw new Error(`Reserved apply-modal job was created but not published: ${jobId}`)

@@ -107,7 +107,9 @@ describe("HomeJobsOfDay", () => {
     expect(mockedJobService.getRecommendedJobs).toHaveBeenCalledWith(10);
     expect(mockedJobService.getJobs).not.toHaveBeenCalled();
     expect(screen.getByText("AI-Powered Picks For You")).toBeInTheDocument();
-    expect(screen.getByText("90% Match")).toBeInTheDocument();
+    // Component maps raw score through a sigmoid (score/4.0) before display,
+    // so a 0.9 score renders as 56%, not a direct 90%.
+    expect(screen.getByText("56% Match")).toBeInTheDocument();
   });
 
   it("falls back to the public jobs list when the candidate has no recommendations yet", async () => {

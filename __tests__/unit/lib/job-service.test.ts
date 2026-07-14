@@ -79,10 +79,19 @@ describe("jobService.getJobs", () => {
 // ── getAllSkills ───────────────────────────────────────────────────────────────
 
 describe("jobService.getAllSkills", () => {
-  it("calls /job/public/skills", async () => {
+  it("calls /job/public/skills with default page and size", async () => {
     mockedApiClient.get.mockResolvedValue(ok200({ skills: [] }));
     await jobService.getAllSkills();
-    expect(mockedApiClient.get).toHaveBeenCalledWith("/job/public/skills");
+    expect(mockedApiClient.get).toHaveBeenCalledWith("/job/public/skills?page=0&size=10");
+  });
+
+  it("appends filter to query string when search is provided", async () => {
+    mockedApiClient.get.mockResolvedValue(ok200({ skills: [] }));
+    await jobService.getAllSkills(0, 50, "java");
+    const url: string = mockedApiClient.get.mock.calls[0][0] as string;
+    expect(url).toContain("page=0");
+    expect(url).toContain("size=50");
+    expect(url).toContain("filter=");
   });
 
   it("throws when status >= 400", async () => {

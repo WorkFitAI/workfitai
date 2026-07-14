@@ -12,7 +12,7 @@ import {
   vi,
 } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
-import { http } from "msw";
+import { http, delay } from "msw";
 import { server } from "../mocks/server";
 import { apiStatusSuccess, mockJobItem } from "../mocks/handlers";
 import JobsPageClient from "@/components/jobs/jobs-page-client";
@@ -76,10 +76,25 @@ describe("JobsPageClient", () => {
   });
 
   it("shows loading state then job list", async () => {
+    // Without an artificial delay the mocked response can resolve within the
+    // same synchronous render flush, so the loading state would never be
+    // observable — delay it so the initial "loading" render is guaranteed.
+    server.use(
+      http.get(`${API}/job/public/jobs`, async () => {
+        await delay(50);
+        return apiStatusSuccess({
+          result: [mockJobItem(), mockJobItem({ postId: "job-002", title: "Backend Engineer" })],
+          meta: { page: 0, pageSize: 12, pages: 1, total: 2 },
+        });
+      }),
+    );
+
     render(<JobsPageClient />);
 
-    // Loading text appears immediately
-    expect(screen.getByText(/loading/i)).toBeInTheDocument();
+    // Loading text appears immediately. Matched by exact text — the sidebar's
+    // skills filter also renders its own transient "Loading..." button, so a
+    // loose /loading/i regex matches both and is ambiguous.
+    expect(screen.getByText("Loading jobs...")).toBeInTheDocument();
 
     // Jobs appear after fetch
     await waitFor(() =>

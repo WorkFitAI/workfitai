@@ -1,11 +1,19 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { SlidersHorizontal, SearchX } from "lucide-react";
+import { toast } from "sonner";
+
 import { useJobs } from "@/hooks/useJobs";
 import { useJobFilters } from "@/hooks/useJobFilters";
+import { useJobPreferences } from "@/hooks/useJobPreferences";
+import { useAuth } from "@/contexts/auth-context";
 
 import JobsHeadPage from "@/components/jobs/head-page";
 import JobList from "@/components/jobs/job-list";
 import JobNavbar from "@/components/jobs/job-navbar";
+import JobPreferencesModal from "@/components/jobs/preferences/job-preferences-modal";
 
 import {
   Pagination,
@@ -15,22 +23,88 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Button } from "@/components/ui/button";
 import { getPagination } from "@/lib/utils";
-import { SearchX } from "lucide-react";
+import {
+  applyPreferencesToParams,
+  hasAnyFilterParams,
+} from "@/lib/job/job-preferences-to-params";
+import { JobPreferences } from "@/types/job-preferences";
+
+const HR_ROLES = ["ROLE_ADMIN", "ROLE_HR", "ROLE_HR_MANAGER"];
 
 export default function JobsPageClient() {
   const { page, pageSize, filters, buildUrl } = useJobFilters();
 
   const { jobs, totalPages, total, loading } = useJobs(page, pageSize, filters);
 
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { user, isAuthenticated } = useAuth();
+
+  const {
+    isReady,
+    hasResponded,
+    declaredPrefs,
+    isModalOpen,
+    openModal,
+    closeModal,
+    save,
+    dismiss,
+  } = useJobPreferences();
+
+  const isHrOrAdmin =
+    isAuthenticated && (user?.roles ?? []).some((role) => HR_ROLES.includes(role));
+
+  // Auto-apply saved preferences once, only when the URL has no filter params of its own
+  // (a deep link or manually-set filter should always win over stored preferences).
+  const autoAppliedRef = useRef(false);
+  useEffect(() => {
+    if (autoAppliedRef.current || !isReady) return;
+    autoAppliedRef.current = true;
+
+    if (declaredPrefs && !hasAnyFilterParams(searchParams)) {
+      const params = applyPreferencesToParams(declaredPrefs, searchParams);
+      router.replace(`?${params.toString()}`);
+    }
+  }, [isReady, declaredPrefs, searchParams, router]);
+
+  // First-run prompting lives in the global JobPreferencesOnboarding gate
+  // (candidate layout) so it fires on the first visit to any page, not only
+  // here. This page keeps only the "Edit preferences" entry point below.
+
+  const handleSavePreferences = (prefs: JobPreferences) => {
+    save(prefs);
+
+    const params = applyPreferencesToParams(prefs, searchParams);
+    router.replace(`?${params.toString()}`);
+
+    toast.success("Preferences saved! We've updated your job search.");
+  };
+
+  // First-run "Skip" should suppress future prompts; canceling an edit of
+  // already-declared preferences must NOT overwrite them — just close.
+  const handleModalClose = declaredPrefs ? closeModal : dismiss;
+
   return (
     <div className="container mx-auto max-w-[1278px] px-4 py-10">
-      <JobsHeadPage />
+      <JobsHeadPage total={total} />
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-10">
         {/* Sidebar */}
         <aside className="md:col-span-3 self-start sticky top-24">
-          <div className="max-h-[calc(100vh-96px)] overflow-y-auto pr-2">
+          <div className="max-h-[calc(100vh-96px)] overflow-y-auto pr-2 space-y-4">
+            {!isHrOrAdmin && (
+              <Button
+                variant="outline"
+                onClick={openModal}
+                className="w-full justify-start gap-2 border-slate-200"
+              >
+                <SlidersHorizontal className="w-4 h-4 text-blue-500" />
+                {hasResponded ? "Edit job preferences" : "Set job preferences"}
+              </Button>
+            )}
+
             <JobNavbar />
           </div>
         </aside>
@@ -117,6 +191,13 @@ export default function JobsPageClient() {
         )}
       </main>
       </div>
+
+      <JobPreferencesModal
+        open={isModalOpen}
+        initialPreferences={declaredPrefs}
+        onSave={handleSavePreferences}
+        onClose={handleModalClose}
+      />
     </div>
   );
 }

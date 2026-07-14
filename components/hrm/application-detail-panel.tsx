@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { StatusBadge } from "./application-table";
 import { StatusUpdateModal } from "./status-update-modal";
 import { NotesPanel } from "./notes-panel";
 import { StatusTimeline } from "./status-timeline";
 import { CvViewer } from "@/components/applications/cv-viewer";
+import { CvMatchAnalysis } from "@/components/hrm/cv-match-analysis";
 import { useApplicationNotes, useStatusUpdate, useStatusHistory } from "@/hooks/useApplicationManagement";
-import type { Application } from "@/types/application";
+import type { Application, CvRankedApplication } from "@/types/application";
 
 interface ApplicationDetailPanelProps {
   application: Application;
@@ -15,6 +17,8 @@ interface ApplicationDetailPanelProps {
   onClose: () => void;
   onRefresh: () => void;
   canUpdateStatus?: boolean;
+  /** Present only when opened from the AI CV ranking tab — drives the AI Match Analysis section. */
+  rankingInfo?: CvRankedApplication;
 }
 
 export function ApplicationDetailPanel({
@@ -23,6 +27,7 @@ export function ApplicationDetailPanel({
   onClose,
   onRefresh,
   canUpdateStatus = true,
+  rankingInfo,
 }: ApplicationDetailPanelProps) {
   const [showStatusModal, setShowStatusModal] = useState(false);
 
@@ -40,6 +45,10 @@ export function ApplicationDetailPanel({
   const { history, loading: historyLoading, error: historyError } = useStatusHistory(application.id);
 
   const snap = application.jobSnapshot;
+  // Mirrors ai-cv-ranking-tab.tsx's isPastRanking: HIRED/OFFER rows keep ranked=true
+  // but the table mutes their ranking UI, so the panel must match that behavior.
+  const isPastRanking = application.status === "HIRED" || application.status === "OFFER";
+  const showRankingInfo = rankingInfo?.ranked && !isPastRanking;
 
   return (
     <>
@@ -75,11 +84,43 @@ export function ApplicationDetailPanel({
           <div className="flex flex-1 overflow-hidden min-h-0">
             {/* Left pane — scrollable details */}
             <div className="w-100 shrink-0 overflow-y-auto border-r border-gray-100 p-6 space-y-6">
+              {/* AI Match Analysis — only when opened from the ranking tab, and not for HIRED/OFFER (table mutes those too) */}
+              {showRankingInfo && (
+                <section>
+                  <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">AI Match Analysis</h3>
+                  <div className="rounded-xl border border-gray-200 p-4">
+                    <CvMatchAnalysis
+                      score={rankingInfo.score}
+                      label={rankingInfo.label}
+                      similarityScore={rankingInfo.similarityScore}
+                      crossScore={rankingInfo.crossScore}
+                      inputCoverage={rankingInfo.inputCoverage}
+                      matchPoints={rankingInfo.matchPoints ?? []}
+                      missPoints={rankingInfo.missPoints ?? []}
+                      variant="panel"
+                    />
+                  </div>
+                </section>
+              )}
+
               {/* Job info */}
               <section>
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Job Details</h3>
                 <div className="rounded-xl border border-gray-200 p-4 space-y-2">
-                  <div className="font-semibold text-gray-900">{snap?.title}</div>
+                  <div className="font-semibold text-gray-900">
+                    {application.jobId ? (
+                      <Link
+                        href={`/jobs/${application.jobId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-blue-600 hover:underline transition-colors"
+                      >
+                        {snap?.title}
+                      </Link>
+                    ) : (
+                      snap?.title
+                    )}
+                  </div>
                   <div className="text-sm text-gray-500">{snap?.companyName} · {snap?.location}</div>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {snap?.employmentType && (
@@ -151,7 +192,11 @@ export function ApplicationDetailPanel({
             {/* Right pane — CV preview fills full height */}
             <div className="flex-1 flex flex-col overflow-hidden p-6">
               <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 shrink-0">CV / Resume</h3>
-              <CvViewer applicationId={application.id} fileName={application.cvFileName} />
+              <CvViewer
+                applicationId={application.id}
+                fileName={application.cvFileName}
+                highlightTerms={showRankingInfo ? rankingInfo?.matchPoints : undefined}
+              />
             </div>
           </div>
 

@@ -55,7 +55,7 @@ export function CandidateFooter() {
           <p className="text-sm text-muted-foreground">
             &copy; {new Date().getFullYear()} WorkfitAI. All right reserved.
           </p>
-          <div className="flex items-center gap-4">
+          {/* <div className="flex items-center gap-4">
             <select aria-label="Language" className="bg-transparent text-sm text-muted-foreground outline-none">
               <option>🇺🇸 English</option>
               <option>🇻🇳 Vietnamese</option>
@@ -64,7 +64,7 @@ export function CandidateFooter() {
               <option>USD</option>
               <option>VND</option>
             </select>
-          </div>
+          </div> */}
         </div>
       </div>
     </footer>

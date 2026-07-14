@@ -36,13 +36,13 @@ export const useJobs = (
     const buildCondition = (key: string, values?: string[]) => {
       if (!values || values.length === 0) return;
 
-      if (key === "skillNames") {
+      if (key === "skills.name") {
         const list = values.map((v) => `'${v}'`).join(",");
         conditions.push(`${key} in [${list}]`);
         return;
       }
 
-      if (values.length === 1 && key !== "skillNames") {
+      if (values.length === 1) {
         conditions.push(`${key}:'${values[0]}'`);
       } else {
         const list = values.map((v) => `'${v}'`).join(",");

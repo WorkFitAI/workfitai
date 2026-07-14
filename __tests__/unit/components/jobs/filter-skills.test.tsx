@@ -46,30 +46,37 @@ describe("FilterSkills", () => {
     vi.clearAllMocks();
   });
 
-  it("fetches skills and shows only the first five with a show more toggle", async () => {
-    mockedJobService.getAllSkills.mockResolvedValue({
-      data: {
-        result: [
-          { skillId: 1, name: "React" },
-          { skillId: 2, name: "Next.js" },
-          { skillId: 3, name: "TypeScript" },
-          { skillId: 4, name: "Tailwind CSS" },
-          { skillId: 5, name: "Node.js" },
-          { skillId: 6, name: "PostgreSQL" },
-        ],
-        meta: skillResponseMeta,
-      },
+  it("fetches skills page by page and appends the next page on show more", async () => {
+    mockedJobService.getAllSkills.mockImplementation(async (page = 0) => {
+      if (page === 0) {
+        return {
+          data: {
+            result: [
+              { skillId: 1, name: "React" },
+              { skillId: 2, name: "Next.js" },
+            ],
+            meta: { page: 0, pages: 2, total: 3 },
+          },
+        };
+      }
+      return {
+        data: {
+          result: [{ skillId: 3, name: "PostgreSQL" }],
+          meta: { page: 1, pages: 2, total: 3 },
+        },
+      };
     });
 
     render(<FilterSkills />);
 
     expect(await screen.findByText("React")).toBeInTheDocument();
-    expect(screen.getByText("Node.js")).toBeInTheDocument();
+    expect(screen.getByText("Next.js")).toBeInTheDocument();
     expect(screen.queryByText("PostgreSQL")).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /show more/i }));
 
-    expect(screen.getByText("PostgreSQL")).toBeInTheDocument();
+    expect(await screen.findByText("PostgreSQL")).toBeInTheDocument();
+    expect(mockedJobService.getAllSkills).toHaveBeenLastCalledWith(1, 10, undefined);
   });
 
   it("updates the skillNames query when a skill is checked", async () => {
@@ -93,14 +100,19 @@ describe("FilterSkills", () => {
   });
 
   it("allows adding a skill when no result matches the search", async () => {
-    mockedJobService.getAllSkills.mockResolvedValue({
+    // Model eventual consistency: once created, a Kubernetes skill exists
+    // server-side, so any later unfiltered refetch (e.g. triggered by the
+    // search box clearing after add) must include it too.
+    let createdSkill: { skillId: number; name: string } | null = null;
+    mockedJobService.getAllSkills.mockImplementation(async () => ({
       data: {
-        result: [],
+        result: createdSkill ? [createdSkill] : [],
         meta: skillResponseMeta,
       },
-    });
-    mockedJobService.createSkill.mockResolvedValue({
-      data: { skillId: 99, name: "Kubernetes" },
+    }));
+    mockedJobService.createSkill.mockImplementation(async () => {
+      createdSkill = { skillId: 99, name: "Kubernetes" };
+      return { data: createdSkill };
     });
 
     render(<FilterSkills />);

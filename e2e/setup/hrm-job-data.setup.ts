@@ -73,6 +73,37 @@ setup("create and publish test job as HRM1", async ({ page }) => {
     // login pre-injection failed — page will attempt cookie-based refresh on first 401
   }
 
+  // Ensure fixture skills exist on this environment — job-form.tsx fetches the
+  // skill list once when the dialog mounts and only accepts names present in
+  // that list, silently dropping unmatched ones (backend then rejects the job
+  // with "Job must have at least one skill").
+  if (accessToken) {
+    try {
+      const existingSkillsRes = await page.request.get(`${API_BASE}/job/public/skills`);
+      const existingNames = new Set<string>();
+      if (existingSkillsRes.ok()) {
+        const json = await existingSkillsRes.json();
+        const list: Array<{ name: string }> = json?.data?.result ?? json?.result ?? [];
+        list.forEach((s) => existingNames.add(s.name));
+      }
+      for (const skillName of jobDef.skills) {
+        if (existingNames.has(skillName)) continue;
+        await page.request
+          .post(`${API_BASE}/job/public/skills`, {
+            data: { name: skillName },
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${accessToken}`,
+              "X-Device-Id": deviceId,
+            },
+          })
+          .catch(() => {/* best-effort — form falls back to a free-text tag if this fails */});
+      }
+    } catch {
+      // best-effort — form falls back to a free-text tag if this fails
+    }
+  }
+
   await page.goto("/job-posts");
   await expect(page).toHaveURL(/job-posts/, { timeout: 15_000 });
 
@@ -158,6 +189,14 @@ setup("create and publish test job as HRM1", async ({ page }) => {
     const categoryOption = page.getByRole("option", { name: jobDef.categoryName }).first();
     if (await categoryOption.isVisible({ timeout: 3_000 }).catch(() => false)) {
       await categoryOption.click();
+    } else {
+      // Category doesn't exist on this environment yet — create it inline via the
+      // same "Create <name>" affordance real HR users use (job-category-select.tsx).
+      await page.getByPlaceholder("Search category...").fill(jobDef.categoryName);
+      const createOption = page.getByText(`Create "${jobDef.categoryName}"`, { exact: true });
+      if (await createOption.isVisible({ timeout: 3_000 }).catch(() => false)) {
+        await createOption.click();
+      }
     }
     await page.waitForTimeout(300);
   }

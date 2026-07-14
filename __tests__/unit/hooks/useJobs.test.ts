@@ -88,6 +88,16 @@ describe("useJobs", () => {
     expect(filter).toContain("skills.name in ['React','TypeScript']");
   });
 
+  it("builds `skills.name in [...]` filter for a single skill (not equality)", async () => {
+    mockJobSvc.getJobs.mockResolvedValue(mockJobData as never);
+
+    renderHook(() => useJobs(1, 4, { skillNames: ["Java"] }));
+
+    await waitFor(() => expect(mockJobSvc.getJobs).toHaveBeenCalled());
+    const { filter } = mockJobSvc.getJobs.mock.calls[0][0];
+    expect(filter).toBe("skills.name in ['Java']");
+  });
+
   it("builds hrName filter using createdBy field", async () => {
     mockJobSvc.getJobs.mockResolvedValue(mockJobData as never);
 

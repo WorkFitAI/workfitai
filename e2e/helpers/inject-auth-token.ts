@@ -57,6 +57,7 @@ export async function injectAuthToken(
     const normalizedRoles = ((roles as string[]) ?? []).map((r: string) =>
       r.startsWith("ROLE_") ? r : `ROLE_${r}`,
     );
+    const shouldDismissJobPreferences = normalizedRoles.includes("ROLE_CANDIDATE");
     const session = {
       username,
       roles: normalizedRoles,
@@ -69,11 +70,27 @@ export async function injectAuthToken(
     // Inject wfa_access_token so client-side API calls don't need a refresh round-trip
     const expiresAt = String(Date.now() + (expiryInMs ?? 900_000));
     await page.addInitScript(
-      ({ token, expiry }: { token: string; expiry: string }) => {
+      ({ token, expiry, dismissJobPreferences }: {
+        token: string;
+        expiry: string;
+        dismissJobPreferences: boolean;
+      }) => {
         localStorage.setItem("wfa_access_token", token);
         localStorage.setItem("wfa_token_expiry", expiry);
+        if (
+          dismissJobPreferences &&
+          sessionStorage.getItem("wfa:e2e-onboarding-seeded") !== "true"
+        ) {
+          if (!localStorage.getItem("wfa:job-preferences")) {
+            localStorage.setItem(
+              "wfa:job-preferences",
+              JSON.stringify({ status: "dismissed", prefs: null, declaredAt: Date.now() }),
+            );
+          }
+          sessionStorage.setItem("wfa:e2e-onboarding-seeded", "true");
+        }
       },
-      { token: accessToken, expiry: expiresAt },
+      { token: accessToken, expiry: expiresAt, dismissJobPreferences: shouldDismissJobPreferences },
     );
   } catch {
     // Login failed — fall back to cookie-based auth from storageState
